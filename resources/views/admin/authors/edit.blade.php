@@ -1,8 +1,13 @@
+<<<<<<< HEAD
 {{-- @extends('layouts.app') --}}
+=======
+@extends('admin.layouts.app')
+>>>>>>> origin/pham-tien-duc
 
 @section('content')
 <h1>Sửa Tác giả</h1>
 
+<<<<<<< HEAD
 {{-- Hiển thị thông báo --}}
 @if(session('success'))
     <div style="color: green;">{{ session('success') }}</div>
@@ -15,6 +20,11 @@
                 <li>{{ $error }}</li>
             @endforeach
         </ul>
+=======
+@if($errors->any())
+    <div style="color: red;">
+        <ul>@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>
+>>>>>>> origin/pham-tien-duc
     </div>
 @endif
 

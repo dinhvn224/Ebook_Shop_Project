@@ -9,7 +9,8 @@ class AuthorController extends Controller
 {
     public function index()
     {
-        $authors = Author::paginate(10); // đã được lọc tự động
+
+        $authors = Author::paginate(10);
         return view('admin.authors.index', compact('authors'));
     }
 
@@ -21,7 +22,8 @@ class AuthorController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+
+            'name' => 'required|string|max:100',
         ]);
 
         Author::create([
@@ -41,7 +43,8 @@ class AuthorController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+        'name' => 'required|string|max:255',
+
         ]);
 
         $author = Author::withoutGlobalScopes()->findOrFail($id);
@@ -57,4 +60,12 @@ class AuthorController extends Controller
 
         return redirect()->route('admin.authors.index')->with('success', 'Tác giả đã được ẩn');
     }
+    public function restore($id)
+    {
+        $author = Author::withoutGlobalScopes()->findOrFail($id);
+        $author->update(['deleted' => false]);
+
+        return redirect()->route('admin.authors.index')->with('success', 'Tác giả đã được khôi phục');
+    }
+
 }

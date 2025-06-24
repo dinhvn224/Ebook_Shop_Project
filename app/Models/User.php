@@ -21,6 +21,12 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'phone_number',
+        'address',
+        'birth_date',
+        'avatar_url',
+        'role',
+        'is_active',
     ];
 
     /**
@@ -41,8 +47,18 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
+            'birth_date' => 'date',
+            'is_active' => 'boolean',
             'password' => 'hashed',
         ];
+    }
+     public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isUser(): bool
+    {
+        return $this->role === 'user';
     }
 }

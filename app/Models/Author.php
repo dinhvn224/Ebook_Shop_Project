@@ -13,7 +13,6 @@ class Author extends Model
         'deleted' => 'boolean',
     ];
 
-    // Tự động ẩn tác giả đã bị đánh dấu xóa
     protected static function booted()
     {
         static::addGlobalScope('not_deleted', function ($builder) {
