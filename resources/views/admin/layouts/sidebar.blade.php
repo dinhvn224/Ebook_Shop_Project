@@ -3,11 +3,11 @@
                 <div id="sidebar-menu" class="sidebar-menu">
                     <ul>
                         <li class="active">
-                            <a href="index.html"><img src="assets/img/icons/dashboard.svg" alt="img"><span>
+                            <a href="index.html"><img src="{{ asset('assets/img/icons/dashboard.svg') }}" alt="img"><span>
                                     Bảng điều khiển</span> </a>
                         </li>
                         <li class="submenu">
-                            <a href="javascript:void(0);"><img src="assets/img/icons/product.svg" alt="img"><span>
+                            <a href="javascript:void(0);"><img src="{{ asset('assets/img/icons/product.svg') }}" alt="img"><span>
                                     Sản phẩm</span> <span class="menu-arrow"></span></a>
                             <ul>
                                 <li><a href="productlist.html">Danh sách sản phẩm</a></li>
@@ -15,7 +15,15 @@
 
                             </ul>
                         </li>
+                        <li class="submenu">
+                            <a href="javascript:void(0);"><img src="{{ asset('assets/img/icons/product.svg') }}" alt="img"><span>
+                                    Quản lý tác giả</span> <span class="menu-arrow"></span></a>
+                            <ul>
+                                <li><a href="{{ route('admin.authors.index') }}">Danh sách sản phẩm</a></li>
+                                <li><a href="addproduct.html">Thêm sản phẩm</a></li>
 
+                            </ul>
+                        </li>
                         <li>
                             <a href="components.html"><i data-feather="layers"></i><span> Thành phần</span> </a>
                         </li>
@@ -103,7 +111,7 @@
                             </ul>
                         </li>
                         <li class="submenu">
-                            <a href="javascript:void(0);"><img src="assets/img/icons/product.svg" alt="img"><span>
+                            <a href="javascript:void(0);"><img src="{{ asset('assets/img/icons/product.svg') }}" alt="img"><span>
                                     Ứng dụng</span> <span class="menu-arrow"></span></a>
                             <ul>
                                 <li><a href="chat.html">Chat</a></li>
@@ -113,7 +121,7 @@
                         </li>
 
                         <li class="submenu">
-                            <a href="javascript:void(0);"><img src="assets/img/icons/users1.svg" alt="img"><span>
+                            <a href="javascript:void(0);"><img src="{{ asset('assets/img/icons/users1.svg') }}" alt="img"><span>
                                     Người dùng</span> <span class="menu-arrow"></span></a>
                             <ul>
                                 <li><a href="newuser.html">Người dùng mới </a></li>
@@ -121,7 +129,7 @@
                             </ul>
                         </li>
                         <li class="submenu">
-                            <a href="javascript:void(0);"><img src="assets/img/icons/settings.svg" alt="img"><span>
+                            <a href="javascript:void(0);"><img src="{{ asset('assets/img/icons/settings.svg') }}" alt="img"><span>
                                     Cài đặt</span> <span class="menu-arrow"></span></a>
                             <ul>
                                 <li><a href="generalsettings.html">Cài đặt chung</a></li>

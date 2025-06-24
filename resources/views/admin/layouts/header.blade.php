@@ -30,10 +30,10 @@
                             <div class="searchinputs">
                                 <input type="text" placeholder="Tìm kiếm...">
                                 <div class="search-addon">
-                                    <span><img src="assets/img/icons/closes.svg" alt="img"></span>
+                                    <span><img src="{{ asset('assets/img/icons/closes.svg') }}" alt="img"></span>
                                 </div>
                             </div>
-                            <a class="btn" id="searchdiv"><img src="assets/img/icons/search.svg" alt="img"></a>
+                            <a class="btn" id="searchdiv"><img src="{{ asset('assets/img/icons/search.svg') }}" alt="img"></a>
                         </form>
                     </div>
                 </li>
@@ -42,20 +42,20 @@
                 <li class="nav-item dropdown has-arrow flag-nav">
                     <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="javascript:void(0);"
                         role="button">
-                        <img src="assets/img/flags/us1.png" alt="" height="20">
+                        <img src="{{ asset('assets/img/flags/us1.png') }}" alt="" height="20">
                     </a>
                     <div class="dropdown-menu dropdown-menu-right">
                         <a href="javascript:void(0);" class="dropdown-item">
-                            <img src="assets/img/flags/us.png" alt="" height="16"> Tiếng Anh
+                            <img src="{{ asset('assets/img/flags/us.png') }}" alt="" height="16"> Tiếng Anh
                         </a>
                         <a href="javascript:void(0);" class="dropdown-item">
-                            <img src="assets/img/flags/fr.png" alt="" height="16"> Tiếng Pháp
+                            <img src="{{ asset('assets/img/flags/fr.png') }}" alt="" height="16"> Tiếng Pháp
                         </a>
                         <a href="javascript:void(0);" class="dropdown-item">
-                            <img src="assets/img/flags/es.png" alt="" height="16"> Tiếng Tây Ban Nha
+                            <img src="{{ asset('assets/img/flags/es.png') }}" alt="" height="16"> Tiếng Tây Ban Nha
                         </a>
                         <a href="javascript:void(0);" class="dropdown-item">
-                            <img src="assets/img/flags/de.png" alt="" height="16"> Tiếng Đức
+                            <img src="{{ asset('assets/img/flags/de.png') }}" alt="" height="16"> Tiếng Đức
                         </a>
                     </div>
                 </li>
@@ -63,7 +63,7 @@
 
                 <li class="nav-item dropdown">
                     <a href="javascript:void(0);" class="dropdown-toggle nav-link" data-bs-toggle="dropdown">
-                        <img src="assets/img/icons/notification-bing.svg" alt="img"> <span
+                        <img src="{{ asset('assets/img/icons/notification-bing.svg') }}" alt="img"> <span
                             class="badge rounded-pill">4</span>
                     </a>
                     <div class="dropdown-menu notifications">
@@ -77,7 +77,7 @@
                                     <a href="activities.html">
                                         <div class="media d-flex">
                                             <span class="avatar flex-shrink-0">
-                                                <img alt="" src="assets/img/profiles/avatar-02.jpg">
+                                                <img alt="" src="{{ asset('assets/img/profiles/avatar-02.jpg') }}">
                                             </span>
                                             <div class="media-body flex-grow-1">
                                                 <p class="noti-details"><span class="noti-title">John Doe</span> đã thêm
@@ -93,7 +93,7 @@
                                     <a href="activities.html">
                                         <div class="media d-flex">
                                             <span class="avatar flex-shrink-0">
-                                                <img alt="" src="assets/img/profiles/avatar-03.jpg">
+                                                <img alt="" src="{{ asset('assets/img/profiles/avatar-03.jpg') }}">
                                             </span>
                                             <div class="media-body flex-grow-1">
                                                 <p class="noti-details"><span class="noti-title">Tarah Shropshire</span>
@@ -109,7 +109,7 @@
                                     <a href="activities.html">
                                         <div class="media d-flex">
                                             <span class="avatar flex-shrink-0">
-                                                <img alt="" src="assets/img/profiles/avatar-06.jpg">
+                                                <img alt="" src="{{ asset('assets/img/profiles/avatar-06.jpg') }}">
                                             </span>
                                             <div class="media-body flex-grow-1">
                                                 <p class="noti-details"><span class="noti-title">Misty Tison</span>
@@ -126,7 +126,7 @@
                                     <a href="activities.html">
                                         <div class="media d-flex">
                                             <span class="avatar flex-shrink-0">
-                                                <img alt="" src="assets/img/profiles/avatar-17.jpg">
+                                                <img alt="" src="{{ asset('assets/img/profiles/avatar-17.jpg') }}">
                                             </span>
                                             <div class="media-body flex-grow-1">
                                                 <p class="noti-details"><span class="noti-title">Rolland Webber</span>
@@ -142,7 +142,7 @@
                                     <a href="activities.html">
                                         <div class="media d-flex">
                                             <span class="avatar flex-shrink-0">
-                                                <img alt="" src="assets/img/profiles/avatar-13.jpg">
+                                                <img alt="" src="{{ asset('assets/img/profiles/avatar-13.jpg') }}">
                                             </span>
                                             <div class="media-body flex-grow-1">
                                                 <p class="noti-details"><span class="noti-title">Bernardo Galaviz</span>
@@ -165,13 +165,13 @@
 
                 <li class="nav-item dropdown has-arrow main-drop">
                     <a href="javascript:void(0);" class="dropdown-toggle nav-link userset" data-bs-toggle="dropdown">
-                        <span class="user-img"><img src="assets/img/profiles/avator1.jpg" alt="">
+                        <span class="user-img"><img src="{{ asset('assets/img/profiles/avator1.jpg') }}" alt="">
                             <span class="status online"></span></span>
                     </a>
                     <div class="dropdown-menu menu-drop-user">
                         <div class="profilename">
                             <div class="profileset">
-                                <span class="user-img"><img src="assets/img/profiles/avator1.jpg" alt="">
+                                <span class="user-img"><img src="{{ asset('assets/img/profiles/avator1.jpg') }}" alt="">
                                     <span class="status online"></span></span>
                                 <div class="profilesets">
                                     <h6>John Doe</h6>
@@ -186,7 +186,7 @@
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
                                 <button type="submit" class="dropdown-item logout pb-0" style="border: none; background: none;">
-                                    <img src="assets/img/icons/log-out.svg" class="me-2" alt="img">Đăng xuất
+                                    <img src="{{ asset('assets/img/icons/log-out.svg') }}" class="me-2" alt="img">Đăng xuất
                                 </button>
                             </form>
                         </div>
