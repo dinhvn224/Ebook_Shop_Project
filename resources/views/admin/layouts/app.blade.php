@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -12,51 +11,53 @@
     <meta name="robots" content="noindex, nofollow">
     <title>Mẫu quản trị Dreams Pos</title>
 
-    <link rel="shortcut icon" type="image/x-icon" href="assets/img/favicon.jpg">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('assets/img/favicon.jpg') }}">
 
-    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
-
-    <link rel="stylesheet" href="assets/css/animate.css">
-
-    <link rel="stylesheet" href="assets/css/dataTables.bootstrap4.min.css">
-
-    <link rel="stylesheet" href="assets/plugins/fontawesome/css/fontawesome.min.css">
-    <link rel="stylesheet" href="assets/plugins/fontawesome/css/all.min.css">
-
-    <link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="{{ asset('assets/css/bootstrap.min.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/css/animate.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/css/dataTables.bootstrap4.min.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/plugins/fontawesome/css/fontawesome.min.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/plugins/fontawesome/css/all.min.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
+<style>
+    .page-wrapper {
+        margin-left: 250px; /* Đảm bảo bằng chiều rộng sidebar */
+        min-height: 100vh;
+        background: #f8f9fa;
+        padding: 30px 20px 20px 20px;
+    }
+    @media (max-width: 991.98px) {
+        .page-wrapper {
+            margin-left: 0;
+            padding: 15px 5px;
+        }
+    }
+</style>
 </head>
 <body>
-<!-- Left Panel -->
-    @include('admin.layouts.sidebar')
-    <!-- /#left-panel -->
+    <div class="main-wrapper">
+        {{-- Sidebar --}}
+        @include('admin.layouts.sidebar')
 
-    <!-- Right Panel -->
-    <div id="right-panel" class="right-panel">
-        <!-- Header-->
-        @include('admin.layouts.header')
-        <!-- /#header -->
+        <div class="page-wrapper">
+            {{-- Header --}}
+            @include('admin.layouts.header')
 
-        <!-- Content -->
-        <div class="content">
-            @yield('content')
+            {{-- Main Content --}}
+            <div class="content" style="margin-top: 30px;">
+                @yield('content')
+            </div>
         </div>
-        <!-- /.content -->
-
-        <div class="clearfix"></div>
     </div>
-    <script src="assets/js/jquery-3.6.0.min.js"></script>
 
-    <script src="assets/js/feather.min.js"></script>
+    <script src="{{ asset('assets/js/jquery-3.6.0.min.js') }}"></script>
+<script src="{{ asset('assets/js/feather.min.js') }}"></script>
+<script src="{{ asset('assets/js/jquery.slimscroll.min.js') }}"></script>
+<script src="{{ asset('assets/js/jquery.dataTables.min.js') }}"></script>
+<script src="{{ asset('assets/js/dataTables.bootstrap4.min.js') }}"></script>
+<script src="{{ asset('assets/js/bootstrap.bundle.min.js') }}"></script>
+<script src="{{ asset('assets/plugins/apexchart/apexcharts.min.js') }}"></script>
+<script src="{{ asset('assets/plugins/apexchart/chart-data.js') }}"></script>
+<script src="{{ asset('assets/js/script.js') }}"></script>
 
-    <script src="assets/js/jquery.slimscroll.min.js"></script>
-
-    <script src="assets/js/jquery.dataTables.min.js"></script>
-    <script src="assets/js/dataTables.bootstrap4.min.js"></script>
-
-    <script src="assets/js/bootstrap.bundle.min.js"></script>
-
-    <script src="assets/plugins/apexchart/apexcharts.min.js"></script>
-    <script src="assets/plugins/apexchart/chart-data.js"></script>
-
-    <script src="assets/js/script.js"></script>
 </body>
