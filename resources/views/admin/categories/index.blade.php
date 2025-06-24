@@ -1,74 +1,42 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản Lý Danh Mục - Admin</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
-</head>
-<body>
+@extends('admin.layouts.app')
 
-    <div class="container mt-4">
+@section('content')
+<h1>Danh sách Danh Mục</h1>
+<a href="{{ route('admin.categories.create') }}" class="btn btn-primary mb-3">Thêm mới danh mục</a>
 
-        <h1>Quản Lý Danh Mục</h1>
+@if(session('success'))
+    <div class="alert alert-success">{{ session('success') }}</div>
+@endif
 
-        <!-- Thông báo thành công -->
-        @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        @endif
+<table class="table table-bordered table-striped">
+    <thead class="thead-dark">
+        <tr>
+            <th>ID</th>
+            <th>Tên</th>
+            <th>Ngày tạo</th>
+            <th>Hành động</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach($categories as $category)
+        <tr>
+            <td>{{ $category->id }}</td>
+            <td>{{ $category->name }}</td>
+            <td>{{ $category->created_at->format('d/m/Y H:i') }}</td>
+            <td>
+                <a href="{{ route('admin.categories.edit', $category->id) }}" class="btn btn-warning btn-sm">Sửa</a>
+                <form action="{{ route('admin.categories.destroy', $category->id) }}" method="POST" style="display:inline-block;">
+                    @csrf
+                    @method('DELETE')
+                    <button class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc muốn xóa danh mục này?')">Xóa</button>
+                </form>
+            </td>
+        </tr>
+        @endforeach
+    </tbody>
+</table>
 
-        <!-- Nút thêm danh mục mới -->
-        <a href="{{ route('admin.categories.create') }}" class="btn btn-success mb-3">Thêm Mới Danh Mục</a>
-
-        <!-- Bảng danh sách danh mục -->
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>STT</th>
-                    <th>Tên</th>
-                    <th>Ngày Tạo</th>
-                    <th>Trạng thái</th>
-                    <th>Hành động</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($categories as $category)
-                <tr>
-                    <td>{{ $loop->iteration }}</td>
-                    <td>{{ $category->name }}</td>
-                    <td>{{ $category->created_at }}</td>
-                    <td>
-                        <span class="badge {{ $category->deleted ? 'bg-secondary' : 'bg-success' }}">
-                            {{ $category->deleted ? 'Ẩn' : 'Hiển thị' }}
-                        </span>
-                    </td>
-                    <td>
-                        <a href="{{ route('admin.categories.edit', $category->id) }}" class="btn btn-warning">Sửa</a>
-                        <!-- Form xóa danh mục -->
-                        <form class="d-inline" method="POST" action="{{ route('admin.categories.destroy', $category->id) }}" onsubmit="return confirm('Xóa bản ghi này?')" style="display:inline;">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger">Xóa</button>
-                        </form>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-
-        <!-- Phân trang -->
-        <div>
-            {{ $categories->links() }} <!-- Hiển thị phân trang -->
-        </div>
-
-    </div>
-
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-
-</body>
-</html>
+<div class="mt-3">
+    {{ $categories->links() }}
+</div>
+@endsection

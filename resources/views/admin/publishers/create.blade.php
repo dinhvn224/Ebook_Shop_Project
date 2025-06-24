@@ -1,40 +1,29 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thêm Mới Nhà Sản Xuất</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
-</head>
-<body>
+@extends('admin.layouts.app')
 
-    <div class="container mt-4">
-        <h1>Thêm Mới Nhà Sản Xuất</h1>
+@section('content')
+    <h1 class="mb-4">Thêm Nhà Sản Xuất</h1>
 
-        <!-- Thông báo thành công hoặc lỗi -->
-        @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        @endif
+    @if(session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
 
-        <!-- Form thêm nhà sản xuất -->
-        <form action="{{ route('admin.publishers.store') }}" method="POST">
-            @csrf
-            <div class="mb-3">
-                <label for="name" class="form-label">Tên</label>
-                <input type="text" name="name" class="form-control" required>
-            </div>
+    @if($errors->any())
+        <div class="alert alert-danger">
+            <ul class="mb-0">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
-            <button type="submit" class="btn btn-primary">Tạo Nhà Sản Xuất</button>
-        </form>
-
-    </div>
-
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-
-</body>
-</html>
+    <form action="{{ route('admin.publishers.store') }}" method="POST" class="w-50">
+        @csrf
+        <div class="mb-3">
+            <label for="name" class="form-label">Tên nhà sản xuất:</label>
+            <input type="text" name="name" id="name" value="{{ old('name') }}" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Lưu</button>
+        <a href="{{ route('admin.publishers.index') }}" class="btn btn-secondary">Hủy</a>
+    </form>
+@endsection
