@@ -15,15 +15,6 @@
 
                             </ul>
                         </li>
-                        <li class="submenu">
-                            <a href="javascript:void(0);"><img src="{{ asset('assets/img/icons/product.svg') }}" alt="img"><span>
-                                    Quản lý tác giả</span> <span class="menu-arrow"></span></a>
-                            <ul>
-                                <li><a href="{{ route('admin.authors.index') }}">Danh sách sản phẩm</a></li>
-                                <li><a href="addproduct.html">Thêm sản phẩm</a></li>
-
-                            </ul>
-                        </li>
                         <li>
                             <a href="components.html"><i data-feather="layers"></i><span> Thành phần</span> </a>
                         </li>
