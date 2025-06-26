@@ -1,14 +1,16 @@
 <?php
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\AuthorController;
-use App\Http\Controllers\Admin\PublisherController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\PublisherController;
 Route::prefix('admin')->name('admin.')->group(function() {
    Route::resource('publishers', PublisherController::class)->except(['show']);
     Route::post('publishers/{id}/restore', [PublisherController::class, 'restore'])->name('publishers.restore');
       Route::resource('categories', CategoryController::class);
     Route::post('categories/{id}/restore', [CategoryController::class, 'restore'])->name('categories.restore');
+    Route::resource('users', UserController::class)->except(['show']);
 
     Route::resource('authors', AuthorController::class)->except(['show']);
     Route::post('authors/{id}/restore', [AuthorController::class, 'restore'])->name('authors.restore');
@@ -25,4 +27,6 @@ Route::middleware(['auth', 'role:user'])->get('/home', function () {
 
 Route::middleware(['auth', 'role:admin'])->get('/admin', function () {
     return view('admin.dashboard');
+
 })->name('admin.dashboard');
+
