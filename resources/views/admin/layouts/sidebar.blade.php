@@ -24,7 +24,6 @@
 
                             </ul>
                         </li>
-<<<<<<< HEAD
                         <li class="submenu">
                             <a href="javascript:void(0);"><img src="{{ asset('assets/img/icons/product.svg') }}" alt="img"><span>
                                     Quản lý tác giả</span> <span class="menu-arrow"></span></a>
@@ -52,8 +51,7 @@
 
                             </ul>
                         </li>
-=======
->>>>>>> 35c862e1052ee3edc79421e0ab98d20714cb357a
+
                         <li>
                             <a href="components.html"><i data-feather="layers"></i><span> Thành phần</span> </a>
                         </li>
