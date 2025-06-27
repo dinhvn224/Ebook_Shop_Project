@@ -51,6 +51,7 @@
 
                             </ul>
                         </li>
+
                         <li>
                             <a href="components.html"><i data-feather="layers"></i><span> Thành phần</span> </a>
                         </li>
@@ -151,8 +152,8 @@
                             <a href="javascript:void(0);"><img src="{{ asset('assets/img/icons/users1.svg') }}" alt="img"><span>
                                     Người dùng</span> <span class="menu-arrow"></span></a>
                             <ul>
-                                <li><a href="newuser.html">Người dùng mới </a></li>
-                                <li><a href="userlists.html">Danh sách người dùng</a></li>
+                                <li><a href="{{ route('admin.users.create') }}">Người dùng mới </a></li>
+                                <li><a href="{{ route('admin.users.index') }}">Danh sách người dùng</a></li>
                             </ul>
                         </li>
                         <li class="submenu">

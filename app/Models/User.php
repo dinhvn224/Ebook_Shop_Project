@@ -44,14 +44,14 @@ class User extends Authenticatable
         return $this->role === 'user';
     }
 
-    public static function boot()
-    {
-        parent::boot();
+    // public static function boot()
+    // {
+    //     parent::boot();
 
-        static::saving(function ($user) {
-            if (isset($user->password) && !empty($user->password)) {
-                $user->password = Hash::make($user->password);  // Mã hóa mật khẩu
-            }
-        });
-    }
+    //     static::saving(function ($user) {
+    //         if (isset($user->password) && !empty($user->password)) {
+    //             $user->password = Hash::make($user->password);  // Mã hóa mật khẩu
+    //         }
+    //     });
+    // }
 }
