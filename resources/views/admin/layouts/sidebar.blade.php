@@ -8,11 +8,10 @@
                         </li>
                         <li class="submenu">
                             <a href="javascript:void(0);"><img src="{{ asset('assets/img/icons/product.svg') }}" alt="img"><span>
-                                    Sản phẩm</span> <span class="menu-arrow"></span></a>
+                                    Quản lý sách</span> <span class="menu-arrow"></span></a>
                             <ul>
-                                <li><a href="productlist.html">Danh sách sản phẩm</a></li>
-                                <li><a href="addproduct.html">Thêm sản phẩm</a></li>
-
+                                <li><a href="{{ route('admin.books.index') }}">Danh sách sách</a></li>
+                                <li><a href="{{ route('admin.books.create') }}">Thêm sách mới</a></li>
                             </ul>
                         </li>
                         <li class="submenu">
