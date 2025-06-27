@@ -6,6 +6,15 @@
                             <a href="index.html"><img src="{{ asset('assets/img/icons/dashboard.svg') }}" alt="img"><span>
                                     Bảng điều khiển</span> </a>
                         </li>
+                         <li class="submenu">
+                            <a href="javascript:void(0);"><img src="{{ asset('assets/img/icons/product.svg') }}" alt="img"><span>
+                                    Quản lý danh mục</span> <span class="menu-arrow"></span></a>
+                            <ul>
+                                <li><a href="{{ route('admin.categories.index') }}">Danh mục</a></li>
+
+
+                            </ul>
+                        </li>
                         <li class="submenu">
                             <a href="javascript:void(0);"><img src="{{ asset('assets/img/icons/product.svg') }}" alt="img"><span>
                                     Quản lý sách</span> <span class="menu-arrow"></span></a>
@@ -18,9 +27,34 @@
                             <a href="javascript:void(0);"><img src="{{ asset('assets/img/icons/product.svg') }}" alt="img"><span>
                                     Quản lý tác giả</span> <span class="menu-arrow"></span></a>
                             <ul>
-                                <li><a href="{{ route('admin.authors.index') }}">Danh sách sản phẩm</a></li>
-                                <li><a href="addproduct.html">Thêm sản phẩm</a></li>
+                                <li><a href="{{ route('admin.authors.index') }}">Danh sách tác giả</a></li>
 
+
+                            </ul>
+                        </li>
+                         <li class="submenu">
+                            <a href="javascript:void(0);"><img src="{{ asset('assets/img/icons/product.svg') }}" alt="img"><span>
+                                    Quản lý người dùng</span> <span class="menu-arrow"></span></a>
+                            <ul>
+                                <li><a href="{{ route('admin.users.index') }}">Danh sách người dùng</a></li>
+
+
+                            </ul>
+                        </li>
+                        <li class="submenu">
+                            <a href="javascript:void(0);"><img src="{{ asset('assets/img/icons/product.svg') }}" alt="img"><span>
+                                    Quản lý nhà sản xuất</span> <span class="menu-arrow"></span></a>
+                            <ul>
+                                <li><a href="{{ route('admin.publishers.index') }}">Danh sách nhà sản xuất</a></li>
+
+
+                            </ul>
+                        </li>
+                        <li class="submenu">
+                            <a href="javascript:void(0);"><img src="{{ asset('assets/img/icons/product.svg') }}" alt="img"><span>
+                                    Quản lý đánh giá</span> <span class="menu-arrow"></span></a>
+                            <ul>
+                                <li><a href="{{ route('admin.reviews.index') }}">Danh sách đánh giá</a></li>
                             </ul>
                         </li>
                         <li>
@@ -123,8 +157,8 @@
                             <a href="javascript:void(0);"><img src="{{ asset('assets/img/icons/users1.svg') }}" alt="img"><span>
                                     Người dùng</span> <span class="menu-arrow"></span></a>
                             <ul>
-                                <li><a href="newuser.html">Người dùng mới </a></li>
-                                <li><a href="userlists.html">Danh sách người dùng</a></li>
+                                <li><a href="{{ route('admin.users.create') }}">Người dùng mới </a></li>
+                                <li><a href="{{ route('admin.users.index') }}">Danh sách người dùng</a></li>
                             </ul>
                         </li>
                         <li class="submenu">

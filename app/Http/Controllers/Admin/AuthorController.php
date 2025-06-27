@@ -42,7 +42,7 @@ class AuthorController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'name' => 'required|string|max:100',
+            'name' => 'required|string|max:255',
         ]);
 
         $author = Author::withoutGlobalScopes()->findOrFail($id);
@@ -56,7 +56,7 @@ class AuthorController extends Controller
         $author = Author::withoutGlobalScopes()->findOrFail($id);
         $author->update(['deleted' => true]);
 
-        return redirect()->route('admin.authors.index')->with('success', 'Tác giả đã được ẩn');
+        return redirect()->route('admin.authors.index')->with('success', 'Tác giả đã bị xóa');
     }
 
     public function restore($id)

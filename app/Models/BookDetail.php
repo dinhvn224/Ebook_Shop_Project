@@ -2,20 +2,35 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Book;
 
 class BookDetail extends Model
 {
-    protected $table = 'book_details';
+    use HasFactory;
 
     protected $fillable = [
-        'book_id', 'language', 'size', 'publish_year', 'total_pages', 'description', 'quantity', 'price', 'promotion_price', 'is_active', 'deleted'
+        'book_id',
+        'language',
+        'size',
+        'publish_year',
+        'total_pages',
+        'description',
+        'quantity',
+        'price',
+        'promotion_price',
+        'is_active',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
-        'deleted' => 'boolean',
+        'publish_year' => 'integer',
+        'total_pages' => 'integer',
+        'quantity' => 'integer',
+        'price' => 'float',
+        'promotion_price' => 'float',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     public function book()

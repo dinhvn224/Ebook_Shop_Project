@@ -2,57 +2,39 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Hash;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
         'name',
         'email',
-        'password',
-        'phone_number',
-        'address',
-        'birth_date',
-        'avatar_url',
-        'role',
-        'is_active',
+        'password',  // Sử dụng password
+        'phone_number',  // Cập nhật thành phone_number
+        'avatar_url',  // Để lưu URL ảnh đại diện
+        'role',  // Vai trò 'user' hoặc 'admin'
+        'is_active',  // Trạng thái 'active' hoặc 'inactive'
+        'birth_date',  // Thêm trường birth_date
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
-        'password',
+        'password',  // Ẩn mật khẩu khi trả về dữ liệu
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'birth_date' => 'date',
-            'is_active' => 'boolean',
-            'password' => 'hashed',
-        ];
-    }
-     public function isAdmin(): bool
+    protected $casts = [
+        'is_active' => 'boolean',
+        'birth_date' => 'date',  // Đảm bảo xử lý ngày sinh như kiểu date
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
+    public function isAdmin(): bool
     {
         return $this->role === 'admin';
     }
@@ -61,4 +43,15 @@ class User extends Authenticatable
     {
         return $this->role === 'user';
     }
+
+    // public static function boot()
+    // {
+    //     parent::boot();
+
+    //     static::saving(function ($user) {
+    //         if (isset($user->password) && !empty($user->password)) {
+    //             $user->password = Hash::make($user->password);  // Mã hóa mật khẩu
+    //         }
+    //     });
+    // }
 }
