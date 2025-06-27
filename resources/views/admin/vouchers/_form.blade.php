@@ -1,3 +1,7 @@
+@extends('layouts.admin')
+
+@section('content')
+
 @if($errors->any())
   <div class="alert alert-danger">
     <ul class="mb-0">
@@ -62,14 +66,14 @@
       value="{{ old('expires_at', isset($voucher->expires_at) ? optional($voucher->expires_at)->format('Y-m-d\TH:i') : '') }}">
   </div>
 
-  {{-- ✅ Kích hoạt switch --}}
+  {{-- Kích hoạt switch --}}
   <div class="form-check form-switch mb-3">
     <input class="form-check-input" type="checkbox" role="switch" name="is_active" value="1"
       {{ old('is_active', $voucher->is_active ?? true) ? 'checked' : '' }}>
     <label class="form-check-label">Kích hoạt voucher</label>
   </div>
 
-  {{-- ✅ Chọn sản phẩm --}}
+  {{-- Chọn sản phẩm --}}
   @if(isset($allProducts))
     <div class="mb-3">
       <label>Áp dụng cho sản phẩm</label>
@@ -89,10 +93,11 @@
   <a href="{{ route('admin.vouchers.index') }}" class="btn btn-secondary">↩️ Quay lại</a>
 </form>
 
-{{-- Script tạo mã ngẫu nhiên --}}
 <script>
 function generateCode() {
   const rand = 'SALE' + Math.floor(1000 + Math.random() * 9000);
   document.querySelector('[name="code"]').value = rand;
 }
 </script>
+
+@endsection

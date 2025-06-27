@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('admin.layouts.app')
 
 @section('content')
 <h2>Chi tiết đơn hàng #{{ $order->id }}</h2>
@@ -45,20 +45,24 @@
 
 <h5 class="mt-4">🎯 Tổng thanh toán: <strong class="text-success">{{ number_format($order->final_amount) }}đ</strong></h5>
 
-<form method="POST" action="{{ route('orders.update', $order->id) }}" class="mt-4">
+<form method="POST" action="{{ route('admin.orders.update', $order->id) }}" class="mt-4">
     @csrf
     @method('PUT')
 
-    <div class="form-group">
-        <label for="status">Cập nhật trạng thái:</label>
-        <select name="status" class="form-control" id="status">
-            @foreach(['PENDING', 'PAID', 'COMPLETED', 'CANCELLED', 'REFUNDED'] as $status)
-                <option value="{{ $status }}" @if($order->status === $status) selected @endif>{{ $status }}</option>
-            @endforeach
-        </select>
-    </div>
+    <div class="row g-3 align-items-center">
+        <div class="col-md-4">
+            <label for="status" class="form-label">Cập nhật trạng thái:</label>
+            <select name="status" class="form-select" id="status">
+                @foreach(['PENDING', 'PAID', 'COMPLETED', 'CANCELLED', 'REFUNDED'] as $status)
+                    <option value="{{ $status }}" @if($order->status === $status) selected @endif>{{ $status }}</option>
+                @endforeach
+            </select>
+        </div>
 
-    <button type="submit" class="btn btn-success mt-2">Cập nhật</button>
-    <a href="{{ route('orders.index') }}" class="btn btn-outline-primary mt-3">← Quay về danh sách đơn</a>
+        <div class="col-md-8 d-flex align-items-end gap-2">
+            <button type="submit" class="btn btn-success">Cập nhật</button>
+            <a href="{{ route('admin.orders.index') }}" class="btn btn-outline-primary">← Quay về danh sách đơn</a>
+        </div>
+    </div>
 </form>
 @endsection

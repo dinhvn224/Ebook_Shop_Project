@@ -41,7 +41,9 @@ class CounterSaleController extends Controller
             'order_date' => now(),
         ]);
 
-        return redirect()->route('counter.index')->with('success', "Đã tạo đơn hàng tại quầy #$order->id");
+        // ✅ Đã sửa route
+        return redirect()->route('admin.counter.index')
+            ->with('success', "Đã tạo đơn hàng tại quầy #$order->id");
     }
 
     public function show(Order $order)
@@ -70,72 +72,68 @@ class CounterSaleController extends Controller
         return back()->with('success', 'Cập nhật trạng thái đơn thành công!');
     }
 
-public function addItem(Request $request)
-{
-    $request->validate([
-        'order_id' => 'required|exists:orders,id',
-    ]);
-
-    // Nếu form cũ: chọn 1 sản phẩm
-    if ($request->has('ebook_variant_id')) {
+    public function addItem(Request $request)
+    {
         $request->validate([
-            'ebook_variant_id' => 'required|exists:book_details,id',
-            'quantity' => 'required|integer|min:1',
+            'order_id' => 'required|exists:orders,id',
         ]);
 
-        $bookIds = [$request->ebook_variant_id];
-        $quantities = [$request->ebook_variant_id => $request->quantity];
-    }
-    // Nếu form mới: chọn nhiều sản phẩm
-    else {
-        $request->validate([
-            'products' => 'required|array',
-            'products.*' => 'exists:book_details,id',
-            'quantities' => 'required|array',
-        ]);
-
-        $bookIds = $request->products;
-        $quantities = $request->quantities;
-    }
-
-    $order = Order::findOrFail($request->order_id);
-
-    foreach ($bookIds as $bookId) {
-        $qty = (int) ($quantities[$bookId] ?? 1);
-        $bookDetail = BookDetail::findOrFail($bookId);
-
-        if ($bookDetail->quantity < $qty) {
-            return back()->with('error', "Sản phẩm [ID: $bookId] không đủ tồn kho!");
-        }
-
-        $existing = OrderItem::withTrashed()
-            ->where('order_id', $request->order_id)
-            ->where('ebook_variant_id', $bookId)
-            ->first();
-
-        if ($existing) {
-            $existing->increment('quantity', $qty);
-            if ($existing->trashed()) {
-                $existing->restore();
-            }
-        } else {
-            OrderItem::create([
-                'order_id' => $request->order_id,
-                'ebook_variant_id' => $bookId,
-                'quantity' => $qty,
-                'price' => $bookDetail->price,
-                'promotion_price' => $bookDetail->promotion_price > 0 ? $bookDetail->promotion_price : null,
+        if ($request->has('ebook_variant_id')) {
+            $request->validate([
+                'ebook_variant_id' => 'required|exists:book_details,id',
+                'quantity' => 'required|integer|min:1',
             ]);
+
+            $bookIds = [$request->ebook_variant_id];
+            $quantities = [$request->ebook_variant_id => $request->quantity];
+        } else {
+            $request->validate([
+                'products' => 'required|array',
+                'products.*' => 'exists:book_details,id',
+                'quantities' => 'required|array',
+            ]);
+
+            $bookIds = $request->products;
+            $quantities = $request->quantities;
         }
 
-        $bookDetail->decrement('quantity', $qty);
+        $order = Order::findOrFail($request->order_id);
+
+        foreach ($bookIds as $bookId) {
+            $qty = (int) ($quantities[$bookId] ?? 1);
+            $bookDetail = BookDetail::findOrFail($bookId);
+
+            if ($bookDetail->quantity < $qty) {
+                return back()->with('error', "Sản phẩm [ID: $bookId] không đủ tồn kho!");
+            }
+
+            $existing = OrderItem::withTrashed()
+                ->where('order_id', $request->order_id)
+                ->where('ebook_variant_id', $bookId)
+                ->first();
+
+            if ($existing) {
+                $existing->increment('quantity', $qty);
+                if ($existing->trashed()) {
+                    $existing->restore();
+                }
+            } else {
+                OrderItem::create([
+                    'order_id' => $request->order_id,
+                    'ebook_variant_id' => $bookId,
+                    'quantity' => $qty,
+                    'price' => $bookDetail->price,
+                    'promotion_price' => $bookDetail->promotion_price > 0 ? $bookDetail->promotion_price : null,
+                ]);
+            }
+
+            $bookDetail->decrement('quantity', $qty);
+        }
+
+        $this->recalculateOrderTotal($request->order_id);
+
+        return back()->with('success', 'Thêm sản phẩm thành công!');
     }
-
-    $this->recalculateOrderTotal($request->order_id);
-
-    return back()->with('success', 'Thêm sản phẩm thành công!');
-}
-
 
     public function updateItem(Request $request, OrderItem $item)
     {
@@ -191,12 +189,10 @@ public function addItem(Request $request)
             'shipping_address' => $request->shipping_address ?: $order->shipping_address,
         ]);
 
-        return redirect()->route('counter.receipt', $order->id)
+        // ✅ Đã sửa route
+        return redirect()->route('admin.counter.receipt', $order->id)
             ->with('success', "Đã thanh toán đơn hàng #$order->id");
     }
-
-
-
 
     private function recalculateOrderTotal($orderId)
     {

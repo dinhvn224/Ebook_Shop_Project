@@ -1,38 +1,126 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Admin\OrderController;
-use App\Http\Controllers\Admin\CounterSaleController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Admin\{
+    UserController,
+    AuthorController,
+    CategoryController,
+    PublisherController,
+    OrderController,
+    CounterSaleController,
+    VoucherController,
+    VoucherProductController
+};
 
+//
+// 🌐 PUBLIC CLIENT ROUTES
+//
+Route::get('/', fn() => view('client.home'))->name('home');
 
-Route::prefix('admin')->group(function () {
-    Route::resource('orders', OrderController::class)
-        ->only(['index', 'show', 'update', 'destroy']);
+Route::middleware(['auth', 'role:user'])->get('/home', fn() => view('client.home'))
+    ->name('home.user');
+
+//
+// 🔐 AUTH ROUTES
+//
+Route::controller(AuthController::class)->group(function () {
+    Route::get('/login', 'showLoginForm')->name('login');
+    Route::post('/login', 'login');
+    Route::get('/register', 'showRegisterForm')->name('register');
+    Route::post('/register', 'register');
+    Route::post('/logout', 'logout')->name('logout');
 });
 
+//
+// 🛠 ADMIN DASHBOARD
+//
+Route::middleware(['auth', 'role:ADMIN'])->get('/admin', fn() => view('admin.dashboard'))
+    ->name('admin.dashboard');
+
+//
+// ⚙️ ADMIN CORE ROUTES
+//
+Route::prefix('admin')
+    ->as('admin.')
+    ->middleware(['auth', 'role:ADMIN'])
+    ->group(function () {
+
+        // 👤 Users
+        Route::resource('users', UserController::class)->except(['show']);
+
+        // ✍️ Authors
+        Route::resource('authors', AuthorController::class)->except(['show']);
+        Route::post('authors/{id}/restore', [AuthorController::class, 'restore'])
+            ->name('authors.restore');
+
+        // 🗂 Categories
+        Route::resource('categories', CategoryController::class);
+        Route::post('categories/{id}/restore', [CategoryController::class, 'restore'])
+            ->name('categories.restore');
+
+        // 📚 Publishers
+        Route::resource('publishers', PublisherController::class)->except(['show']);
+        Route::post('publishers/{id}/restore', [PublisherController::class, 'restore'])
+            ->name('publishers.restore');
+
+        // 🧾 Orders
+        Route::resource('orders', OrderController::class)
+            ->only(['index', 'show', 'update', 'destroy']);
+
+        // 🎫 Vouchers
+        Route::resource('vouchers', VoucherController::class);
+
+        // 🏷 Voucher-Product Mapping
+        Route::prefix('voucher-products')->as('voucher-products.')->group(function () {
+            Route::get('/', [VoucherProductController::class, 'index'])->name('index');
+            Route::post('/attach', [VoucherProductController::class, 'attach'])->name('attach');
+            Route::post('/detach', [VoucherProductController::class, 'detach'])->name('detach');
+        });
+
+        //
+    });
 
 
-Route::prefix('admin/counter-sale')->name('counter.')->group(function () {
-    Route::get('/', [CounterSaleController::class, 'index'])->name('index');
-    Route::post('/create', [CounterSaleController::class, 'createOrder'])->name('createOrder');
-    Route::get('/{order}', [CounterSaleController::class, 'show'])->name('show');
-    Route::put('/update-status/{order}', [CounterSaleController::class, 'updateStatus'])->name('updateStatus');
+Route::prefix('admin')
+    ->as('admin.')
+    ->middleware(['auth', 'role:ADMIN'])
+    ->group(function () {
 
-    Route::post('/add-item', [CounterSaleController::class, 'addItem'])->name('addItem');
-    Route::put('/update-item/{item}', [CounterSaleController::class, 'updateItem'])->name('updateItem');
-    Route::delete('/delete-item/{item}', [CounterSaleController::class, 'deleteItem'])->name('deleteItem');
+        // 💵 ROUTES cho quản lý đơn hàng tại quầy
+        Route::prefix('counter-sale')
+            ->as('counter.')
+            ->controller(CounterSaleController::class)
+            ->group(function () {
 
-    Route::post('/checkout/{order}', [CounterSaleController::class, 'checkout'])->name('checkout');
-    Route::get('/receipt/{order}', [CounterSaleController::class, 'receipt'])->name('receipt');
-    Route::get('/pdf/{order}', [CounterSaleController::class, 'exportPdf'])->name('pdf');
-});
+                // 📄 Trang danh sách đơn hàng
+                Route::get('/', 'index')->name('index');
 
-Route::prefix('admin')->name('admin.')->group(function () {
-    Route::resource('vouchers', \App\Http\Controllers\Admin\VoucherController::class);
-});
+                // ➕ Tạo đơn mới
+                Route::post('/create', 'createOrder')->name('createOrder');
 
-Route::prefix('admin')->name('admin.')->group(function () {
-    Route::get('voucher-products', [\App\Http\Controllers\Admin\VoucherProductController::class, 'index'])->name('voucher-products');
-    Route::post('voucher-products/attach', [\App\Http\Controllers\Admin\VoucherProductController::class, 'attach'])->name('voucher-products.attach');
-    Route::post('voucher-products/detach', [\App\Http\Controllers\Admin\VoucherProductController::class, 'detach'])->name('voucher-products.detach');
-});
+                // 👁 Xem chi tiết đơn
+                Route::get('/{order}', 'show')->name('show');
+
+                // 🔄 Cập nhật trạng thái đơn hàng (PENDING, PAID, CANCELLED...)
+                Route::put('/update-status/{order}', 'updateStatus')->name('updateStatus');
+
+                // 🛒 Thêm sản phẩm vào đơn
+                Route::post('/add-item', 'addItem')->name('addItem');
+
+                // ✏️ Cập nhật số lượng sản phẩm
+                Route::put('/update-item/{item}', 'updateItem')->name('updateItem');
+
+                // 🗑 Xóa sản phẩm khỏi đơn
+                Route::delete('/delete-item/{item}', 'deleteItem')->name('deleteItem');
+
+                // 💳 Thanh toán đơn
+                Route::post('/checkout/{order}', 'checkout')->name('checkout');
+
+                // 🖨 In hóa đơn (HTML)
+                Route::get('/receipt/{order}', 'receipt')->name('receipt');
+
+                // ⬇️ Xuất hóa đơn PDF
+                Route::get('/pdf/{order}', 'exportPdf')->name('pdf');
+            });
+    });
