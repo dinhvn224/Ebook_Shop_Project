@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('vouchers', function (Blueprint $table) {
-            $table->softDeletes(); // Tạo cột deleted_at (datetime nullable)
+            if (!Schema::hasColumn('vouchers', 'deleted_at')) {
+                $table->timestamp('deleted_at')->nullable();
+            }
         });
     }
 

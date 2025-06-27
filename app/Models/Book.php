@@ -16,4 +16,9 @@ class Book extends Model
     {
         return $this->hasMany(BookDetail::class);
     }
+
+    public function book()
+    {
+        return $this->belongsTo(\App\Models\Book::class);
+    }
 }

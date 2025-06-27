@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\{
     PublisherController,
     OrderController,
     CounterSaleController,
+    DashboardController,
     VoucherController,
     VoucherProductController
 };
@@ -124,3 +125,5 @@ Route::prefix('admin')
                 Route::get('/pdf/{order}', 'exportPdf')->name('pdf');
             });
     });
+
+Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');

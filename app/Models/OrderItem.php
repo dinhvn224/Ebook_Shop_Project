@@ -24,4 +24,6 @@ class OrderItem extends Model
     {
         return $this->belongsTo(BookDetail::class, 'ebook_variant_id');
     }
+
+
 }

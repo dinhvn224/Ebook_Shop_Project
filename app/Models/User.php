@@ -2,15 +2,18 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Notifications\Notification;
 
 class User extends Authenticatable
 {
     use HasFactory, Notifiable, SoftDeletes;
+
+    const ROLE_ADMIN = 'ADMIN';
+    const ROLE_USER  = 'USER';
 
     protected $fillable = [
         'name',
@@ -21,21 +24,22 @@ class User extends Authenticatable
         'birth_date',
         'avatar_url',
         'role',
-        'is_active'
+        'is_active',
     ];
 
     protected $hidden = [
-        'password',  // Ẩn mật khẩu khi trả về dữ liệu
+        'password',
         'remember_token',
     ];
 
     protected $casts = [
-        'is_active' => 'boolean',
-        'birth_date' => 'date',  // Đảm bảo xử lý ngày sinh như kiểu date
+        'is_active'  => 'boolean',
+        'birth_date' => 'date',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
 
+    // ================= RELATIONS =================
 
     public function orders()
     {
@@ -49,13 +53,25 @@ class User extends Authenticatable
             ->withTimestamps();
     }
 
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
+    }
+
+    // ================= HELPERS =================
+
     public function isAdmin(): bool
     {
-        return $this->role === 'admin';
+        return $this->role === self::ROLE_ADMIN;
     }
 
     public function isUser(): bool
     {
-        return $this->role === 'user';
+        return $this->role === self::ROLE_USER;
+    }
+
+    public function getAvatarUrlAttribute($value)
+    {
+        return $value ?: 'https://ui-avatars.com/api/?name=' . urlencode($this->name);
     }
 }
