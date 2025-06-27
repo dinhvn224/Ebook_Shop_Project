@@ -51,7 +51,13 @@
 
                             </ul>
                         </li>
-
+                        <li class="submenu">
+                            <a href="javascript:void(0);"><img src="{{ asset('assets/img/icons/product.svg') }}" alt="img"><span>
+                                    Quản lý đánh giá</span> <span class="menu-arrow"></span></a>
+                            <ul>
+                                <li><a href="{{ route('admin.reviews.index') }}">Danh sách đánh giá</a></li>
+                            </ul>
+                        </li>
                         <li>
                             <a href="components.html"><i data-feather="layers"></i><span> Thành phần</span> </a>
                         </li>

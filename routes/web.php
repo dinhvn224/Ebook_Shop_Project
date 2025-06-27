@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\AuthorController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\PublisherController;
+use App\Http\Controllers\Admin\ReviewController;
 Route::prefix('admin')->name('admin.')->group(function() {
    Route::resource('publishers', PublisherController::class)->except(['show']);
     Route::post('publishers/{id}/restore', [PublisherController::class, 'restore'])->name('publishers.restore');
@@ -15,6 +16,8 @@ Route::prefix('admin')->name('admin.')->group(function() {
 
     Route::resource('authors', AuthorController::class)->except(['show']);
     Route::post('authors/{id}/restore', [AuthorController::class, 'restore'])->name('authors.restore');
+    Route::resource('reviews', ReviewController::class)->except(['show']);
+    Route::patch('reviews/{id}/status', [ReviewController::class, 'updateStatus'])->name('reviews.updateStatus');
 });
 
 // Trang chủ cho tất cả mọi người
