@@ -14,8 +14,8 @@ function setListAdmin(l) {
 
 // Hàm khởi tạo, tất cả các trang đều cần
 function khoiTao() {
-    // get data từ localstorage
-    list_products = getListProducts() || list_products;
+    // KHÔNG lấy list_products từ localStorage nữa, luôn dùng biến toàn cục (API)
+    // list_products = getListProducts() || list_products;
     adminInfo = getListAdmin() || adminInfo;
 
     setupEventTaiKhoan();
@@ -26,6 +26,12 @@ function khoiTao() {
 // ========= Các hàm liên quan tới danh sách sản phẩm =========
 // Localstorage cho dssp: 'ListProducts
 function setListProducts(newList) {
+    // Đảm bảo mọi sản phẩm đều có book_id
+    for (var i = 0; i < newList.length; i++) {
+        if (!newList[i].book_id && newList[i].masp) {
+            newList[i].book_id = newList[i].masp;
+        }
+    }
     window.localStorage.setItem('ListProducts', JSON.stringify(newList));
 }
 
@@ -284,6 +290,7 @@ function checkTaiKhoan() {
 // Tạo event, hiệu ứng cho form tài khoản
 function setupEventTaiKhoan() {
     var taikhoan = document.getElementsByClassName('taikhoan')[0];
+    if (!taikhoan) return; // Nếu không có phần tử, thoát hàm luôn
     var list = taikhoan.getElementsByTagName('input');
 
     // Tạo eventlistener cho input để tạo hiệu ứng label
@@ -513,8 +520,15 @@ function addTags(nameTag, link) {
 
 // Thêm sản phẩm vào trang
 function addProduct(p, ele, returnString) {
+    if (!p.book_id && p.masp) {
+        p.book_id = p.masp;
+    }
+    if (!p.book_id) {
+        console.error('SẢN PHẨM LỖI, KHÔNG RENDER:', p);
+        return '';
+    }
     promo = new Promo(p.promo.name, p.promo.value); // class Promo
-    product = new Product(p.masp, p.name, p.img, p.price, p.star, p.rateCount, promo); // Class product
+    product = new Product(p.masp, p.name, p.img, p.price, p.star, p.rateCount, promo, p.book_id); // Class product
 
     return addToWeb(product, ele, returnString);
 }

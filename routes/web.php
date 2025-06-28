@@ -1,7 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\HomeController;
 
 use App\Http\Controllers\Admin\{
     UserController,
@@ -13,7 +15,8 @@ use App\Http\Controllers\Admin\{
     DashboardController,
     VoucherController,
     VoucherProductController,
-    ReviewController
+    ReviewController,
+    BookController
 };
 
 //
@@ -81,6 +84,8 @@ Route::prefix('admin')
             Route::post('/detach', [VoucherProductController::class, 'detach'])->name('detach');
         });
 
+        Route::resource('books', BookController::class)->except(['show']);
+
         // Reviews
         Route::resource('reviews', ReviewController::class)->except(['show']);
         Route::patch('reviews/{id}/status', [ReviewController::class, 'updateStatus'])->name('reviews.updateStatus');
@@ -132,4 +137,12 @@ Route::prefix('admin')
             });
     });
 
-Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
+
+// API routes (không cần auth)
+Route::get('/api/products', [HomeController::class, 'getProductsData'])->name('api.products');
+
+// Route động cho trang chi tiết sản phẩm (không cần auth)
+Route::get('/product/{id}', function ($id) {
+    return view('client.product_detail', ['id' => $id]);
+});
+

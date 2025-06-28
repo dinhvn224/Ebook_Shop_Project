@@ -1,4 +1,4 @@
-window.onload = function () {
+function renderTrangChu() {
 	khoiTao();
 
 	// Thêm hình vào banner
@@ -42,18 +42,28 @@ window.onload = function () {
 	} else { // ko có filter : trang chính mặc định sẽ hiển thị các sp hot, ...
 		var soLuong = (window.innerWidth < 1200 ? 4 : 5); // màn hình nhỏ thì hiển thị 4 sp, to thì hiển thị 5
 
+		// Lấy toàn bộ sản phẩm
+		var allProducts = list_products.slice(); // copy mảng
+
+		// Chia thành các nhóm, mỗi nhóm 5 sản phẩm
+		var group1 = allProducts.splice(0, 5);
+		var group2 = allProducts.splice(0, 5);
+		var group3 = allProducts.splice(0, 5);
+		var group4 = allProducts.splice(0, 5);
+		var group5 = allProducts.splice(0, 5);
+
 		// Các màu
 		var yellow_red = ['#ff9c00', '#ec1f1f'];
 		var blue = ['#42bcf4', '#004c70'];
 		var green = ['#5de272', '#007012'];
 
-		// Thêm các khung sản phẩm
+		// Thêm các khung sản phẩm (không filter, chỉ truyền mảng 5 sp)
 		var div = document.getElementsByClassName('contain-khungSanPham')[0];
-		addKhungSanPham('NỔI BẬT NHẤT', yellow_red, ['star=3', 'sort=rateCount-decrease'], soLuong, div);
-		addKhungSanPham('SẢN PHẨM MỚI', blue, ['promo=moiramat', 'sort=rateCount-decrease'], soLuong, div);
-		addKhungSanPham('GIÁ SỐC ONLINE', green, ['promo=giareonline', 'sort=rateCount-decrease'], soLuong, div);
-		addKhungSanPham('GIẢM GIÁ LỚN', yellow_red, ['promo=giamgia'], soLuong, div);
-		addKhungSanPham('GIÁ RẺ CHO MỌI NHÀ', green, ['price=0-3000000', 'sort=price'], soLuong, div);
+		addKhungSanPhamCustom('NỔI BẬT NHẤT', yellow_red, group1, div);
+		addKhungSanPhamCustom('SẢN PHẨM MỚI', blue, group2, div);
+		addKhungSanPhamCustom('GIÁ SỐC ONLINE', green, group3, div);
+		addKhungSanPhamCustom('GIẢM GIÁ LỚN', yellow_red, group4, div);
+		addKhungSanPhamCustom('GIÁ RẺ CHO MỌI NHÀ', green, group5, div);
 	}
 
 	// Thêm chọn mức giá
@@ -86,7 +96,7 @@ window.onload = function () {
 
 	// Thêm filter đã chọn
 	addAllChoosedFilter();
-};
+}
 
 var soLuongSanPhamMaxTrongMotTrang = 15;
 
@@ -678,4 +688,27 @@ function hideSanPhamKhongThuoc(list) {
 		}
 		if (hide) hideLi(allLi[i]);
 	}
+}
+
+// Thêm hàm custom để render nhóm sản phẩm không filter
+function addKhungSanPhamCustom(tenKhung, color, products, ele) {
+	var gradient = `background-image: linear-gradient(120deg, ` + color[0] + ` 0%, ` + color[1] + ` 50%, ` + color[0] + ` 100%);`
+	var borderColor = `border-color: ` + color[0];
+	var borderA = `\tborder-left: 2px solid ` + color[0] + `;\n\t\t\t\tborder-right: 2px solid ` + color[0] + `;`;
+
+	var s = `<div class="khungSanPham" style="` + borderColor + `">
+\t\t\t\t<h3 class="tenKhung" style="` + gradient + `">* ` + tenKhung + ` *</h3>
+\t\t\t\t<div class="listSpTrongKhung flexContain">`;
+
+	for (var i = 0; i < products.length; i++) {
+		s += addProduct(products[i], null, true);
+	}
+
+	s += `\t</div>
+\t\t\t\t<a class="xemTatCa" href="index.html" style="` + borderA + `">
+\t\t\t\t\tXem tất cả ` + products.length + ` sản phẩm
+\t\t\t\t</a>
+\t\t\t</div> <hr>`;
+
+	ele.innerHTML += s;
 }

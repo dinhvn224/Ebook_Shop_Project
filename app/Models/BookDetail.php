@@ -44,4 +44,8 @@ class BookDetail extends Model
             $builder->where('deleted', false)->orWhereNull('deleted');
         });
     }
+    public function reviews()
+{
+    return $this->hasMany(Review::class);
+}
 }

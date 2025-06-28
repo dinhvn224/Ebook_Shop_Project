@@ -1,85 +1,209 @@
-/* public/css/create.css */
-
-.card {
-    border: 1px solid #e9ecef;
-    border-radius: 0.25rem;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+.review-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    margin-top: 20px;
+}
+.page-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: #333;
 }
 
-.card-body {
+/* === Pagination Container === */
+.pagination-container {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+/* === Laravel Pagination Styling === */
+.pagination {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    list-style: none;
+    padding: 0;
+    flex-wrap: nowrap;
+    font-size: 0.5rem;
+}
+
+
+
+/* --- Review Card --- */
+.review-card {
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+    color: #555;
+}
+
+.review-date {
+    font-style: italic;
+    font-size: 0.85rem;
+    color: #888;
+}
+
+.review-rating i {
+    color: #ccc;
+    font-size: 1.2rem;
+    margin-right: 2px;
+}
+
+.review-rating .rated {
+    color: #f5a623;
+}
+
+.review-comment {
+    margin-top: 8px;
+    color: #333;
+    font-size: 1rem;
+}
+
+/* --- Star Input --- */
+.star-rating {
+    display: flex;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+.star-rating .star {
+    font-size: 2rem;
+    color: #ccc;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.star-rating .star.hovered,
+.star-rating .star.selected {
+    color: #ffb700;
+}
+
+/* --- Form --- */
+.review-form-section form {
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.review-form-section textarea {
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    resize: vertical;
+}
+
+.review-form-section .btn {
+    padding: 10px 20px;
+    font-weight: bold;
+    border-radius: 6px;
+}
+.review-grid-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
     padding: 20px;
 }
 
-.form-group {
-    margin-bottom: 20px;
+.review-left-column, .review-right-column {
+    background: #fff;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 12px;
 }
 
-.form-group label {
-    font-weight: bold;
-    margin-bottom: 5px;
-    display: block;
+
+
+/* Phần còn lại giữ nguyên */
+.review-card {
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
-.form-control {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ced4da;
-    border-radius: 0.25rem;
-    box-sizing: border-box;
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+    color: #555;
 }
 
-.btn-primary {
-    background-color: #007bff;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 0.25rem;
-    cursor: pointer;
+.review-date {
+    font-style: italic;
+    font-size: 0.85rem;
+    color: #888;
 }
 
-.btn-primary:hover {
-    background-color: #0056b3;
+.review-rating i {
+    color: #ccc;
+    font-size: 1.2rem;
+    margin-right: 2px;
 }
 
-.alert {
-    padding: 10px;
-    margin-bottom: 20px;
-    border-radius: 0.25rem;
+.review-rating .rated {
+    color: #f5a623;
 }
 
-.alert-danger {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-}
-
-.alert-success {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
+.review-comment {
+    margin-top: 8px;
+    color: #333;
+    font-size: 1rem;
 }
 
 .star-rating {
     display: flex;
-    flex-direction: row; /* trái sang phải */
-    gap: 5px;
+    gap: 10px;
+    margin-top: 5px;
 }
 
-.star-rating input[type="radio"] {
-    display: none;
-}
-
-.star-rating label {
-    font-size: 24px;
-    color: #ddd;
+.star-rating .star {
+    font-size: 2rem;
+    color: #ccc;
     cursor: pointer;
-    transition: color 0.2s ease-in-out;
+    transition: color 0.2s;
 }
 
-.star-rating label.selected {
-    color: #ffca08; /* sao được chọn */
+.star-rating .star.hovered,
+.star-rating .star.selected {
+    color: #ffb700;
 }
 
-.star-rating label.hovered {
-    color: #ffca08; /* sao hover */
+.review-form textarea {
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    resize: vertical;
+}
+
+.review-form .btn {
+    padding: 10px 20px;
+    font-weight: bold;
+    border-radius: 6px;
+}
+/* Responsive khi màn nhỏ */
+@media (max-width: 768px) {
+    .review-grid-container {
+        grid-template-columns: 1fr;
+    }
 }

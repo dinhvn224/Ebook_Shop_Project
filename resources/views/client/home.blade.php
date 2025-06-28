@@ -31,9 +31,6 @@
         </a>
     </div>
     <hr>
-    @if(session('error'))
-        <div class="alert alert-danger mt-2">{{ session('error') }}</div>
-    @endif
     <div class="contain-products" style="display:none">
         <div class="filterName">
             <input type="text" placeholder="Lọc trong trang theo tên..." onkeyup="filterProductsName(this)">
@@ -46,8 +43,21 @@
         </ul>
         <div class="pagination"></div>
     </div>
-    <div class="contain-khungSanPham" ></div>
+    <div class="contain-khungSanPham"></div>
+    <script>addContainTaiKhoan();</script>
+@endsection
+
+@section('scripts')
+    <script src="{{ asset('client/js/classes.js') }}"></script>
+    <script src="{{ asset('client/js/dungchung.js') }}"></script>
     <script>
-        addContainTaiKhoan(); addPlc();
+       fetch('/api/products')
+            .then(res => res.json())
+            .then(data => {
+                list_products = data;
+                console.log('LIST_PRODUCTS:', list_products);
+                renderTrangChu();
+            });
     </script>
+    <script src="{{ asset('client/js/trangchu.js') }}"></script>
 @endsection

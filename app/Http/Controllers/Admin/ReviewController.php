@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Auth;
 
 class ReviewController extends Controller
 {
-
     public function index()
     {
         $reviews = Review::with(['user', 'bookDetail.book'])->get();
@@ -30,80 +29,31 @@ class ReviewController extends Controller
         return redirect()->route('admin.reviews.index')->with('success', 'Sửa trạng thái bình luận thành công');
     }
 
-// public function create($bookDetailId)
-//     {
-//         $user = Auth::user();
-//         if (!$user) {
-//             return redirect()->back()->with('error', 'You must be logged in to leave a review.');
-//         }
-
-//         $bookDetail = BookDetail::with('book')->findOrFail($bookDetailId);
-//         $hasPurchased = Order::where('user_id', $user->id)
-//             ->where('status', 'COMPLETED')
-//             ->whereHas('items', function ($query) use ($bookDetailId) {
-//                 $query->where('ebook_variant_id', $bookDetailId);
-//             })
-//             ->exists();
-
-//         if (!$hasPurchased) {
-//             return redirect()->back()->with('error', 'You must purchase this book to leave a review.');
-//         }
-
-//         return view('client.reviews.create', compact('bookDetailId', 'bookDetail'));
-//     }
-
-//     public function store(Request $request)
-//     {
-//         $request->validate([
-//             'book_detail_id' => 'required|exists:book_details,id',
-//             'rating' => 'required|integer|between:1,5',
-//             'comment' => 'required|string|max:1000',
-//         ]);
-
-//         $user = Auth::user();
-//         if (!$user) {
-//             return redirect()->back()->with('error', 'You must be logged in to leave a review.');
-//         }
-
-//         $bookDetailId = $request->book_detail_id;
-//         $hasPurchased = Order::where('user_id', $user->id)
-//             ->where('status', 'COMPLETED')
-//             ->whereHas('items', function ($query) use ($bookDetailId) {
-//                 $query->where('ebook_variant_id', $bookDetailId);
-//             })
-//             ->exists();
-
-//         if (!$hasPurchased) {
-//             return redirect()->back()->with('error', 'You must purchase this book to leave a review.');
-//         }
-
-//         Review::create([
-//             'user_id' => $user->id,
-//             'book_detail_id' => $bookDetailId,
-//             'rating' => $request->rating,
-//             'comment' => $request->comment,
-//             'status' => 'pending',
-//             'created_at' => NOW(),
-//         ]);
-
-//         return redirect()->route('home.user')->with('success', 'Review submitted successfully and is awaiting approval.');
-//     }
-public function create($bookDetailId)
+    public function create($bookDetailId)
     {
+        // Lấy chỉ các đánh giá liên quan đến bookDetailId hiện tại
+        $reviews = Review::with(['user', 'bookDetail.book'])
+            ->where('book_detail_id', $bookDetailId)
+            ->where('status', 'visible')
+            ->paginate(5);
+
         $userId = Auth::id();
 
-        // Kiểm tra người dùng đã mua sản phẩm chưa
-    $hasPurchased = OrderItem::where('ebook_variant_id', $bookDetailId)
-        ->whereHas('order', function ($query) use ($userId) {
-            $query->where('user_id', $userId)
-                  ->where('status', 'COMPLETED'); // trạng thái ở bảng orders ✅
-        })->exists();
-        if (!$hasPurchased) {
-            return redirect()->route('home')->with('error', 'Bạn cần mua sách này trước khi đánh giá.');
+        // Fetch book detail
+        $bookDetail = BookDetail::with('book')->findOrFail($bookDetailId);
+        if (!$bookDetail) {
+            return redirect()->route('home')->with('error', 'Sản phẩm không tồn tại.');
         }
 
-        $bookDetail = BookDetail::with('book')->findOrFail($bookDetailId);
-        return view('client.reviews.create', compact('bookDetail', 'bookDetailId'));
+        // Kiểm tra xem người dùng đã mua sản phẩm chưa
+        $hasPurchased = Auth::check() ? $this->hasUserPurchasedBook($userId, $bookDetailId) : false;
+
+        // Kiểm tra xem người dùng đã đánh giá chưa
+        $existingReview = Auth::check() ? Review::where('user_id', $userId)
+            ->where('book_detail_id', $bookDetailId)
+            ->first() : null;
+
+        return view('client.reviews.create', compact('bookDetail', 'bookDetailId', 'reviews', 'hasPurchased', 'existingReview'));
     }
 
     public function store(Request $request)
@@ -111,15 +61,13 @@ public function create($bookDetailId)
         $request->validate([
             'book_detail_id' => 'required|exists:book_details,id',
             'rating' => 'required|integer|min:1|max:5',
-            'comment' => 'required|string',
+            'comment' => 'required|string|max:1000',
         ]);
 
         $userId = Auth::id();
 
-        // Kiểm tra lại một lần nữa
-        $hasPurchased = OrderItem::whereHas('order', function ($query) use ($userId) {
-            $query->where('user_id', $userId)->where('status', 'COMPLETED');
-        })->where('ebook_variant_id', $request->book_detail_id)->exists();
+        // Verify purchase again
+        $hasPurchased = $this->hasUserPurchasedBook($userId, $request->book_detail_id);
 
         if (!$hasPurchased) {
             return redirect()->back()->with('error', 'Bạn chưa mua sản phẩm này.');
@@ -130,9 +78,19 @@ public function create($bookDetailId)
             'book_detail_id' => $request->book_detail_id,
             'rating' => $request->rating,
             'comment' => $request->comment,
-            'status' => 'pending',
+            'status' => 'visible',
+            'created_at' => now(),
         ]);
 
-        return redirect()->route('home')->with('success', 'Đánh giá của bạn đã được gửi và chờ duyệt.');
+        return redirect()->route('reviews.create', ['bookDetailId' => $request->book_detail_id])
+                ->with('success', 'Đánh giá thành công');
+    }
+
+    private function hasUserPurchasedBook($userId, $bookDetailId)
+    {
+        return OrderItem::where('ebook_variant_id', $bookDetailId)
+            ->whereHas('order', function ($query) use ($userId) {
+                $query->where('user_id', $userId)->where('status', 'COMPLETED');
+            })->exists();
     }
 }

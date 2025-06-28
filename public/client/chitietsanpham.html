@@ -29,7 +29,30 @@
     <link rel="stylesheet" href="css/chitietsanpham.css">
     <link rel="stylesheet" href="css/footer.css">
     <!-- js -->
-    <script src="data/products.js"></script>
+    <script>
+        var list_products = [];
+        // Thử lấy dữ liệu từ API, nếu không được thì dùng dữ liệu local
+        fetch('/api/products')
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error('API không khả dụng');
+                }
+                return res.json();
+            })
+            .then(data => {
+                list_products = data;
+                if (typeof initProductDetail === 'function') {
+                    initProductDetail();
+                }
+            })
+            .catch(error => {
+                console.log('Không thể lấy dữ liệu từ API, sử dụng dữ liệu local:', error);
+                // Sử dụng dữ liệu local nếu API không khả dụng
+                if (typeof initProductDetail === 'function') {
+                    initProductDetail();
+                }
+            });
+    </script>
     <script src="js/classes.js"></script>
     <script src="js/dungchung.js"></script>
     <script src="js/chitietsanpham.js"></script>

@@ -42,10 +42,10 @@ function addChart(id, chartOption) {
 
 function createChartConfig(
     title = 'Title',
-    charType = 'bar', 
-    labels = ['nothing'], 
-    data = [2], 
-    colors = ['red'], 
+    charType = 'bar',
+    labels = ['nothing'],
+    data = [2],
+    colors = ['red'],
 ) {
     return {
         type: charType,
@@ -112,18 +112,18 @@ function addThongKe() {
     // Thêm thống kê
     // addChart('myChart1', createChartConfig(
     //     'Số lượng bán ra',
-    //     'bar', 
-    //     Object.keys(thongKeHang), 
+    //     'bar',
+    //     Object.keys(thongKeHang),
     //     Object.values(thongKeHang).map(_ =>  _.soLuongBanRa),
     //     colors,
     // ));
 
     // addChart1('myChart2', createChartConfig(
     //     'Doanh thu',
-    //     'doughnut', 
-    //     // Object.keys(thongKeHang), 
+    //     'doughnut',
+    //     // Object.keys(thongKeHang),
     //     Object.values(thongKeHang).map(_ =>  _.doanhThu),
-        
+
     //     // colors,
     // ));
 
@@ -271,6 +271,7 @@ function layThongTinSanPhamTuTable(id) {
 
     try {
         return {
+            "book_id": masp,
             "name": name,
             "company": company,
             "img": previewSrc,
@@ -676,7 +677,7 @@ function sortDonHangTable(loai) {
     var list = document.getElementsByClassName('donhang')[0].getElementsByClassName("table-content")[0];
     var tr = list.getElementsByTagName('tr');
 
-    quickSort(tr, 0, tr.length-1, loai, getValueOfTypeInTable_DonHang); 
+    quickSort(tr, 0, tr.length-1, loai, getValueOfTypeInTable_DonHang);
     decrease = !decrease;
 }
 

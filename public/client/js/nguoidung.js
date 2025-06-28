@@ -20,9 +20,9 @@ window.onload = function () {
             }
         }
 
-        addTatCaDonHang(currentUser); // hàm này cần chạy trước để tính được tổng tiền tất cả đơn hàng 
+        addTatCaDonHang(currentUser); // hàm này cần chạy trước để tính được tổng tiền tất cả đơn hàng
         addInfoUser(currentUser);
-    
+
     } else {
         var warning = `<h2 style="color: red; font-weight:bold; text-align:center; font-size: 2em; padding: 50px;">
                             Bạn chưa đăng nhập !!
@@ -47,8 +47,8 @@ function addInfoUser(user) {
         </tr>
         <tr>
             <td>Mật khẩu: </td>
-            <td style="text-align: center;"> 
-                <i class="fa fa-pencil" id="butDoiMatKhau" onclick="openChangePass()"> Đổi mật khẩu</i> 
+            <td style="text-align: center;">
+                <i class="fa fa-pencil" id="butDoiMatKhau" onclick="openChangePass()"> Đổi mật khẩu</i>
             </td>
             <td></td>
         </tr>
@@ -69,8 +69,8 @@ function addInfoUser(user) {
                     </tr>
                     <tr>
                         <td></td>
-                        <td> 
-                            <div><button onclick="changePass()">Đồng ý</button></div> 
+                        <td>
+                            <div><button onclick="changePass()">Đồng ý</button></div>
                         </td>
                     </tr>
                 </table>
@@ -165,7 +165,7 @@ function changeInfo(iTag, info) {
             // Đổi tên trong list đơn hàng
             if (!currentUser.donhang.length) {
                 document.getElementsByClassName('listDonHang')[0].innerHTML = `
-                    <h3 style="width=100%; padding: 50px; color: green; font-size: 2em; text-align: center"> 
+                    <h3 style="width=100%; padding: 50px; color: green; font-size: 2em; text-align: center">
                         Xin chào ` + inp.value + `. Bạn chưa có đơn hàng nào.
                     </h3>`;
             }
@@ -210,14 +210,14 @@ function changeInfo(iTag, info) {
 function addTatCaDonHang(user) {
     if (!user) {
         document.getElementsByClassName('listDonHang')[0].innerHTML = `
-            <h3 style="width=100%; padding: 50px; color: red; font-size: 2em; text-align: center"> 
+            <h3 style="width=100%; padding: 50px; color: red; font-size: 2em; text-align: center">
                 Bạn chưa đăng nhập !!
             </h3>`;
         return;
     }
     if (!user.donhang.length) {
         document.getElementsByClassName('listDonHang')[0].innerHTML = `
-            <h3 style="width=100%; padding: 50px; color: green; font-size: 2em; text-align: center"> 
+            <h3 style="width=100%; padding: 50px; color: green; font-size: 2em; text-align: center">
                 Xin chào ` + currentUser.username + `. Bạn chưa có đơn hàng nào.
             </h3>`;
         return;
@@ -232,9 +232,9 @@ function addDonHang(dh) {
 
     var s = `
             <table class="listSanPham">
-                <tr> 
+                <tr>
                     <th colspan="6">
-                        <h3 style="text-align:center;"> Đơn hàng ngày: ` + new Date(dh.ngaymua).toLocaleString() + `</h3> 
+                        <h3 style="text-align:center;"> Đơn hàng ngày: ` + new Date(dh.ngaymua).toLocaleString() + `</h3>
                     </th>
                 </tr>
                 <tr>
@@ -243,7 +243,7 @@ function addDonHang(dh) {
                     <th>Giá</th>
                     <th>Số lượng</th>
                     <th>Thành tiền</th>
-                    <th>Thời gian thêm vào giỏ</th> 
+                    <th>Thời gian thêm vào giỏ</th>
                 </tr>`;
 
     var totalPrice = 0;
@@ -259,7 +259,7 @@ function addDonHang(dh) {
                 <tr>
                     <td>` + (i + 1) + `</td>
                     <td class="noPadding imgHide">
-                        <a target="_blank" href="chitietsanpham.html?` + p.name.split(' ').join('-') + `" title="Xem chi tiết">
+                        <a target="_blank" href="/product/` + p.book_id + `" title="Xem chi tiết">
                             ` + p.name + `
                             <img src="` + p.img + `">
                         </a>
