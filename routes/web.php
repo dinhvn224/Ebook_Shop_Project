@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Admin\{
     UserController,
     AuthorController,
+    BookController,
     CategoryController,
     PublisherController,
     OrderController,
@@ -127,3 +128,11 @@ Route::prefix('admin')
     });
 
 Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
+
+Route::prefix('admin')->name('admin.')->group(function() {
+
+    Route::resource('books', BookController::class)->except(['show']);
+    Route::post('books/{book}/details', [BookController::class, 'addDetail'])->name('books.details.add');
+    Route::put('books/{book}/details/{detail}', [BookController::class, 'updateDetail'])->name('books.details.update');
+    Route::delete('books/{book}/details/{detail}', [BookController::class, 'deleteDetail'])->name('books.details.delete');
+});
