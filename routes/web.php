@@ -37,11 +37,13 @@ Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('regi
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 // Yêu cầu đăng nhập
-Route::middleware(['auth', 'role:user'])->get('/home', function () {
-    return view('client.home');
-})->name('home.user');
-
-
+Route::middleware(['auth', 'role:user'])->group(function () {
+    Route::get('/home', function () {
+        return view('client.home');
+    })->name('home.user');
+    Route::get('/reviews/create/{bookDetailId}', [ReviewController::class, 'create'])->name('reviews.create');
+    Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+});
 Route::middleware(['auth', 'role:admin'])->get('/admin', function () {
     return view('admin.dashboard');
 

@@ -31,6 +31,9 @@
         </a>
     </div>
     <hr>
+    @if(session('error'))
+        <div class="alert alert-danger mt-2">{{ session('error') }}</div>
+    @endif
     <div class="contain-products" style="display:none">
         <div class="filterName">
             <input type="text" placeholder="Lọc trong trang theo tên..." onkeyup="filterProductsName(this)">
