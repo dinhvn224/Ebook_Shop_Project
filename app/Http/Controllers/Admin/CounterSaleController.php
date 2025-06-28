@@ -15,7 +15,11 @@ class CounterSaleController extends Controller
     {
         $status = $request->get('status');
 
-        $orders = Order::where('payment_method', 'COUNTER')
+        $orders = Order::with([
+                'items.bookDetail' => fn($q) => $q->withTrashed(),
+                'items.bookDetail.book' => fn($q) => $q->withoutGlobalScopes()
+            ])
+            ->where('payment_method', 'COUNTER')
             ->when($status !== null, fn($q) => $q->where('status', $status))
             ->when($status === null, fn($q) => $q->where('status', 'PENDING'))
             ->orderByDesc('created_at')
@@ -41,13 +45,17 @@ class CounterSaleController extends Controller
             'order_date' => now(),
         ]);
 
-        // ✅ Đã sửa route
         return redirect()->route('admin.counter.index')
             ->with('success', "Đã tạo đơn hàng tại quầy #$order->id");
     }
 
     public function show(Order $order)
     {
+        $order->load([
+            'items.bookDetail' => fn($q) => $q->withTrashed(),
+            'items.bookDetail.book' => fn($q) => $q->withoutGlobalScopes()
+        ]);
+
         return view('admin.counter.show', compact('order'));
     }
 
@@ -101,7 +109,7 @@ class CounterSaleController extends Controller
 
         foreach ($bookIds as $bookId) {
             $qty = (int) ($quantities[$bookId] ?? 1);
-            $bookDetail = BookDetail::findOrFail($bookId);
+            $bookDetail = BookDetail::withTrashed()->findOrFail($bookId);
 
             if ($bookDetail->quantity < $qty) {
                 return back()->with('error', "Sản phẩm [ID: $bookId] không đủ tồn kho!");
@@ -189,7 +197,6 @@ class CounterSaleController extends Controller
             'shipping_address' => $request->shipping_address ?: $order->shipping_address,
         ]);
 
-        // ✅ Đã sửa route
         return redirect()->route('admin.counter.receipt', $order->id)
             ->with('success', "Đã thanh toán đơn hàng #$order->id");
     }

@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Product;
+use App\Models\Book;
 use App\Models\Voucher;
 
 class VoucherProductController extends Controller
@@ -14,7 +14,7 @@ class VoucherProductController extends Controller
         $search = $request->get('search');
         $voucherFilter = $request->get('voucher');
 
-        $products = \App\Models\Product::with('vouchers')
+        $products = Book::with('vouchers') // 🟢 Dùng Book thay vì Product
             ->when($search, function ($query, $search) {
                 $query->where('name', 'like', "%$search%");
             })
@@ -23,32 +23,31 @@ class VoucherProductController extends Controller
             })
             ->paginate(10);
 
-        $vouchers = \App\Models\Voucher::where('is_active', true)
+        $vouchers = Voucher::where('is_active', true)
             ->where(function ($q) {
-                $q->whereNull('expires_at')->orWhere('expires_at', '>=', now());
+                $q->whereNull('end_date')->orWhere('end_date', '>=', now());
             })
-            ->latest()->get();
+            ->latest()
+            ->get();
 
         return view('admin.voucher-products.index', compact('products', 'vouchers'));
     }
 
-
     public function attach(Request $request)
     {
-        $product = Product::findOrFail($request->input('product_id'));
+        $book = Book::findOrFail($request->input('product_id'));
         $voucherId = $request->input('voucher_id');
 
-        // Chỉ gán 1 mã duy nhất
-        $product->vouchers()->sync([$voucherId]);
-
+        $book->vouchers()->sync([$voucherId]); // 🟢 Gán voucher cho book
         return back()->with('success', '✅ Đã gán mã thành công (thay thế mã cũ nếu có)!');
     }
+
     public function detach(Request $request)
     {
-        $product = Product::findOrFail($request->input('product_id'));
+        $book = Book::findOrFail($request->input('product_id'));
         $voucherId = $request->input('voucher_id');
-        $product->vouchers()->detach($voucherId);
 
+        $book->vouchers()->detach($voucherId); // 🟢 Gỡ voucher khỏi book
         return back()->with('success', '🗑 Đã gỡ mã khỏi sản phẩm!');
     }
 }

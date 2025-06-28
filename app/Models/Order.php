@@ -23,7 +23,6 @@ class Order extends Model
         'change_amount',
     ];
 
-    // 🧠 Thêm dòng này để Laravel auto-cast ngày sang Carbon
     protected $casts = [
         'order_date' => 'datetime',
         'completed_date' => 'datetime',
@@ -36,6 +35,7 @@ class Order extends Model
 
     public function items()
     {
+        // Thêm withTrashed() nếu bạn muốn lấy luôn item đã xóa mềm
         return $this->hasMany(OrderItem::class);
     }
 }

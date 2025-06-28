@@ -5,7 +5,7 @@
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="mb-0 text-primary">
-            <i class="fas fa-tags me-2"></i> Gán mã giảm giá cho sản phẩm
+            <i class="fas fa-tags me-2"></i> Gán mã giảm giá cho sách
         </h4>
     </div>
 
@@ -21,7 +21,7 @@
     <form method="GET" class="row g-3 align-items-end mb-4">
         <div class="col-md-4">
             <label class="form-label">🔍 Tìm kiếm</label>
-            <input type="text" name="search" class="form-control" placeholder="Tên sản phẩm..." value="{{ request('search') }}">
+            <input type="text" name="search" class="form-control" placeholder="Tên sách..." value="{{ request('search') }}">
         </div>
         <div class="col-md-4">
             <label class="form-label">🎟 Lọc theo voucher</label>
@@ -41,12 +41,12 @@
         </div>
     </form>
 
-    {{-- Bảng sản phẩm --}}
+    {{-- Bảng sách --}}
     <div class="table-responsive">
         <table class="table table-bordered table-hover align-middle text-center">
             <thead class="table-light">
                 <tr>
-                    <th width="30%">📘 Sản phẩm</th>
+                    <th width="30%">📘 Sách</th>
                     <th>💰 Giá</th>
                     <th>🎟 Voucher đã gán</th>
                     <th>⬇ Giảm</th>
@@ -54,32 +54,36 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($products as $product)
+                @foreach($products as $book)
                     @php
-                        $voucher = $product->vouchers->first();
+                        $voucher = $book->vouchers->first();
+                        $price = optional($book->details->first())->price ?? 0;
+
                         $discount = 0;
                         if ($voucher) {
-                            $discount = $voucher->type === 'percent'
-                                ? $product->price * $voucher->value / 100
-                                : $voucher->value;
-                            if ($voucher->type === 'percent' && $voucher->max_discount) {
-                                $discount = min($discount, $voucher->max_discount);
+                            $discount = $voucher->discount_type === 'percent'
+                                ? $price * $voucher->discount_value / 100
+                                : $voucher->discount_value;
+
+                            if ($voucher->discount_type === 'percent' && $voucher->max_uses) {
+                                $discount = min($discount, $voucher->max_uses);
                             }
-                            $discount = min($discount, $product->price);
+
+                            $discount = min($discount, $price);
                         }
                     @endphp
                     <tr>
                         <td class="text-start ps-3">
-                            <strong>{{ $product->name }}</strong>
+                            <strong>{{ $book->name }}</strong>
                             <br>
-                            <small class="text-muted">#{{ $product->id }}</small>
+                            <small class="text-muted">#{{ $book->id }}</small>
                         </td>
-                        <td>{{ number_format($product->price) }}đ</td>
+                        <td>{{ number_format($price) }}đ</td>
                         <td>
                             @if($voucher)
                                 <form method="POST" action="{{ route('admin.voucher-products.detach') }}">
                                     @csrf
-                                    <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                    <input type="hidden" name="product_id" value="{{ $book->id }}">
                                     <input type="hidden" name="voucher_id" value="{{ $voucher->id }}">
                                     <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Gỡ mã {{ $voucher->code }}?')">
                                         {{ $voucher->code }} ✖
@@ -99,13 +103,13 @@
                         <td>
                             <form method="POST" action="{{ route('admin.voucher-products.attach') }}">
                                 @csrf
-                                <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                <input type="hidden" name="product_id" value="{{ $book->id }}">
                                 <select name="voucher_id" class="form-select form-select-sm" onchange="this.form.submit()">
                                     <option value="">-- Chọn mã --</option>
                                     @foreach($vouchers as $v)
                                         <option value="{{ $v->id }}">
                                             {{ $v->code }} 
-                                            ({{ $v->type === 'percent' ? $v->value.'%' : number_format($v->value).'đ' }})
+                                            ({{ $v->discount_type === 'percent' ? $v->discount_value.'%' : number_format($v->discount_value).'đ' }})
                                         </option>
                                     @endforeach
                                 </select>

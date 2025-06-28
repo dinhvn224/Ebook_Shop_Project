@@ -11,8 +11,11 @@ class OrderItem extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'order_id', 'ebook_variant_id',
-        'quantity', 'price', 'promotion_price'
+        'order_id', 
+        'ebook_variant_id',
+        'quantity', 
+        'price', 
+        'promotion_price'
     ];
 
     public function order()
@@ -24,6 +27,4 @@ class OrderItem extends Model
     {
         return $this->belongsTo(BookDetail::class, 'ebook_variant_id');
     }
-
-
 }

@@ -14,11 +14,18 @@ use App\Http\Controllers\Admin\{
     VoucherController,
     VoucherProductController
 };
+use App\Http\Controllers\Client\BookController as ClientBookController;
+use App\Http\Controllers\HomeController;
 
 //
 // 🌐 PUBLIC CLIENT ROUTES
 //
-Route::get('/', fn() => view('client.home'))->name('home');
+Route::get('/', [HomeController::class, 'index'])->name('home');
+
+Route::get('/books', [BookController::class, 'index'])->name('books.index');
+
+
+Route::get('/book/{book}', [ClientBookController::class, 'show'])->name('book.detail');
 
 Route::middleware(['auth', 'role:user'])->get('/home', fn() => view('client.home'))
     ->name('home.user');
@@ -129,7 +136,7 @@ Route::prefix('admin')
 
 Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
-Route::prefix('admin')->name('admin.')->group(function() {
+Route::prefix('admin')->name('admin.')->group(function () {
 
     Route::resource('books', BookController::class)->except(['show']);
     Route::post('books/{book}/details', [BookController::class, 'addDetail'])->name('books.details.add');
