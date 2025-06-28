@@ -3,18 +3,16 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+// use Illuminate\Database\Eloquent\SoftDeletes;
 
 class OrderItem extends Model
 {
-    protected $table = 'order_items';
-    protected $fillable = ['order_id', 'ebook_variant_id', 'price', 'promotion_price', 'quantity'];
+    use HasFactory;
 
-    protected $casts = [
-        'price' => 'float',
-        'promotion_price' => 'float',
-        'quantity' => 'integer',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
+    protected $fillable = [
+        'order_id', 'ebook_variant_id',
+        'quantity', 'price', 'promotion_price'
     ];
 
     public function order()

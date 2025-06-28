@@ -3,23 +3,30 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+// use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Order extends Model
 {
-    protected $table = 'orders';
-    protected $fillable = ['user_id', 'status', 'amount', 'total_amount', 'final_amount', 'ship_amount', 'change_amount', 'payment_method', 'order_date', 'completed_date'];
+    use HasFactory;
 
+    protected $fillable = [
+        'user_id',
+        'customer_name',
+        'shipping_address',
+        'phone_number',
+        'final_amount',
+        'status',
+        'payment_method',
+        'order_date',
+        'completed_date',
+        'change_amount',
+    ];
+
+    // 🧠 Thêm dòng này để Laravel auto-cast ngày sang Carbon
     protected $casts = [
-        'status' => 'string',
-        'amount' => 'float',
-        'total_amount' => 'float',
-        'final_amount' => 'float',
-        'ship_amount' => 'float',
-        'change_amount' => 'float',
         'order_date' => 'datetime',
         'completed_date' => 'datetime',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
     ];
 
     public function user()

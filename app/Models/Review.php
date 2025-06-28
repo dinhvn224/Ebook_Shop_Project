@@ -26,7 +26,7 @@ class Review extends Model
     {
         return $this->belongsTo(BookDetail::class, 'book_detail_id');
     }
-        public function book()
+    public function book()
     {
         return $this->bookDetail()->getRelated()->belongsTo(Book::class, 'book_id');
     }

@@ -5,53 +5,73 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\Hash;
+// use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Notifications\Notification;
 
 class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
+    const ROLE_ADMIN = 'ADMIN';
+    const ROLE_USER  = 'USER';
+
     protected $fillable = [
         'name',
         'email',
-        'password',  // Sử dụng password
-        'phone_number',  // Cập nhật thành phone_number
-        'avatar_url',  // Để lưu URL ảnh đại diện
-        'role',  // Vai trò 'user' hoặc 'admin'
-        'is_active',  // Trạng thái 'active' hoặc 'inactive'
-        'birth_date',  // Thêm trường birth_date
+        'password',
+        'phone_number',
+        'address',
+        'birth_date',
+        'avatar_url',
+        'role',
+        'is_active',
     ];
 
     protected $hidden = [
-        'password',  // Ẩn mật khẩu khi trả về dữ liệu
+        'password',
         'remember_token',
     ];
 
     protected $casts = [
-        'is_active' => 'boolean',
-        'birth_date' => 'date',  // Đảm bảo xử lý ngày sinh như kiểu date
+        'is_active'  => 'boolean',
+        'birth_date' => 'date',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
 
+    // ================= RELATIONS =================
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    public function vouchers()
+    {
+        return $this->belongsToMany(Voucher::class)
+            ->withPivot('used_at')
+            ->withTimestamps();
+    }
+
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
+    }
+
+    // ================= HELPERS =================
+
     public function isAdmin(): bool
     {
-        return $this->role === 'admin';
+        return $this->role === self::ROLE_ADMIN;
     }
 
     public function isUser(): bool
     {
-        return $this->role === 'user';
+        return $this->role === self::ROLE_USER;
     }
 
-    // public static function boot()
-    // {
-    //     parent::boot();
-
-    //     static::saving(function ($user) {
-    //         if (isset($user->password) && !empty($user->password)) {
-    //             $user->password = Hash::make($user->password);  // Mã hóa mật khẩu
-    //         }
-    //     });
-    // }
+    public function getAvatarUrlAttribute($value)
+    {
+        return $value ?: 'https://ui-avatars.com/api/?name=' . urlencode($this->name);
+    }
 }
