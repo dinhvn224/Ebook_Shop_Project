@@ -14,7 +14,6 @@ class Author extends Model
         'deleted' => 'boolean',
     ];
 
-    // Global scope để tự động ẩn các bản ghi bị đánh dấu xóa
     protected static function booted()
     {
         static::addGlobalScope('not_deleted', function ($builder) {
