@@ -1,1 +1,1 @@
-<h1>Đây là footer</h1>
+<div class="footer"><script>addFooter();</script></div>
