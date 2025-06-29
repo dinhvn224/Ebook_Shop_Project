@@ -36,6 +36,10 @@ class BookDetail extends Model
     {
         return $this->belongsTo(Book::class);
     }
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
 
     public function images()
     {

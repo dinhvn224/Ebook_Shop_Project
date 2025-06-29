@@ -10,7 +10,7 @@ class Review extends Model
     use HasFactory;
     protected $table = 'reviews';
     public $timestamps = false;
-    protected $fillable = ['user_id', 'book_detail_id','rating','comment','status','created_at'];
+    protected $fillable = ['user_id', 'book_detail_id', 'rating', 'comment', 'status', 'created_at'];
 
     protected $casts = [
         'status' => 'string',
@@ -26,8 +26,4 @@ class Review extends Model
     {
         return $this->belongsTo(BookDetail::class, 'book_detail_id');
     }
-    // public function book()
-    // {
-    //     return $this->bookDetail()->getRelated()->belongsTo(Book::class, 'book_id');
-    // }
 }

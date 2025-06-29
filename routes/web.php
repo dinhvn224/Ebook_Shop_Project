@@ -14,9 +14,11 @@ use App\Http\Controllers\Admin\{
     VoucherController,
     VoucherProductController,
     ImageController
+
 };
 use App\Http\Controllers\Client\BookController as ClientBookController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ReviewController;
 
 //
 // 🌐 PUBLIC CLIENT ROUTES
@@ -25,13 +27,18 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::get('/books', [BookController::class, 'index'])->name('books.index');
 
-
 Route::get('/book/{book}', [ClientBookController::class, 'show'])->name('book.detail');
 
 Route::middleware(['auth', 'role:user'])->get('/home', fn() => view('client.home'))
     ->name('home.user');
-Route::get('/reviews/create/{bookDetailId}', [ReviewController::class, 'create'])->name('reviews.create');
-Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+
+Route::prefix('reviews')->name('reviews.')->group(function () {
+    Route::middleware(['auth', 'role:user'])->group(function () {
+        Route::post('/', [ReviewController::class, 'store'])->name('store');         // Viết mới
+        Route::put('/{review}', [ReviewController::class, 'update'])->name('update'); // Cập nhật trong 24h
+    });
+});
+
 //
 // 🔐 AUTH ROUTES
 //
@@ -46,13 +53,15 @@ Route::controller(AuthController::class)->group(function () {
 //
 // 🛠 ADMIN DASHBOARD
 //
-Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
+Route::middleware(['auth', 'role:ADMIN'])->get('/admin', fn() => view('admin.dashboard'))
+    ->name('admin.dashboard');
 
+//
 // ⚙️ ADMIN CORE ROUTES
 //
 Route::prefix('admin')
     ->as('admin.')
-    ->middleware(['auth', 'role:admin'])
+    ->middleware(['auth', 'role:ADMIN'])
     ->group(function () {
 
         // 👤 Users
@@ -86,20 +95,16 @@ Route::prefix('admin')
             Route::post('/attach', [VoucherProductController::class, 'attach'])->name('attach');
             Route::post('/detach', [VoucherProductController::class, 'detach'])->name('detach');
         });
-
-        Route::resource('books', BookController::class)->except(['show']);
-
-        // Reviews
-        Route::resource('reviews', ReviewController::class)->except(['show']);
-        Route::patch('reviews/{id}/status', [ReviewController::class, 'updateStatus'])->name('reviews.updateStatus');
-            
-        //
+        // ⭐ Reviews - ADMIN
+        Route::prefix('reviews')->as('reviews.')->group(function () {
+            Route::get('/', [ReviewController::class, 'index'])->name('index');                      // Danh sách đánh giá
+            Route::patch('/{review}/status', [ReviewController::class, 'updateStatus'])->name('updateStatus'); // Duyệt / ẩn / chờ
+        });
     });
-
 
 Route::prefix('admin')
     ->as('admin.')
-    ->middleware(['auth', 'role:admin'])
+    ->middleware(['auth', 'role:ADMIN'])
     ->group(function () {
 
         // 💵 ROUTES cho quản lý đơn hàng tại quầy
@@ -140,12 +145,18 @@ Route::prefix('admin')
             });
     });
 
+Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
-// API routes (không cần auth)
-Route::get('/api/products', [HomeController::class, 'getProductsData'])->name('api.products');
-
-// Route động cho trang chi tiết sản phẩm (không cần auth)
-Route::get('/product/{id}', function ($id) {
-    return view('client.product_detail', ['id' => $id]);
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::resource('books', BookController::class)->except(['show']);
+    Route::post('books/{book}/details', [BookController::class, 'addDetail'])->name('books.details.add');
+    Route::put('books/{book}/details/{detail}', [BookController::class, 'updateDetail'])->name('books.details.update');
+    Route::delete('books/{book}/details/{detail}', [BookController::class, 'deleteDetail'])->name('books.details.delete');
 });
 
+Route::prefix('admin')
+    ->as('admin.')
+    ->middleware(['auth', 'role:admin'])
+    ->group(function () {
+        Route::resource('images', ImageController::class);
+    });
