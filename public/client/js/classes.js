@@ -47,7 +47,11 @@ function Promo(name, value) { // khuyen mai
 	}
 }
 
+<<<<<<< HEAD
 function Product(masp, name, img, price, star, rateCount, promo) {
+=======
+function Product(masp, name, img, price, star, rateCount, promo, book_id) {
+>>>>>>> bb0dd456760762e21f130d1cde44876af4484162
 	this.masp = masp;
 	this.img = img;
 	this.name = name;
@@ -55,9 +59,22 @@ function Product(masp, name, img, price, star, rateCount, promo) {
 	this.star = star;
 	this.rateCount = rateCount;
 	this.promo = promo;
+<<<<<<< HEAD
 }
 
 function addToWeb(p, ele, returnString) {
+=======
+	this.book_id = book_id || masp;
+}
+
+function addToWeb(p, ele, returnString) {
+	// Kiểm tra và log nếu book_id bị undefined
+	if (!p.book_id) {
+		console.error('TẠO LINK CHI TIẾT SẢN PHẨM: book_id bị undefined:', p);
+	}
+	var chitietSp = '/product/' + p.book_id;
+
+>>>>>>> bb0dd456760762e21f130d1cde44876af4484162
 	// Chuyển star sang dạng tag html
 	var rating = "";
 	if (p.rateCount > 0) {
@@ -81,7 +98,14 @@ function addToWeb(p, ele, returnString) {
 
 	// tách theo dấu ' ' vào gắn lại bằng dấu '-', code này giúp bỏ hết khoảng trắng và thay vào bằng dấu '-'.
 	// Tạo link tới chi tiết sản phẩm, chuyển tất cả ' ' thành '-'
+<<<<<<< HEAD
+<<<<<<< HEAD
 	var chitietSp = 'chitietsanpham.html?' + p.name.split(' ').join('-');
+=======
+>>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+=======
+	var chitietSp = 'chitietsanpham.html?' + p.name.split(' ').join('-');
+>>>>>>> 403b81004c524c3a82f6e1695d2e1bea02830cdf
 
 	// Cho mọi thứ vào tag <li>... </li>
 	var newLi =
@@ -110,4 +134,8 @@ function addToWeb(p, ele, returnString) {
 	// Thêm tag <li> vừa tạo vào <ul> homeproduct (mặc định) , hoặc tag ele truyền vào
 	var products = ele || document.getElementById('products');
 	products.innerHTML += newLi;
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> bb0dd456760762e21f130d1cde44876af4484162
