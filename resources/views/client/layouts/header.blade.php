@@ -23,12 +23,12 @@
             <!-- PHẦN TÀI KHOẢN DÙNG BLADE -->
             <div class="member">
                 @if(Auth::check())
-                    <a href="#">
+                    <a href="{{route('profile.index')}}">
                         <i class="fa fa-user"></i>
                         {{ Auth::user()->name }}
                     </a>
                     <div class="menuMember">
-                        <a href="{{ route('home.user') }}">Trang người dùng</a>
+                        <a href="{{ route('profile.index') }}">Trang người dùng</a>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button type="submit" onclick="return confirm('Xác nhận đăng xuất?')">Đăng xuất</button>

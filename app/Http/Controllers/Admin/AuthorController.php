@@ -8,9 +8,16 @@ use Illuminate\Http\Request;
 
 class AuthorController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $authors = Author::paginate(10);
+        $query = Author::withoutGlobalScopes();
+
+        if ($request->has('keyword') && $request->keyword !== null) {
+            $query->where('name', 'like', '%' . $request->keyword . '%');
+        }
+
+        $authors = $query->paginate(10)->withQueryString();
+
         return view('admin.authors.index', compact('authors'));
     }
 

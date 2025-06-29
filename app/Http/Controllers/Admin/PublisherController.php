@@ -8,10 +8,16 @@ use Illuminate\Http\Request;
 
 class PublisherController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // Lấy tất cả, kể cả bản ghi bị ẩn
-        $publishers = Publisher::withoutGlobalScopes()->paginate(10);
+        $query = Publisher::withoutGlobalScopes();
+
+        if ($request->has('keyword') && $request->keyword !== null) {
+            $query->where('name', 'like', '%' . $request->keyword . '%');
+        }
+
+        $publishers = $query->paginate(10)->withQueryString();
+
         return view('admin.publishers.index', compact('publishers'));
     }
 

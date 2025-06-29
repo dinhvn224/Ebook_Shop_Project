@@ -17,7 +17,7 @@ use App\Http\Controllers\Admin\{
 };
 use App\Http\Controllers\Client\BookController as ClientBookController;
 use App\Http\Controllers\HomeController;
-
+use App\Http\Controllers\Client\UserProfileController;
 //
 // 🌐 PUBLIC CLIENT ROUTES
 //
@@ -30,6 +30,7 @@ Route::get('/book/{book}', [ClientBookController::class, 'show'])->name('book.de
 
 Route::middleware(['auth', 'role:user'])->get('/home', fn() => view('client.home'))
     ->name('home.user');
+
 
 //
 // 🔐 AUTH ROUTES
@@ -147,4 +148,12 @@ Route::prefix('admin')
     ->middleware(['auth', 'role:admin'])
     ->group(function () {
         Route::resource('images', ImageController::class);
+    });
+Route::middleware(['auth', 'role:user'])
+    ->prefix('profile')
+    ->name('profile.')
+    ->group(function () {
+        Route::get('/', [UserProfileController::class, 'index'])->name('index');      // profile.index
+        Route::get('/edit', [UserProfileController::class, 'edit'])->name('edit');    // profile.edit
+        Route::put('/update', [UserProfileController::class, 'update'])->name('update'); // profile.update
     });

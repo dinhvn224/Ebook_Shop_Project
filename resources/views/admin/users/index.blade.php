@@ -9,6 +9,28 @@
     <div class="alert alert-success">{{ session('success') }}</div>
 @endif
 
+<!-- Thanh tìm kiếm -->
+<div class="mb-3">
+    <form action="{{ route('admin.users.index') }}" method="GET" class="row g-2">
+        <div class="col-auto">
+            <input type="text" name="keyword" class="form-control" placeholder="Tìm theo tên hoặc email..."
+                   value="{{ request('keyword') }}">
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-outline-primary">
+                <i class="fas fa-search"></i> Tìm kiếm
+            </button>
+        </div>
+        @if(request('keyword'))
+            <div class="col-auto">
+                <a href="{{ route('admin.users.index') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-times"></i> Xóa lọc
+                </a>
+            </div>
+        @endif
+    </form>
+</div>
+
 <table class="table table-bordered table-striped">
     <thead class="thead-dark">
         <tr>
@@ -22,7 +44,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach($users as $user)
+        @forelse($users as $user)
         <tr>
             <td>{{ $user->id }}</td>
             <td>{{ $user->name }}</td>
@@ -45,10 +67,26 @@
                 </form>
             </td>
         </tr>
-        @endforeach
+        @empty
+        <tr>
+            <td colspan="7" class="text-muted text-center py-4">
+                <i class="fas fa-user-slash fa-2x mb-2"></i><br>
+                Không tìm thấy người dùng nào.
+            </td>
+        </tr>
+        @endforelse
     </tbody>
 </table>
 
-{{ $users->links() }}  <!-- Phân trang -->
+@if($users->hasPages())
+<div class="d-flex justify-content-between align-items-center mt-3">
+    <div>
+        {{ $users->links('pagination::bootstrap-5') }}
+    </div>
+    <div class="text-muted small">
+        Hiển thị từ {{ $users->firstItem() ?? 0 }} đến {{ $users->lastItem() ?? 0 }} / {{ $users->total() }} người dùng
+    </div>
+</div>
+@endif
 
 @endsection
