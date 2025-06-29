@@ -97,15 +97,5 @@
                     initProductDetail();
                 }
             });
-
-        // Hàm chuyển hướng đến trang review (luôn chuyển hướng nếu có book_id)
-        function redirectToReview() {
-            if (sanPhamHienTai && sanPhamHienTai.book_id) {
-                window.location.href = '{{ route("reviews.create", ["bookDetailId" => ":id"]) }}'.replace(':id', sanPhamHienTai.book_id);
-            } else {
-                console.error('Không tìm thấy book_id:', sanPhamHienTai);
-                window.location.href = '{{ url("/") }}'; // Fallback nếu không có book_id
-            }
-        }
     </script>
 @endsection

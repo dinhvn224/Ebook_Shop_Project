@@ -20,9 +20,21 @@ window.onload = function () {
             }
         }
 
+<<<<<<< HEAD
         addTatCaDonHang(currentUser); // hàm này cần chạy trước để tính được tổng tiền tất cả đơn hàng
         addInfoUser(currentUser);
 
+=======
+<<<<<<< HEAD
+        addTatCaDonHang(currentUser); // hàm này cần chạy trước để tính được tổng tiền tất cả đơn hàng 
+        addInfoUser(currentUser);
+    
+=======
+        addTatCaDonHang(currentUser); // hàm này cần chạy trước để tính được tổng tiền tất cả đơn hàng
+        addInfoUser(currentUser);
+
+>>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
     } else {
         var warning = `<h2 style="color: red; font-weight:bold; text-align:center; font-size: 2em; padding: 50px;">
                             Bạn chưa đăng nhập !!
@@ -47,8 +59,18 @@ function addInfoUser(user) {
         </tr>
         <tr>
             <td>Mật khẩu: </td>
+<<<<<<< HEAD
             <td style="text-align: center;">
                 <i class="fa fa-pencil" id="butDoiMatKhau" onclick="openChangePass()"> Đổi mật khẩu</i>
+=======
+<<<<<<< HEAD
+            <td style="text-align: center;"> 
+                <i class="fa fa-pencil" id="butDoiMatKhau" onclick="openChangePass()"> Đổi mật khẩu</i> 
+=======
+            <td style="text-align: center;">
+                <i class="fa fa-pencil" id="butDoiMatKhau" onclick="openChangePass()"> Đổi mật khẩu</i>
+>>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
             </td>
             <td></td>
         </tr>
@@ -69,8 +91,18 @@ function addInfoUser(user) {
                     </tr>
                     <tr>
                         <td></td>
+<<<<<<< HEAD
                         <td>
                             <div><button onclick="changePass()">Đồng ý</button></div>
+=======
+<<<<<<< HEAD
+                        <td> 
+                            <div><button onclick="changePass()">Đồng ý</button></div> 
+=======
+                        <td>
+                            <div><button onclick="changePass()">Đồng ý</button></div>
+>>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
                         </td>
                     </tr>
                 </table>
@@ -165,7 +197,15 @@ function changeInfo(iTag, info) {
             // Đổi tên trong list đơn hàng
             if (!currentUser.donhang.length) {
                 document.getElementsByClassName('listDonHang')[0].innerHTML = `
+<<<<<<< HEAD
                     <h3 style="width=100%; padding: 50px; color: green; font-size: 2em; text-align: center">
+=======
+<<<<<<< HEAD
+                    <h3 style="width=100%; padding: 50px; color: green; font-size: 2em; text-align: center"> 
+=======
+                    <h3 style="width=100%; padding: 50px; color: green; font-size: 2em; text-align: center">
+>>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
                         Xin chào ` + inp.value + `. Bạn chưa có đơn hàng nào.
                     </h3>`;
             }
@@ -210,14 +250,30 @@ function changeInfo(iTag, info) {
 function addTatCaDonHang(user) {
     if (!user) {
         document.getElementsByClassName('listDonHang')[0].innerHTML = `
+<<<<<<< HEAD
             <h3 style="width=100%; padding: 50px; color: red; font-size: 2em; text-align: center">
+=======
+<<<<<<< HEAD
+            <h3 style="width=100%; padding: 50px; color: red; font-size: 2em; text-align: center"> 
+=======
+            <h3 style="width=100%; padding: 50px; color: red; font-size: 2em; text-align: center">
+>>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
                 Bạn chưa đăng nhập !!
             </h3>`;
         return;
     }
     if (!user.donhang.length) {
         document.getElementsByClassName('listDonHang')[0].innerHTML = `
+<<<<<<< HEAD
             <h3 style="width=100%; padding: 50px; color: green; font-size: 2em; text-align: center">
+=======
+<<<<<<< HEAD
+            <h3 style="width=100%; padding: 50px; color: green; font-size: 2em; text-align: center"> 
+=======
+            <h3 style="width=100%; padding: 50px; color: green; font-size: 2em; text-align: center">
+>>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
                 Xin chào ` + currentUser.username + `. Bạn chưa có đơn hàng nào.
             </h3>`;
         return;
@@ -232,9 +288,21 @@ function addDonHang(dh) {
 
     var s = `
             <table class="listSanPham">
+<<<<<<< HEAD
                 <tr>
                     <th colspan="6">
                         <h3 style="text-align:center;"> Đơn hàng ngày: ` + new Date(dh.ngaymua).toLocaleString() + `</h3>
+=======
+<<<<<<< HEAD
+                <tr> 
+                    <th colspan="6">
+                        <h3 style="text-align:center;"> Đơn hàng ngày: ` + new Date(dh.ngaymua).toLocaleString() + `</h3> 
+=======
+                <tr>
+                    <th colspan="6">
+                        <h3 style="text-align:center;"> Đơn hàng ngày: ` + new Date(dh.ngaymua).toLocaleString() + `</h3>
+>>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
                     </th>
                 </tr>
                 <tr>
@@ -243,7 +311,15 @@ function addDonHang(dh) {
                     <th>Giá</th>
                     <th>Số lượng</th>
                     <th>Thành tiền</th>
+<<<<<<< HEAD
                     <th>Thời gian thêm vào giỏ</th>
+=======
+<<<<<<< HEAD
+                    <th>Thời gian thêm vào giỏ</th> 
+=======
+                    <th>Thời gian thêm vào giỏ</th>
+>>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
                 </tr>`;
 
     var totalPrice = 0;
@@ -259,7 +335,15 @@ function addDonHang(dh) {
                 <tr>
                     <td>` + (i + 1) + `</td>
                     <td class="noPadding imgHide">
+<<<<<<< HEAD
                         <a target="_blank" href="/product/` + p.book_id + `" title="Xem chi tiết">
+=======
+<<<<<<< HEAD
+                        <a target="_blank" href="chitietsanpham.html?` + p.name.split(' ').join('-') + `" title="Xem chi tiết">
+=======
+                        <a target="_blank" href="/product/` + p.book_id + `" title="Xem chi tiết">
+>>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
                             ` + p.name + `
                             <img src="` + p.img + `">
                         </a>
@@ -287,4 +371,12 @@ function addDonHang(dh) {
             <hr>
         `;
     div.innerHTML += s;
+<<<<<<< HEAD
 }
+=======
+<<<<<<< HEAD
+}
+=======
+}
+>>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb

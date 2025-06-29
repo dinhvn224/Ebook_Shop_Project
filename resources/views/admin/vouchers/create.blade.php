@@ -16,8 +16,8 @@
         <li>
           @switch($error)
             @case('The code has already been taken.') Mã giảm giá này đã tồn tại rồi. @break
-            @case('The start at field must be a valid date.') Trường "Ngày bắt đầu" phải là ngày hợp lệ. @break
-            @case('The expires at field must be a valid date.') Trường "Ngày kết thúc" phải là ngày hợp lệ. @break
+            @case('The start date field must be a valid date.') Trường "Ngày bắt đầu" phải là ngày hợp lệ. @break
+            @case('The end date field must be a valid date.') Trường "Ngày kết thúc" phải là ngày hợp lệ. @break
             @default {{ $error }}
           @endswitch
         </li>
@@ -48,16 +48,16 @@
 
         <div class="col-md-6">
           <label class="form-label">Loại giảm</label>
-          <select name="type" class="form-select" required>
+          <select name="discount_type" class="form-select" required>
             <option value="">-- Chọn loại --</option>
-            <option value="percent" {{ old('type', $voucher->type ?? '') == 'percent' ? 'selected' : '' }}>Phần trăm</option>
-            <option value="fixed" {{ old('type', $voucher->type ?? '') == 'fixed' ? 'selected' : '' }}>Số tiền cố định</option>
+            <option value="PERCENT" {{ old('discount_type', $voucher->discount_type ?? '') == 'PERCENT' ? 'selected' : '' }}>Phần trăm</option>
+            <option value="FIXED" {{ old('discount_type', $voucher->discount_type ?? '') == 'FIXED' ? 'selected' : '' }}>Số tiền cố định</option>
           </select>
         </div>
 
         <div class="col-md-6">
           <label class="form-label">Giá trị giảm</label>
-          <input type="number" name="value" class="form-control" value="{{ old('value', $voucher->value ?? '') }}" required>
+          <input type="number" name="discount_value" class="form-control" value="{{ old('discount_value', $voucher->discount_value ?? '') }}" required>
         </div>
 
         <div class="col-md-6">
@@ -67,19 +67,24 @@
 
         <div class="col-md-6">
           <label class="form-label">Lượt dùng tối đa</label>
-          <input type="number" name="usage_limit" class="form-control" value="{{ old('usage_limit', $voucher->usage_limit ?? '') }}">
+          <input type="number" name="max_uses" class="form-control" value="{{ old('max_uses', $voucher->max_uses ?? '') }}">
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Điều kiện tối thiểu (VNĐ)</label>
+          <input type="number" name="min_order_amount" class="form-control" value="{{ old('min_order_amount', $voucher->min_order_amount ?? '') }}">
         </div>
 
         <div class="col-md-6">
           <label class="form-label">Ngày bắt đầu</label>
-          <input type="datetime-local" name="start_at" class="form-control"
-            value="{{ old('start_at', isset($voucher->start_at) ? optional($voucher->start_at)->format('Y-m-d\TH:i') : '') }}">
+          <input type="datetime-local" name="start_date" class="form-control"
+            value="{{ old('start_date', isset($voucher->start_date) ? optional($voucher->start_date)->format('Y-m-d\TH:i') : '') }}">
         </div>
 
         <div class="col-md-6">
           <label class="form-label">Ngày kết thúc</label>
-          <input type="datetime-local" name="expires_at" class="form-control"
-            value="{{ old('expires_at', isset($voucher->expires_at) ? optional($voucher->expires_at)->format('Y-m-d\TH:i') : '') }}">
+          <input type="datetime-local" name="end_date" class="form-control"
+            value="{{ old('end_date', isset($voucher->end_date) ? optional($voucher->end_date)->format('Y-m-d\TH:i') : '') }}">
         </div>
 
         <div class="col-md-6 d-flex align-items-center">

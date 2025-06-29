@@ -1,13 +1,11 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\HomeController;
-
 use App\Http\Controllers\Admin\{
     UserController,
     AuthorController,
+    BookController,
     CategoryController,
     PublisherController,
     OrderController,
@@ -15,14 +13,20 @@ use App\Http\Controllers\Admin\{
     DashboardController,
     VoucherController,
     VoucherProductController,
-    ReviewController,
-    BookController
+    ImageController
 };
+use App\Http\Controllers\Client\BookController as ClientBookController;
+use App\Http\Controllers\HomeController;
 
 //
 // 🌐 PUBLIC CLIENT ROUTES
 //
-Route::get('/', fn() => view('client.home'))->name('home');
+Route::get('/', [HomeController::class, 'index'])->name('home');
+
+Route::get('/books', [BookController::class, 'index'])->name('books.index');
+
+
+Route::get('/book/{book}', [ClientBookController::class, 'show'])->name('book.detail');
 
 Route::middleware(['auth', 'role:user'])->get('/home', fn() => view('client.home'))
     ->name('home.user');
@@ -42,14 +46,13 @@ Route::controller(AuthController::class)->group(function () {
 //
 // 🛠 ADMIN DASHBOARD
 //
-Route::middleware(['auth', 'role:ADMIN'])->get('/admin', fn() => view('admin.dashboard'))
-    ->name('admin.dashboard');
+Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
 // ⚙️ ADMIN CORE ROUTES
 //
 Route::prefix('admin')
     ->as('admin.')
-    ->middleware(['auth', 'role:ADMIN'])
+    ->middleware(['auth', 'role:admin'])
     ->group(function () {
 
         // 👤 Users
@@ -96,7 +99,7 @@ Route::prefix('admin')
 
 Route::prefix('admin')
     ->as('admin.')
-    ->middleware(['auth', 'role:ADMIN'])
+    ->middleware(['auth', 'role:admin'])
     ->group(function () {
 
         // 💵 ROUTES cho quản lý đơn hàng tại quầy

@@ -23,7 +23,6 @@ class Order extends Model
         'change_amount',
     ];
 
-    // 🧠 Thêm dòng này để Laravel auto-cast ngày sang Carbon
     protected $casts = [
         'order_date' => 'datetime',
         'completed_date' => 'datetime',

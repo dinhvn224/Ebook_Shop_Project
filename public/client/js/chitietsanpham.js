@@ -1,3 +1,15 @@
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+var nameProduct, maProduct, sanPhamHienTai; // Tên sản phẩm trong trang này, 
+// là biến toàn cục để có thể dùng ở bát cứ đâu trong trang
+// không cần tính toán lấy tên từ url nhiều lần
+
+window.onload = function () {
+    khoiTao();
+
+=======
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
 var nameProduct, maProduct, sanPhamHienTai; // Tên sản phẩm trong trang này,
 // là biến toàn cục để có thể dùng ở bát cứ đâu trong trang
 // không cần tính toán lấy tên từ url nhiều lần
@@ -8,6 +20,10 @@ var dataLoaded = false;
 // Hàm khởi tạo trang chi tiết sản phẩm
 function initProductDetail() {
     khoiTao();
+<<<<<<< HEAD
+=======
+>>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
     phanTich_URL_chiTietSanPham();
 
     // autocomplete cho khung tim kiem
@@ -23,6 +39,28 @@ function khongTimThaySanPham() {
 }
 
 function phanTich_URL_chiTietSanPham() {
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+    nameProduct = window.location.href.split('?')[1]; // lấy tên
+    if(!nameProduct) return khongTimThaySanPham();
+
+    // tách theo dấu '-' vào gắn lại bằng dấu ' ', code này giúp bỏ hết dấu '-' thay vào bằng khoảng trắng.
+    // code này làm ngược lại so với lúc tạo href cho sản phẩm trong file classes.js
+    nameProduct = nameProduct.split('-').join(' ');
+
+    for(var p of list_products) {
+        if(nameProduct == p.name) {
+            maProduct = p.masp;
+            break;
+        }
+    }
+
+    sanPhamHienTai = timKiemTheoMa(list_products, maProduct);
+    if(!sanPhamHienTai) return khongTimThaySanPham();
+
+=======
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
     // Lấy ID từ URL thay vì tên sản phẩm
     const urlParts = window.location.pathname.split('/');
     const productId = urlParts[urlParts.length - 1];
@@ -37,6 +75,10 @@ function phanTich_URL_chiTietSanPham() {
     nameProduct = sanPhamHienTai.name || sanPhamHienTai.title || 'Sản phẩm không tên';
     maProduct = sanPhamHienTai.book_id || sanPhamHienTai.id || sanPhamHienTai.masp;
 
+<<<<<<< HEAD
+=======
+>>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
     var divChiTiet = document.getElementsByClassName('chitietSanpham')[0];
 
     // Đổi title
@@ -47,11 +89,29 @@ function phanTich_URL_chiTietSanPham() {
     h1.innerHTML = 'Sách ' + nameProduct;
 
     // Cập nhật sao
+<<<<<<< HEAD
     var rating = divChiTiet.getElementsByClassName('rating')[0];
+=======
+    var rating = "";
+<<<<<<< HEAD
+    if (sanPhamHienTai.rateCount > 0) {
+        for (var i = 1; i <= 5; i++) {
+            if (i <= sanPhamHienTai.star) {
+=======
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
     if (sanPhamHienTai.rateCount && sanPhamHienTai.rateCount > 0) {
         var stars = '';
         for (var i = 1; i <= 5; i++) {
+<<<<<<< HEAD
             stars += `<i class="fa fa-star${i <= (sanPhamHienTai.star || 0) ? '' : '-o'}"></i>`;
+=======
+            if (i <= (sanPhamHienTai.star || 0)) {
+>>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+                rating += `<i class="fa fa-star"></i>`
+            } else {
+                rating += `<i class="fa fa-star-o"></i>`
+            }
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
         }
         stars += `<span> (${sanPhamHienTai.rateCount} đánh giá)</span>`;
         rating.innerHTML = stars;
@@ -59,14 +119,38 @@ function phanTich_URL_chiTietSanPham() {
 
     // Cập nhật giá + label khuyến mãi
     var price = divChiTiet.getElementsByClassName('area_price')[0];
+<<<<<<< HEAD
     if (sanPhamHienTai.promo && sanPhamHienTai.promo.name && sanPhamHienTai.promo.name !== 'giareonline') {
         price.innerHTML = `<strong>${sanPhamHienTai.price}₫</strong>`;
+=======
+<<<<<<< HEAD
+    if (sanPhamHienTai.promo.name != 'giareonline') {
+        price.innerHTML = `<strong>` + sanPhamHienTai.price + `₫</strong>`;
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
         price.innerHTML += new Promo(sanPhamHienTai.promo.name, sanPhamHienTai.promo.value).toWeb();
     } else if (sanPhamHienTai.promo && sanPhamHienTai.promo.name === 'giareonline') {
         document.getElementsByClassName('ship')[0].style.display = '';
         price.innerHTML = `<strong>${sanPhamHienTai.promo.value}₫</strong><span>${sanPhamHienTai.price}₫</span>`;
     } else {
+<<<<<<< HEAD
         price.innerHTML = `<strong>${sanPhamHienTai.price}₫</strong>`;
+=======
+        document.getElementsByClassName('ship')[0].style.display = ''; // hiển thị 'giao hàng trong 1 giờ'
+        price.innerHTML = `<strong>` + sanPhamHienTai.promo.value + `&#8363;</strong>
+					        <span>` + sanPhamHienTai.price + `&#8363;</span>`;
+=======
+    if (sanPhamHienTai.promo && sanPhamHienTai.promo.name && sanPhamHienTai.promo.name != 'giareonline') {
+        price.innerHTML = `<strong>` + sanPhamHienTai.price + `₫</strong>`;
+        price.innerHTML += new Promo(sanPhamHienTai.promo.name, sanPhamHienTai.promo.value).toWeb();
+    } else if (sanPhamHienTai.promo && sanPhamHienTai.promo.name == 'giareonline') {
+        document.getElementsByClassName('ship')[0].style.display = ''; // hiển thị 'giao hàng trong 1 giờ'
+        price.innerHTML = `<strong>` + sanPhamHienTai.promo.value + `&#8363;</strong>
+					        <span>` + sanPhamHienTai.price + `&#8363;</span>`;
+    } else {
+        // Trường hợp không có khuyến mãi
+        price.innerHTML = `<strong>` + sanPhamHienTai.price + `₫</strong>`;
+>>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
     }
 
     // Cập nhật chi tiết khuyến mãi
@@ -74,6 +158,13 @@ function phanTich_URL_chiTietSanPham() {
 
     // Cập nhật thông số
     var info = document.getElementsByClassName('info')[0];
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+    var s = addThongSo('Tác Giả', sanPhamHienTai.detail.tacgia);
+    s += addThongSo('xuất sứ', sanPhamHienTai.detail.xuatsu);
+=======
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
     var s = '';
     if (sanPhamHienTai.detail) {
         s = addThongSo('Tác Giả', sanPhamHienTai.detail.tacgia || 'Chưa có thông tin');
@@ -82,10 +173,33 @@ function phanTich_URL_chiTietSanPham() {
         s = addThongSo('Tác Giả', 'Chưa có thông tin');
         s += addThongSo('xuất sứ', 'Chưa có thông tin');
     }
+<<<<<<< HEAD
     info.innerHTML = s;
 
     // Cập nhật hình
     var hinh = divChiTiet.getElementsByClassName('picture')[0].getElementsByTagName('img')[0];
+=======
+>>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+    info.innerHTML = s;
+
+    // Cập nhật hình
+    var hinh = divChiTiet.getElementsByClassName('picture')[0];
+    hinh = hinh.getElementsByTagName('img')[0];
+<<<<<<< HEAD
+    hinh.src = sanPhamHienTai.img;
+    document.getElementById('bigimg').src = sanPhamHienTai.img;
+
+    
+
+    // Khởi động thư viện hỗ trợ banner - chỉ chạy sau khi tạo xong hình nhỏ
+    var owl = $('.owl-carousel');
+    owl.owlCarousel({
+        items: 5,
+        center: true,
+        smartSpeed: 450,
+    });
+=======
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
     if (sanPhamHienTai.img) {
         hinh.src = sanPhamHienTai.img;
         document.getElementById('bigimg').src = sanPhamHienTai.img;
@@ -108,10 +222,15 @@ function phanTich_URL_chiTietSanPham() {
     document.querySelector('.buy_now').onclick = function() {
         themVaoGioHang(sanPhamHienTai.book_id || sanPhamHienTai.id || sanPhamHienTai.masp, nameProduct);
     };
+<<<<<<< HEAD
+=======
+>>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
 }
 
 // Chi tiết khuyến mãi
 function getDetailPromo(sp) {
+<<<<<<< HEAD
     if (!sp.promo || !sp.promo.name) return '';
     switch (sp.promo.name) {
         case 'giamgia':
@@ -125,6 +244,34 @@ function getDetailPromo(sp) {
             return `Sản phẩm sẽ được giảm ${span}₫ khi mua hàng online bằng thẻ VPBank hoặc tin nhắn SMS`;
         default:
             return '';
+=======
+<<<<<<< HEAD
+=======
+    if (!sp.promo || !sp.promo.name) return '';
+>>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+    switch (sp.promo.name) {
+        case 'giamgia':
+            var span = `<span style="font-weight: bold">` + sp.promo.value + `</span>`;
+            return `Khách hàng sẽ được giảm ` + span + `₫ khi tới mua trực tiếp tại cửa hàng`;
+<<<<<<< HEAD
+
+        case 'moiramat':
+            return `Khách hàng được đọc thử tại cửa hàng.`;
+
+=======
+        case 'moiramat':
+            return `Khách hàng được đọc thử tại cửa hàng.`;
+>>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+        case 'giareonline':
+            var del = stringToNum(sp.price) - stringToNum(sp.promo.value);
+            var span = `<span style="font-weight: bold">` + numToString(del) + `</span>`;
+            return `Sản phẩm sẽ được giảm ` + span + `₫ khi mua hàng online bằng thẻ VPBank hoặc tin nhắn SMS`;
+<<<<<<< HEAD
+=======
+        default:
+            return '';
+>>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
     }
 }
 
@@ -182,6 +329,18 @@ function addKhungSanPham(list_sanpham, tenKhung, color, ele) {
 
 /// gợi ý sản phẩm
 function suggestion(){
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+    // ====== Lay ra thong tin san pham hien tai ====== 
+    const giaSanPhamHienTai = stringToNum(sanPhamHienTai.price);
+
+    // ====== Tìm các sản phẩm tương tự theo tiêu chí ====== 
+    const sanPhamTuongTu = list_products
+    // Lọc sản phẩm trùng
+    .filter((_) => _.masp !== sanPhamHienTai.masp)
+=======
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
     // ====== Lay ra thong tin san pham hien tai ======
     const giaSanPhamHienTai = stringToNum(sanPhamHienTai.price);
 
@@ -189,6 +348,10 @@ function suggestion(){
     const sanPhamTuongTu = list_products
     // Lọc sản phẩm trùng
     .filter((_) => _.masp !== sanPhamHienTai.masp && _.masp && sanPhamHienTai.masp)
+<<<<<<< HEAD
+=======
+>>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
     // Tính điểm cho từng sản phẩm
     .map(sanPham => {
         // Tiêu chí 1: giá sản phẩm ko lệch nhau quá 1 triệu
@@ -196,6 +359,29 @@ function suggestion(){
         let giaTienGanGiong = Math.abs(giaSanPham - giaSanPhamHienTai) < 1000000;
 
         // Tiêu chí 2: các thông số kỹ thuật giống nhau
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+        let soLuongChiTietGiongNhau = 0;                
+        for(let key in sanPham.detail) {
+            let value = sanPham.detail[key];
+            let currentValue = sanPhamHienTai.detail[key];
+
+            if(value == currentValue) soLuongChiTietGiongNhau++;
+        }
+        let giongThongSoKyThuat  = soLuongChiTietGiongNhau >= 3;
+
+        // Tiêu chí 3: cùng hãng sản xuất 
+        let cungHangSanXuat = sanPham.company ===  sanPhamHienTai.company
+
+        // Tiêu chí 4: cùng loại khuyến mãi
+        let cungLoaiKhuyenMai = sanPham.promo?.name === sanPhamHienTai.promo?.name;
+        
+        // Tiêu chí 5: có đánh giá, số sao
+        let soDanhGia = Number.parseInt(sanPham.rateCount, 10)
+        let soSao = Number.parseInt(sanPham.star, 10);
+=======
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
         let soLuongChiTietGiongNhau = 0;
         if (sanPham.detail && sanPhamHienTai.detail) {
             for(let key in sanPham.detail) {
@@ -218,6 +404,10 @@ function suggestion(){
         // Tiêu chí 5: có đánh giá, số sao
         let soDanhGia = Number.parseInt(sanPham.rateCount || 0, 10);
         let soSao = Number.parseInt(sanPham.star || 0, 10);
+<<<<<<< HEAD
+=======
+>>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
 
         // Tính điểm cho sản phẩm này (càng thoả nhiều tiêu chí điểm càng cao => càng nên gợi ý)
         let diem = 0;
@@ -239,9 +429,27 @@ function suggestion(){
     // Lấy ra 10 sản phẩm đầu tiên
     .slice(0, 10);
 
+<<<<<<< HEAD
     // ====== Hiển thị 5 sản phẩm lên web ======
+=======
+    console.log(sanPhamTuongTu)
+
+<<<<<<< HEAD
+    // ====== Hiển thị 5 sản phẩm lên web ====== 
+=======
+    // ====== Hiển thị 5 sản phẩm lên web ======
+>>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
     if(sanPhamTuongTu.length) {
         let div = document.getElementById('goiYSanPham');
         addKhungSanPham(sanPhamTuongTu, 'Bạn có thể thích', ['#434aa8', '#ec1f1f'], div);
     }
+<<<<<<< HEAD
 }
+=======
+<<<<<<< HEAD
+}
+=======
+}
+>>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
