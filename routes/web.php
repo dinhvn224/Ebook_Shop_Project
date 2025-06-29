@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\{
 };
 use App\Http\Controllers\Client\BookController as ClientBookController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ChatBotController;
 
 //
 // 🌐 PUBLIC CLIENT ROUTES
@@ -143,3 +144,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::put('books/{book}/details/{detail}', [BookController::class, 'updateDetail'])->name('books.details.update');
     Route::delete('books/{book}/details/{detail}', [BookController::class, 'deleteDetail'])->name('books.details.delete');
 });
+
+//
+// 🤖 CHATBOT ROUTES
+//
+Route::post('/chatbot/webhook', [ChatBotController::class, 'webhook'])->name('chatbot.webhook');
