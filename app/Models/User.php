@@ -53,10 +53,11 @@ class User extends Authenticatable
             ->withTimestamps();
     }
 
-    public function notifications()
-    {
-        return $this->hasMany(Notification::class);
-    }
+public function customNotifications()
+{
+    return $this->hasMany(\App\Models\Notification::class);
+}
+
 
     // ================= HELPERS =================
 

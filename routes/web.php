@@ -12,10 +12,11 @@ use App\Http\Controllers\Admin\{
     CounterSaleController,
     DashboardController,
     VoucherController,
-    VoucherProductController
+    VoucherProductController,
 };
 use App\Http\Controllers\Client\BookController as ClientBookController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ReviewController;
 
 //
 // 🌐 PUBLIC CLIENT ROUTES
@@ -24,11 +25,16 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::get('/books', [BookController::class, 'index'])->name('books.index');
 
-
 Route::get('/book/{book}', [ClientBookController::class, 'show'])->name('book.detail');
 
 Route::middleware(['auth', 'role:user'])->get('/home', fn() => view('client.home'))
     ->name('home.user');
+
+Route::prefix('reviews')->name('reviews.')->middleware('auth')->group(function () {
+    Route::post('/', [ReviewController::class, 'store'])->name('store');
+    Route::put('/{review}', [ReviewController::class, 'update'])->name('update');
+});
+
 
 //
 // 🔐 AUTH ROUTES
@@ -86,10 +92,13 @@ Route::prefix('admin')
             Route::post('/attach', [VoucherProductController::class, 'attach'])->name('attach');
             Route::post('/detach', [VoucherProductController::class, 'detach'])->name('detach');
         });
-
-        //
+        // ⭐ Reviews - ADMIN
+        Route::prefix('reviews')->as('reviews.')->group(function () {
+            Route::get('/', [ReviewController::class, 'index'])->name('index');                      // Danh sách đánh giá
+            Route::patch('/{review}/status', [ReviewController::class, 'updateStatus'])->name('updateStatus'); // Duyệt / ẩn / chờ
+            Route::get('/statistics', [ReviewController::class, 'statistics'])->name('statistics');  // Thống kê
+        });
     });
-
 
 Route::prefix('admin')
     ->as('admin.')
@@ -137,7 +146,6 @@ Route::prefix('admin')
 Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
 Route::prefix('admin')->name('admin.')->group(function () {
-
     Route::resource('books', BookController::class)->except(['show']);
     Route::post('books/{book}/details', [BookController::class, 'addDetail'])->name('books.details.add');
     Route::put('books/{book}/details/{detail}', [BookController::class, 'updateDetail'])->name('books.details.update');

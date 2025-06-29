@@ -75,6 +75,17 @@
                 </div>
             </div>
         </div>
+        <form action="{{ route('reviews.store') }}" method="POST">
+    @csrf
+    <input type="hidden" name="book_detail_id" value="{{ $book->id }}">
+    <label for="rating">Số sao:</label>
+    <select name="rating" id="rating">
+        @for($i=1; $i<=5; $i++) <option value="{{ $i }}">{{ $i }}</option> @endfor
+    </select>
+    <textarea name="comment" placeholder="Viết đánh giá..."></textarea>
+    <button type="submit">Gửi đánh giá</button>
+</form>
+
         <div id="goiYSanPham"></div>
     </section>
 </div>

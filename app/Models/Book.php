@@ -55,7 +55,6 @@ class Book extends Model
         return $this->belongsToMany(Voucher::class, 'book_voucher');
     }
     
-
     // Global scope để loại bỏ sách đã bị đánh dấu xóa
     protected static function booted()
     {

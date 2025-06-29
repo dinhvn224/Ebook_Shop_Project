@@ -37,7 +37,6 @@
                                 </button>
                             </div>
                         </div>
-                        <!-- Thumbnail images would go here -->
                     </div>
                 </div>
 
@@ -50,11 +49,11 @@
                             <div class="rating-section">
                                 <div class="rating-stars">
                                     @for($i = 1; $i <= 5; $i++)
-                                        <i class="fas fa-star {{ $i <= 4 ? 'active' : '' }}"></i>
+                                        <i class="fas fa-star {{ $i <= round($avgRating) ? 'active' : '' }}"></i>
                                     @endfor
                                 </div>
-                                <span class="rating-count">(4.2) 256 đánh giá</span>
-                                <span class="sold-count">• 1.2k đã bán</span>
+                                <span class="rating-count">({{ number_format($avgRating, 1) }}) {{ $totalReviews }} đánh giá</span>
+                                <span class="sold-count">• {{ $bookDetail->sold_count ?? '1.2k' }} đã bán</span>
                             </div>
                         </div>
 
@@ -183,14 +182,14 @@
     <div class="container mt-5">
         <div class="product-tabs">
             <div class="tab-navigation">
-                <button class="tab-btn active" data-tab="description">Mô tả sản phẩm</button>
-                <button class="tab-btn" data-tab="specifications">Thông số kỹ thuật</button>
-                <button class="tab-btn" data-tab="reviews">Đánh giá (256)</button>
-                <button class="tab-btn" data-tab="shipping">Vận chuyển</button>
+                <button class="custom-tab-btn active" data-tab="description">Mô tả sản phẩm</button>
+                <button class="custom-tab-btn" data-tab="specifications">Thông số kỹ thuật</button>
+                <button class="custom-tab-btn" data-tab="reviews">Đánh giá ({{ $totalReviews }})</button>
+                <button class="custom-tab-btn" data-tab="shipping">Vận chuyển</button>
             </div>
 
-            <div class="tab-content-container">
-                <div class="tab-content active" id="description">
+            <div class="custom-tab-content-container">
+                <div class="custom-tab-content active" id="description">
                     <div class="description-content">
                         <h4>Mô tả sản phẩm</h4>
                         <div class="content-text">
@@ -199,7 +198,7 @@
                     </div>
                 </div>
 
-                <div class="tab-content" id="specifications">
+                <div class="custom-tab-content" id="specifications">
                     <div class="specifications-table">
                         <h4>Thông số kỹ thuật</h4>
                         <table class="spec-table">
@@ -235,25 +234,130 @@
                     </div>
                 </div>
 
-                <div class="tab-content" id="reviews">
+                <div class="custom-tab-content" id="reviews">
                     <div class="reviews-section">
                         <h4>Đánh giá từ khách hàng</h4>
+                        <!-- Tổng quan đánh giá -->
                         <div class="review-summary">
                             <div class="overall-rating">
-                                <span class="rating-number">4.2</span>
+                                <span class="rating-number">{{ number_format($avgRating, 1) }}</span>
                                 <div class="rating-stars">
                                     @for($i = 1; $i <= 5; $i++)
-                                        <i class="fas fa-star {{ $i <= 4 ? 'active' : '' }}"></i>
+                                        <i class="fas fa-star {{ $i <= round($avgRating) ? 'active' : '' }}"></i>
                                     @endfor
                                 </div>
-                                <span class="total-reviews">256 đánh giá</span>
+                                <span class="total-reviews">{{ $totalReviews }} đánh giá</span>
                             </div>
                         </div>
-                        <p class="text-muted">Chức năng đánh giá chi tiết sẽ được cập nhật sớm...</p>
+
+                        <!-- Form đánh giá hoặc hiển thị đánh giá đã có -->
+                        @if ($existingReview)
+                            <p>Bạn đã đánh giá sản phẩm này</p>
+                            <div class="review-rating mb-2">
+                                @for ($i = 1; $i <= 5; $i++)
+                                    @if ($i <= $existingReview->rating)
+                                        <i class="fas fa-star rated"></i>
+                                    @else
+                                        <i class="fas fa-star"></i>
+                                    @endif
+                                @endfor
+                            </div>
+                            <p>Bình luận: "{{ $existingReview->comment }}"</p>
+                            <span class="review-date">{{ $existingReview->created_at->format('d/m/Y H:i') }}</span>
+
+                            @if ($existingReview->created_at->diffInHours(now()) <= 24)
+                                <div class="mt-2">
+                                    <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editReviewModal">Chỉnh sửa</button>
+                                </div>
+                            @endif
+                        @elseif ($hasPurchased)
+                            <form action="{{ route('reviews.store') }}" method="POST" class="review-form mt-3">
+                                @csrf
+                                <input type="hidden" name="book_detail_id" value="{{ $bookDetail->id }}">
+                                <div class="form-group">
+                                    <label for="rating">Đánh giá (1-5 sao)</label>
+                                    <div class="star-rating">
+                                        @for ($i = 1; $i <= 5; $i++)
+                                            <input type="radio" id="star{{ $i }}" name="rating" value="{{ $i }}" required hidden>
+                                            <label for="star{{ $i }}" class="star" data-value="{{ $i }}"><i class="fas fa-star"></i></label>
+                                        @endfor
+                                    </div>
+                                </div>
+                                <div class="form-group mt-3">
+                                    <label for="comment">Bình luận</label>
+                                    <textarea name="comment" class="form-control" rows="4" maxlength="1000"></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary mt-3">Gửi đánh giá</button>
+                            </form>
+                        @endif
+
+                        <!-- Danh sách đánh giá -->
+                        <div class="review-list mt-4">
+                            @forelse($reviews as $review)
+                                <div class="review-card">
+                                    <div class="review-header">
+                                        <strong>{{ $review->user->name }}</strong>
+                                        <span class="review-date">{{ $review->created_at->format('d/m/Y H:i') }}</span>
+                                    </div>
+                                    <div class="review-rating">
+                                        @for ($i = 1; $i <= 5; $i++)
+                                            <i class="fas fa-star {{ $i <= $review->rating ? 'rated' : '' }}"></i>
+                                        @endfor
+                                    </div>
+                                    <div class="review-comment">
+                                        {{ $review->comment }}
+                                    </div>
+                                </div>
+                            @empty
+                                <p>Chưa có đánh giá nào cho sản phẩm này.</p>
+                            @endforelse
+                        </div>
+
+                        <!-- Modal chỉnh sửa -->
+                        @if ($existingReview && $existingReview->created_at->diffInHours(now()) <= 24)
+                            <div class="modal fade" id="editReviewModal" tabindex="-1" role="dialog" aria-labelledby="editReviewModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="editReviewModalLabel">Chỉnh sửa đánh giá</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form action="{{ route('reviews.update', $existingReview->id) }}" method="POST">
+                                                @csrf
+                                                @method('PUT')
+                                                <input type="hidden" name="book_detail_id" value="{{ $bookDetail->id }}">
+
+                                                <div class="form-group">
+                                                    <label for="rating">Đánh giá (1-5 sao)</label>
+                                                    <div class="star-rating">
+                                                        @for ($i = 1; $i <= 5; $i++)
+                                                            <input type="radio" id="edit-star{{ $i }}" name="rating" value="{{ $i }}"
+                                                                {{ $existingReview->rating == $i ? 'checked' : '' }} required hidden>
+                                                            <label for="edit-star{{ $i }}" class="star {{ $existingReview->rating >= $i ? 'selected' : '' }}" data-value="{{ $i }}">
+                                                                <i class="fas fa-star"></i>
+                                                            </label>
+                                                        @endfor
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group mt-3">
+                                                    <label for="comment">Bình luận</label>
+                                                    <textarea name="comment" class="form-control" rows="4" maxlength="1000">{{ $existingReview->comment }}</textarea>
+                                                </div>
+                                                <button type="submit" class="btn btn-primary mt-3">Cập nhật</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
                     </div>
                 </div>
 
-                <div class="tab-content" id="shipping">
+                <div class="custom-tab-content" id="shipping">
                     <div class="shipping-policy">
                         <h4>Chính sách vận chuyển</h4>
                         <div class="policy-content">
@@ -272,10 +376,12 @@
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
 </div>
+
 
 <style>
 /* Modern Design System */
@@ -291,7 +397,6 @@
     --background-light: #f8fafc;
     --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
     --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
     --radius: 8px;
     --radius-lg: 12px;
 }
@@ -412,9 +517,19 @@
     color: #d1d5db;
     transition: color 0.2s;
 }
+.star-rating label.selected i {
+    color: var(--warning-color) !important;
+}
 
-.rating-stars i.active {
+.rating-stars i.active, .rating-stars i.rated {
     color: var(--warning-color);
+}
+.fas.fa-star {
+    color: #d1d5db; /* sao xám */
+}
+
+.fas.fa-star.rated {
+    color: var(--warning-color); /* sao vàng */
 }
 
 .rating-count {
@@ -706,7 +821,7 @@
     border-bottom: 1px solid var(--border-color);
 }
 
-.tab-btn {
+.custom-tab-btn {
     flex: 1;
     padding: 1rem 1.5rem;
     background: transparent;
@@ -718,17 +833,17 @@
     position: relative;
 }
 
-.tab-btn:hover {
+.custom-tab-btn:hover {
     color: var(--primary-color);
     background: rgba(37, 99, 235, 0.05);
 }
 
-.tab-btn.active {
+.custom-tab-btn.active {
     color: var(--primary-color);
     background: white;
 }
 
-.tab-btn.active::after {
+.custom-tab-btn.active::after {
     content: '';
     position: absolute;
     bottom: 0;
@@ -738,19 +853,19 @@
     background: var(--primary-color);
 }
 
-.tab-content-container {
+.custom-tab-content-container {
     padding: 2rem;
 }
 
-.tab-content {
-    display: none;
+.custom-tab-content {
+    display: none !important;;
 }
 
-.tab-content.active {
-    display: block;
+.custom-tab-content.active {
+    display: block !important;;
 }
 
-.tab-content h4 {
+.custom-tab-content h4 {
     color: var(--text-primary);
     margin-bottom: 1rem;
     font-weight: 600;
@@ -810,28 +925,77 @@
     font-size: 0.875rem;
 }
 
-/* Policy Content */
-.policy-content {
+.review-form-section {
+    margin-bottom: 2rem;
+}
+
+.review-form {
+    max-width: 500px;
+}
+
+.star-rating {
+    display: flex;
+    gap: 5px;
+}
+
+.star-rating label {
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: #d1d5db;
+}
+
+.star-rating label:hover,
+.star-rating label:hover ~ label,
+.star-rating input:checked ~ label,
+.star-rating .selected {
+    color: var(--warning-color);
+}
+
+.review-list {
     display: grid;
     gap: 1.5rem;
 }
 
-.policy-item h6 {
-    color: var(--text-primary);
-    margin-bottom: 0.5rem;
+.review-card {
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 1rem;
+    background: white;
+}
+
+.review-header {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 0.5rem;
+    margin-bottom: 0.5rem;
 }
 
-.policy-item h6 i {
-    color: var(--primary-color);
+.review-header strong {
+    color: var(--text-primary);
+    font-weight: 600;
 }
 
-.policy-item p {
+.review-date {
     color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+.review-comment {
+    color: var(--text-primary);
     line-height: 1.6;
-    margin: 0;
+}
+
+/* Modal */
+.modal-content {
+    border-radius: var(--radius);
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--border-color);
+}
+
+.modal-title {
+    color: var(--text-primary);
 }
 
 /* Responsive Design */
@@ -869,7 +1033,7 @@
         flex-wrap: wrap;
     }
     
-    .tab-btn {
+    .custom-tab-btn {
         flex: none;
         min-width: 50%;
     }
@@ -884,7 +1048,7 @@
         height: 300px;
     }
     
-    .tab-btn {
+    .custom-tab-btn {
         min-width: 100%;
     }
 }
@@ -910,18 +1074,16 @@ function decreaseQuantity() {
 
 // Tab Functionality
 document.addEventListener('DOMContentLoaded', function() {
-    const tabBtns = document.querySelectorAll('.tab-btn');
-    const tabContents = document.querySelectorAll('.tab-content');
+    const tabBtns = document.querySelectorAll('.custom-tab-btn');
+    const tabContents = document.querySelectorAll('.custom-tab-content');
     
     tabBtns.forEach(btn => {
         btn.addEventListener('click', function() {
             const targetTab = this.getAttribute('data-tab');
             
-            // Remove active class from all tabs and contents
             tabBtns.forEach(b => b.classList.remove('active'));
             tabContents.forEach(c => c.classList.remove('active'));
             
-            // Add active class to clicked tab and corresponding content
             this.classList.add('active');
             document.getElementById(targetTab).classList.add('active');
         });
@@ -946,5 +1108,42 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+document.addEventListener('DOMContentLoaded', function () {
+    function setupStarRating(containerSelector, prefix) {
+        const container = document.querySelector(containerSelector);
+        if (!container) return;
+
+        const stars = container.querySelectorAll('.star');
+
+        stars.forEach(star => {
+            star.addEventListener('click', function () {
+                const value = parseInt(this.dataset.value);
+
+                // Cập nhật class selected
+                stars.forEach((s, i) => {
+                    s.classList.toggle('selected', i < value);
+                });
+
+                // Chọn input radio
+                const radio = document.getElementById(`${prefix}-star${value}`);
+                if (radio) radio.checked = true;
+            });
+
+            star.addEventListener('mouseover', function () {
+                const value = parseInt(this.dataset.value);
+                stars.forEach((s, i) => s.classList.toggle('hovered', i < value));
+            });
+
+            star.addEventListener('mouseout', function () {
+                stars.forEach(s => s.classList.remove('hovered'));
+            });
+        });
+    }
+
+    setupStarRating('.review-form .star-rating', ''); // Đánh giá mới
+    setupStarRating('#editReviewModal .star-rating', 'edit'); // Chỉnh sửa
+});
+
 </script>
 @endsection
