@@ -37,6 +37,16 @@ class BookDetail extends Model
         return $this->belongsTo(Book::class);
     }
 
+    public function images()
+    {
+        return $this->hasMany(\App\Models\Image::class, 'book_id', 'book_id');
+    }
+
+    public function mainImage()
+    {
+        return $this->hasOne(\App\Models\Image::class, 'book_id', 'book_id')->where('is_main', 1);
+    }
+
     protected static function booted()
     {
         static::addGlobalScope('not_deleted', function ($builder) {

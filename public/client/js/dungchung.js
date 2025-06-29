@@ -15,12 +15,15 @@ function setListAdmin(l) {
 // Hàm khởi tạo, tất cả các trang đều cần
 function khoiTao() {
 <<<<<<< HEAD
+<<<<<<< HEAD
     // get data từ localstorage
     list_products = getListProducts() || list_products;
 =======
     // KHÔNG lấy list_products từ localStorage nữa, luôn dùng biến toàn cục (API)
     // list_products = getListProducts() || list_products;
 >>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+=======
+>>>>>>> 403b81004c524c3a82f6e1695d2e1bea02830cdf
     adminInfo = getListAdmin() || adminInfo;
 
     setupEventTaiKhoan();
@@ -32,6 +35,7 @@ function khoiTao() {
 // Localstorage cho dssp: 'ListProducts
 function setListProducts(newList) {
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
     // Đảm bảo mọi sản phẩm đều có book_id
     for (var i = 0; i < newList.length; i++) {
@@ -40,6 +44,8 @@ function setListProducts(newList) {
         }
     }
 >>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+=======
+>>>>>>> 403b81004c524c3a82f6e1695d2e1bea02830cdf
     window.localStorage.setItem('ListProducts', JSON.stringify(newList));
 }
 
