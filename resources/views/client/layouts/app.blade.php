@@ -9,7 +9,7 @@
     <link rel="shortcut icon" href="{{ asset('client/img/favicon.ico') }}" />
 
     <!-- Load font awesome icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ asset('assets/plugins/fontawesome/css/all.min.css') }}">
 
     <!-- owl carousel libraries -->
     <link rel="stylesheet" href="{{ asset('client/js/owlcarousel/owl.carousel.min.css') }}">

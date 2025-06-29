@@ -12,7 +12,8 @@ use App\Http\Controllers\Admin\{
     CounterSaleController,
     DashboardController,
     VoucherController,
-    VoucherProductController
+    VoucherProductController,
+    ImageController
 };
 use App\Http\Controllers\Client\BookController as ClientBookController;
 use App\Http\Controllers\HomeController;
@@ -45,15 +46,14 @@ Route::controller(AuthController::class)->group(function () {
 //
 // 🛠 ADMIN DASHBOARD
 //
-Route::middleware(['auth', 'role:ADMIN'])->get('/admin', fn() => view('admin.dashboard'))
-    ->name('admin.dashboard');
+Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
 //
 // ⚙️ ADMIN CORE ROUTES
 //
 Route::prefix('admin')
     ->as('admin.')
-    ->middleware(['auth', 'role:ADMIN'])
+    ->middleware(['auth', 'role:admin'])
     ->group(function () {
 
         // 👤 Users
@@ -94,7 +94,7 @@ Route::prefix('admin')
 
 Route::prefix('admin')
     ->as('admin.')
-    ->middleware(['auth', 'role:ADMIN'])
+    ->middleware(['auth', 'role:admin'])
     ->group(function () {
 
         // 💵 ROUTES cho quản lý đơn hàng tại quầy
@@ -135,8 +135,6 @@ Route::prefix('admin')
             });
     });
 
-Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
-
 Route::prefix('admin')->name('admin.')->group(function () {
 
     Route::resource('books', BookController::class)->except(['show']);
@@ -145,7 +143,21 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::delete('books/{book}/details/{detail}', [BookController::class, 'deleteDetail'])->name('books.details.delete');
 });
 
-//
 // 🤖 CHATBOT ROUTES
 //
 Route::post('/chatbot/webhook', [ChatBotController::class, 'webhook'])->name('chatbot.webhook');
+
+Route::prefix('admin')
+    ->as('admin.')
+    ->middleware(['auth', 'role:admin'])
+    ->group(function () {
+        Route::resource('images', ImageController::class);
+    });
+
+
+Route::prefix('admin')
+    ->as('admin.')
+    ->middleware(['auth', 'role:admin'])
+    ->group(function () {
+        Route::resource('images', ImageController::class);
+    });

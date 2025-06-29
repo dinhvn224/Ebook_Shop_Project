@@ -1,6 +1,7 @@
 @extends('client.layouts.app')
 
 @section('content')
+@php use Illuminate\Support\Str; @endphp
 <div class="homepage-container">
     <!-- Hero Banner Section -->
     <section class="hero-banner">
@@ -128,7 +129,10 @@
                     @foreach ($book->details as $detail)
                         <div class="product-card" data-book-id="{{ $book->id }}">
                             <div class="product-image">
-                                <img src="{{ asset('client/img/products/noimage.png') }}" alt="{{ $book->name }}" loading="lazy">
+                                @php
+                                    $img = $book->images->first()->url ?? 'client/img/products/noimage.png';
+                                @endphp
+                                <img src="{{ asset('storage/' . $img) }}" alt="{{ $book->name }}" loading="lazy">
                                 <div class="product-overlay">
                                     <button class="quick-view-btn" title="Xem nhanh">
                                         <i class="fas fa-eye"></i>
@@ -156,7 +160,7 @@
 
                                 <div class="product-author">
                                     <i class="fas fa-user"></i>
-                                    <span>Tác giả: {{ $book->author ?? 'Chưa cập nhật' }}</span>
+                                    <span>Tác giả: {{ $book->author->name ?? 'Chưa cập nhật' }}</span>
                                 </div>
 
                                 <div class="product-rating">
@@ -769,21 +773,21 @@
         flex-direction: column;
         align-items: stretch;
     }
-    
+
     .filter-group {
         justify-content: center;
     }
-    
+
     .products-grid {
         grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
         gap: 1rem;
     }
-    
+
     .newsletter-content {
         flex-direction: column;
         text-align: center;
     }
-    
+
     .section-title {
         font-size: 1.5rem;
     }
@@ -793,11 +797,11 @@
     .products-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .product-actions {
         flex-direction: column;
     }
-    
+
     .newsletter-form {
         flex-direction: column;
     }
@@ -815,7 +819,7 @@ function addContainTaiKhoan() {
 function filterProductsName(input) {
     const searchTerm = input.value.toLowerCase();
     const products = document.querySelectorAll('.product-card');
-    
+
     products.forEach(product => {
         const title = product.querySelector('.product-title a').textContent.toLowerCase();
         if (title.includes(searchTerm)) {
@@ -824,11 +828,11 @@ function filterProductsName(input) {
             product.style.display = 'none';
         }
     });
-    
+
     // Show/hide no products message
     const visibleProducts = Array.from(products).filter(p => p.style.display !== 'none');
     const noProductsMsg = document.querySelector('.no-products');
-    
+
     if (visibleProducts.length === 0 && !noProductsMsg) {
         const productsGrid = document.querySelector('.products-grid');
         const noProductsDiv = document.createElement('div');
@@ -851,12 +855,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // View toggle functionality
     const viewBtns = document.querySelectorAll('.view-btn');
     const productsGrid = document.querySelector('.products-grid');
-    
+
     viewBtns.forEach(btn => {
         btn.addEventListener('click', function() {
             viewBtns.forEach(b => b.classList.remove('active'));
             this.classList.add('active');
-            
+
             if (this.dataset.view === 'list') {
                 productsGrid.style.gridTemplateColumns = '1fr';
             } else {
@@ -864,14 +868,14 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-    
+
     // Wishlist functionality
     document.querySelectorAll('.wishlist-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const icon = this.querySelector('i');
             icon.classList.toggle('far');
             icon.classList.toggle('fas');
-            
+
             if (icon.classList.contains('fas')) {
                 this.style.color = '#e74c3c';
             } else {
@@ -879,14 +883,14 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-    
+
     // Newsletter subscription
     const subscribeBtn = document.querySelector('.subscribe-btn');
     if (subscribeBtn) {
         subscribeBtn.addEventListener('click', function() {
             const emailInput = document.querySelector('.email-input');
             const email = emailInput.value;
-            
+
             if (email && email.includes('@')) {
                 alert('Cảm ơn bạn đã đăng ký nhận tin!');
                 emailInput.value = '';
@@ -895,18 +899,18 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    
+
     // Add to cart functionality
     document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const productCard = this.closest('.product-card');
             const productName = productCard.querySelector('.product-title a').textContent;
-            
+
             // Add loading state
             const originalText = this.innerHTML;
             this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang thêm...';
             this.disabled = true;
-            
+
             // Simulate API call
             setTimeout(() => {
                 this.innerHTML = '<i class="fas fa-check"></i> Đã thêm';
