@@ -3,14 +3,28 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\Book;
 
 class BookDetail extends Model
 {
+    use HasFactory, SoftDeletes;
+
     protected $table = 'book_details';
 
     protected $fillable = [
-        'book_id', 'language', 'size', 'publish_year', 'total_pages', 'description', 'quantity', 'price', 'promotion_price', 'is_active', 'deleted'
+        'book_id',
+        'language',
+        'size',
+        'publish_year',
+        'total_pages',
+        'description',
+        'quantity',
+        'price',
+        'promotion_price',
+        'is_active',
+        'deleted'
     ];
 
     protected $casts = [

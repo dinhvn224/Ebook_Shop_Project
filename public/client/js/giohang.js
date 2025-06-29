@@ -27,10 +27,17 @@ function addProductToTable(user) {
 	if (!user) {
 		s += `
 			<tr>
+<<<<<<< HEAD
+				<td colspan="7"> 
+					<h1 style="color:red; background-color:white; font-weight:bold; text-align:center; padding: 15px 0;">
+						Bạn chưa đăng nhập !!
+					</h1> 
+=======
 				<td colspan="7">
 					<h1 style="color:red; background-color:white; font-weight:bold; text-align:center; padding: 15px 0;">
 						Bạn chưa đăng nhập !!
 					</h1>
+>>>>>>> bb0dd456760762e21f130d1cde44876af4484162
 				</td>
 			</tr>
 		`;
@@ -39,10 +46,17 @@ function addProductToTable(user) {
 	} else if (user.products.length == 0) {
 		s += `
 			<tr>
+<<<<<<< HEAD
+				<td colspan="7"> 
+					<h1 style="color:green; background-color:white; font-weight:bold; text-align:center; padding: 15px 0;">
+						Giỏ hàng trống !!
+					</h1> 
+=======
 				<td colspan="7">
 					<h1 style="color:green; background-color:white; font-weight:bold; text-align:center; padding: 15px 0;">
 						Giỏ hàng trống !!
 					</h1>
+>>>>>>> bb0dd456760762e21f130d1cde44876af4484162
 				</td>
 			</tr>
 		`;
@@ -63,7 +77,11 @@ function addProductToTable(user) {
 			<tr>
 				<td>` + (i + 1) + `</td>
 				<td class="noPadding imgHide">
+<<<<<<< HEAD
+					<a target="_blank" href="chitietsanpham.html?` + p.name.split(' ').join('-') + `" title="Xem chi tiết">
+=======
 					<a target="_blank" href="/product/` + p.book_id + `" title="Xem chi tiết">
+>>>>>>> bb0dd456760762e21f130d1cde44876af4484162
 						` + p.name + `
 						<img src="` + p.img + `">
 					</a>

@@ -18,3 +18,4 @@ class Publisher extends Model
         });
     }
 }
+
