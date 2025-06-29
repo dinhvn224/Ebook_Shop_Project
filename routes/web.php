@@ -16,6 +16,10 @@ use App\Http\Controllers\Admin\{
 };
 use App\Http\Controllers\Client\BookController as ClientBookController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\Client\CartController;
+use App\Http\Controllers\Client\CartController as ClientCartController;
+
+
 
 //
 // 🌐 PUBLIC CLIENT ROUTES
@@ -29,6 +33,13 @@ Route::get('/book/{book}', [ClientBookController::class, 'show'])->name('book.de
 
 Route::middleware(['auth', 'role:user'])->get('/home', fn() => view('client.home'))
     ->name('home.user');
+
+     // Các route giỏ hàng
+    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+    Route::post('/cart/add', [CartController::class, 'addToCart'])->name('cart.add');
+    Route::post('/cart/update/{id}', [CartController::class, 'updateQuantity'])->name('cart.update');
+    Route::post('/cart/remove/{id}', [CartController::class, 'removeFromCart'])->name('cart.remove');
+    Route::post('/cart/clear', [CartController::class, 'clearCart'])->name('cart.clear');
 
 //
 // 🔐 AUTH ROUTES

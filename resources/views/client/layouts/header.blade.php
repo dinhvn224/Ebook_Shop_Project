@@ -48,7 +48,7 @@
             <!-- End Member -->
 
             <div class="cart">
-                <a href="giohang.html">
+                <a href="{{route('cart.index')}}">
                     <i class="fa fa-shopping-cart"></i>
                     <span>Giỏ hàng</span>
                     <span class="cart-number"></span>

@@ -22,8 +22,8 @@
                     <div class="image-gallery">
                         <div class="main-image">
                             @if($book->image)
-                                <img src="{{ asset('storage/' . $book->image) }}" 
-                                     alt="{{ $book->name }}" 
+                                <img src="{{ asset('storage/' . $book->image) }}"
+                                     alt="{{ $book->name }}"
                                      class="img-fluid main-book-image">
                             @else
                                 <div class="placeholder-image">
@@ -144,7 +144,7 @@
                             </div>
 
                             <div class="action-buttons">
-                                <button class="btn btn-primary add-to-cart">
+                                <button class="btn btn-primary add-to-cart" onclick="addToCart('{{ $detail->id }}')">
                                     <i class="fas fa-shopping-cart"></i>
                                     Thêm vào giỏ hàng
                                 </button>
@@ -276,6 +276,37 @@
         </div>
     </div>
 </div>
+
+<script>
+    function addToCart(bookDetailId) {
+        fetch("{{ route('cart.add') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                book_detail_id: bookDetailId,
+                quantity: 1
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                // Optional: cập nhật icon giỏ hàng trên header
+            } else {
+                alert('Thêm vào giỏ hàng thất bại!');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Đã xảy ra lỗi!');
+        });
+    }
+</script>
+
+
 
 <style>
 /* Modern Design System */
@@ -839,36 +870,36 @@
     .book-detail-container {
         padding: 1rem;
     }
-    
+
     .book-title {
         font-size: 1.5rem;
     }
-    
+
     .current-price {
         font-size: 1.5rem;
     }
-    
+
     .action-buttons {
         flex-direction: column;
     }
-    
+
     .btn {
         justify-content: center;
     }
-    
+
     .shipping-info {
         flex-direction: column;
         gap: 1rem;
     }
-    
+
     .trust-badges {
         justify-content: center;
     }
-    
+
     .tab-navigation {
         flex-wrap: wrap;
     }
-    
+
     .tab-btn {
         flex: none;
         min-width: 50%;
@@ -879,11 +910,11 @@
     .main-book-image {
         height: 300px;
     }
-    
+
     .placeholder-image {
         height: 300px;
     }
-    
+
     .tab-btn {
         min-width: 100%;
     }
@@ -912,15 +943,15 @@ function decreaseQuantity() {
 document.addEventListener('DOMContentLoaded', function() {
     const tabBtns = document.querySelectorAll('.tab-btn');
     const tabContents = document.querySelectorAll('.tab-content');
-    
+
     tabBtns.forEach(btn => {
         btn.addEventListener('click', function() {
             const targetTab = this.getAttribute('data-tab');
-            
+
             // Remove active class from all tabs and contents
             tabBtns.forEach(b => b.classList.remove('active'));
             tabContents.forEach(c => c.classList.remove('active'));
-            
+
             // Add active class to clicked tab and corresponding content
             this.classList.add('active');
             document.getElementById(targetTab).classList.add('active');
