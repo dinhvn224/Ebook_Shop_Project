@@ -3,175 +3,181 @@
 @section('content')
 <div class="book-detail-wrapper">
     <!-- Breadcrumb -->
-    <div class="container">
-        <nav aria-label="breadcrumb" class="my-3">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{ route('home') }}">Trang chủ</a></li>
-                <li class="breadcrumb-item"><a href="{{ route('books.index') }}">Sách</a></li>
-                <li class="breadcrumb-item active">{{ $book->name }}</li>
-            </ol>
-        </nav>
+    <div class="breadcrumb-custom">
+        <a href="/">TRANG CHỦ</a>
+        {{-- <span class="divider">›</span>
+        <a href="/books">SÁCH</a> --}}
+        <span class="divider">›</span>
+        <span>{{ strtoupper($book->category->name ?? 'CHI TIẾT') }}</span>
     </div>
 
     <!-- Main Content -->
     <div class="container">
-        <div class="book-detail-container">
-            <div class="row g-5">
-                <!-- Book Image Gallery -->
-                <div class="col-lg-5">
-                    <div class="image-gallery">
-                        <div class="main-image">
-                            @if($book->image)
-                                <img src="{{ asset('storage/' . $book->image) }}" 
-                                     alt="{{ $book->name }}" 
-                                     class="img-fluid main-book-image">
-                            @else
-                                <div class="placeholder-image">
-                                    <i class="fas fa-book"></i>
-                                    <p>Chưa có ảnh</p>
-                                </div>
-                            @endif
-                            <div class="image-overlay">
-                                <button class="btn btn-light btn-sm zoom-btn">
-                                    <i class="fas fa-search-plus"></i>
-                                </button>
-                            </div>
+        <div class="book-detail-flex">
+            <div class="left-image">
+                <div class="main-image">
+                    @php
+                        $allImages = $book->images;
+                        $mainImgUrl = $book->images->where('is_main', 1)->first()->url ?? $book->images->first()->url ?? null;
+                    @endphp
+
+                    @if($mainImgUrl)
+                        <img src="{{ asset('storage/' . $mainImgUrl) }}"
+                             alt="{{ $book->name }}"
+                             class="img-fluid main-book-image" id="mainBookImage">
+                    @else
+                        <div class="placeholder-image">
+                            <i class="fas fa-book"></i>
+                            <p>Chưa có ảnh</p>
                         </div>
-                        <!-- Thumbnail images would go here -->
-                    </div>
+                    @endif
                 </div>
-
-                <!-- Book Information -->
-                <div class="col-lg-7">
-                    <div class="book-info">
-                        <!-- Title & Rating -->
-                        <div class="book-header">
-                            <h1 class="book-title">{{ $book->name }}</h1>
-                            <div class="rating-section">
-                                <div class="rating-stars">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <i class="fas fa-star {{ $i <= 4 ? 'active' : '' }}"></i>
-                                    @endfor
-                                </div>
-                                <span class="rating-count">(4.2) 256 đánh giá</span>
-                                <span class="sold-count">• 1.2k đã bán</span>
-                            </div>
-                        </div>
-
-                        <!-- Price Section -->
-                        <div class="price-section">
-                            @foreach ($book->details as $detail)
-                                <div class="price-container">
-                                    @if ($detail->promotion_price && $detail->promotion_price < $detail->price)
-                                        <div class="price-row">
-                                            <span class="current-price">{{ number_format($detail->promotion_price) }}₫</span>
-                                            <span class="original-price">{{ number_format($detail->price) }}₫</span>
-                                        </div>
-                                        <div class="discount-info">
-                                            <span class="discount-percent">
-                                                -{{ round((($detail->price - $detail->promotion_price) / $detail->price) * 100) }}%
-                                            </span>
-                                            <span class="save-amount">
-                                                Tiết kiệm {{ number_format($detail->price - $detail->promotion_price) }}₫
-                                            </span>
-                                        </div>
-                                    @else
-                                        <span class="current-price">{{ number_format($detail->price) }}₫</span>
-                                    @endif
+                <div class="thumbnails-gallery-horizontal">
+                    <div class="swiper thumbnails-swiper">
+                        <div class="swiper-wrapper">
+                            @foreach($allImages as $img)
+                                <div class="swiper-slide">
+                                    <img src="{{ asset('storage/' . $img->url) }}"
+                                         class="thumb-img{{ asset('storage/' . $img->url) == asset('storage/' . $mainImgUrl) ? ' active' : '' }}"
+                                         alt="Ảnh"
+                                         onclick="showMainImage(this)">
                                 </div>
                             @endforeach
                         </div>
+                        <div class="swiper-button-next"></div>
+                        <div class="swiper-button-prev"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="right-info">
+                <div class="book-info">
+                    <!-- Title & Rating -->
+                    <div class="book-header">
+                        <h1 class="book-title">{{ $book->name }}</h1>
+                        <div class="rating-section">
+                            <div class="rating-stars">
+                                @for($i = 1; $i <= 5; $i++)
+                                    <i class="fas fa-star {{ $i <= 4 ? 'active' : '' }}"></i>
+                                @endfor
+                            </div>
+                            <span class="rating-count">(4.2) 256 đánh giá</span>
+                            <span class="sold-count">• 1.2k đã bán</span>
+                        </div>
+                    </div>
 
-                        <!-- Book Details -->
-                        <div class="book-details">
-                            <div class="detail-grid">
-                                <div class="detail-item">
-                                    <span class="detail-label">Tác giả:</span>
-                                    <span class="detail-value author-link">{{ $book->author->name ?? 'Chưa rõ' }}</span>
-                                </div>
-                                <div class="detail-item">
-                                    <span class="detail-label">Nhà xuất bản:</span>
-                                    <span class="detail-value">{{ $book->publisher->name ?? 'Chưa rõ' }}</span>
-                                </div>
-                                <div class="detail-item">
-                                    <span class="detail-label">Thể loại:</span>
-                                    <span class="detail-value">
-                                        <span class="category-tag">{{ $book->category->name ?? 'Chưa rõ' }}</span>
-                                    </span>
-                                </div>
-                                <div class="detail-item">
-                                    <span class="detail-label">Tình trạng:</span>
-                                    <span class="detail-value">
-                                        <span class="stock-badge in-stock">
-                                            <i class="fas fa-check-circle"></i> Còn hàng
+                    <!-- Price Section -->
+                    <div class="price-section">
+                        @foreach ($book->details as $detail)
+                            <div class="price-container">
+                                @if ($detail->promotion_price && $detail->promotion_price < $detail->price)
+                                    <div class="price-row">
+                                        <span class="current-price">{{ number_format($detail->promotion_price) }}₫</span>
+                                        <span class="original-price">{{ number_format($detail->price) }}₫</span>
+                                    </div>
+                                    <div class="discount-info">
+                                        <span class="discount-percent">
+                                            -{{ round((($detail->price - $detail->promotion_price) / $detail->price) * 100) }}%
                                         </span>
+                                        <span class="save-amount">
+                                            Tiết kiệm {{ number_format($detail->price - $detail->promotion_price) }}₫
+                                        </span>
+                                    </div>
+                                @else
+                                    <span class="current-price">{{ number_format($detail->price) }}₫</span>
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+
+                    <!-- Book Details -->
+                    <div class="book-details">
+                        <div class="detail-grid">
+                            <div class="detail-item">
+                                <span class="detail-label">Tác giả:</span>
+                                <span class="detail-value author-link">{{ $book->author->name ?? 'Chưa rõ' }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Nhà xuất bản:</span>
+                                <span class="detail-value">{{ $book->publisher->name ?? 'Chưa rõ' }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Thể loại:</span>
+                                <span class="detail-value">
+                                    <span class="category-tag">{{ $book->category->name ?? 'Chưa rõ' }}</span>
+                                </span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Tình trạng:</span>
+                                <span class="detail-value">
+                                    <span class="stock-badge in-stock">
+                                        <i class="fas fa-check-circle"></i> Còn hàng
                                     </span>
-                                </div>
+                                </span>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Shipping Info -->
-                        <div class="shipping-info">
-                            <div class="shipping-item">
-                                <i class="fas fa-shipping-fast"></i>
-                                <div class="shipping-text">
-                                    <strong>Miễn phí vận chuyển</strong>
-                                    <span>Đơn hàng từ 150.000₫</span>
-                                </div>
-                            </div>
-                            <div class="shipping-item">
-                                <i class="fas fa-undo-alt"></i>
-                                <div class="shipping-text">
-                                    <strong>Đổi trả miễn phí</strong>
-                                    <span>Trong vòng 15 ngày</span>
-                                </div>
+                    <!-- Shipping Info -->
+                    <div class="shipping-info">
+                        <div class="shipping-item">
+                            <i class="fas fa-shipping-fast"></i>
+                            <div class="shipping-text">
+                                <strong>Miễn phí vận chuyển</strong>
+                                <span>Đơn hàng từ 150.000₫</span>
                             </div>
                         </div>
-
-                        <!-- Purchase Actions -->
-                        <div class="purchase-section">
-                            <div class="quantity-section">
-                                <label class="quantity-label">Số lượng:</label>
-                                <div class="quantity-controls">
-                                    <button type="button" class="qty-btn minus" onclick="decreaseQuantity()">
-                                        <i class="fas fa-minus"></i>
-                                    </button>
-                                    <input type="number" id="quantity" value="1" min="1" max="99" class="qty-input">
-                                    <button type="button" class="qty-btn plus" onclick="increaseQuantity()">
-                                        <i class="fas fa-plus"></i>
-                                    </button>
-                                </div>
+                        <div class="shipping-item">
+                            <i class="fas fa-undo-alt"></i>
+                            <div class="shipping-text">
+                                <strong>Đổi trả miễn phí</strong>
+                                <span>Trong vòng 15 ngày</span>
                             </div>
+                        </div>
+                    </div>
 
-                            <div class="action-buttons">
-                                <button class="btn btn-primary add-to-cart">
-                                    <i class="fas fa-shopping-cart"></i>
-                                    Thêm vào giỏ hàng
+                    <!-- Purchase Actions -->
+                    <div class="purchase-section">
+                        <div class="quantity-section">
+                            <label class="quantity-label">Số lượng:</label>
+                            <div class="quantity-controls">
+                                <button type="button" class="qty-btn minus" onclick="decreaseQuantity()">
+                                    <i class="fas fa-minus"></i>
                                 </button>
-                                <button class="btn btn-success buy-now">
-                                    <i class="fas fa-bolt"></i>
-                                    Mua ngay
-                                </button>
-                                <button class="btn btn-outline wishlist-btn">
-                                    <i class="far fa-heart"></i>
+                                <input type="number" id="quantity" value="1" min="1" max="99" class="qty-input">
+                                <button type="button" class="qty-btn plus" onclick="increaseQuantity()">
+                                    <i class="fas fa-plus"></i>
                                 </button>
                             </div>
                         </div>
 
-                        <!-- Trust Badges -->
-                        <div class="trust-badges">
-                            <div class="badge-item">
-                                <i class="fas fa-shield-alt"></i>
-                                <span>Hàng chính hãng</span>
-                            </div>
-                            <div class="badge-item">
-                                <i class="fas fa-medal"></i>
-                                <span>Chất lượng cao</span>
-                            </div>
-                            <div class="badge-item">
-                                <i class="fas fa-headset"></i>
-                                <span>Hỗ trợ 24/7</span>
-                            </div>
+                        <div class="action-buttons">
+                            <button class="btn btn-primary add-to-cart">
+                                <i class="fas fa-shopping-cart"></i>
+                                Thêm vào giỏ hàng
+                            </button>
+                            <button class="btn btn-success buy-now">
+                                <i class="fas fa-bolt"></i>
+                                Mua ngay
+                            </button>
+                            <button class="btn btn-outline wishlist-btn">
+                                <i class="far fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Trust Badges -->
+                    <div class="trust-badges">
+                        <div class="badge-item">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Hàng chính hãng</span>
+                        </div>
+                        <div class="badge-item">
+                            <i class="fas fa-medal"></i>
+                            <span>Chất lượng cao</span>
+                        </div>
+                        <div class="badge-item">
+                            <i class="fas fa-headset"></i>
+                            <span>Hỗ trợ 24/7</span>
                         </div>
                     </div>
                 </div>
@@ -297,58 +303,92 @@
 }
 
 .book-detail-wrapper {
-    background: #ffffff;
-    min-height: 100vh;
+    max-width: 1100px;
+    margin: 32px auto;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+    padding: 32px 40px;
 }
 
-.breadcrumb {
-    background: transparent;
-    padding: 0;
-    margin: 0;
-    font-size: 0.875rem;
+.breadcrumb-custom {
+    background: #f5f5f5;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 24px;
+    font-weight: 500;
 }
-
-.breadcrumb-item a {
-    color: var(--text-secondary);
+.breadcrumb-custom a {
+    color: #2c3e50;
     text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
     transition: color 0.2s;
 }
-
-.breadcrumb-item a:hover {
-    color: var(--primary-color);
+.breadcrumb-custom a:hover {
+    color: #e74c3c;
+}
+.breadcrumb-custom .divider {
+    color: #888;
+    font-size: 16px;
+    margin: 0 2px;
+}
+.breadcrumb-custom span:last-child {
+    color: #222;
+    text-transform: uppercase;
 }
 
-.book-detail-container {
-    background: white;
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--border-color);
-    padding: 2rem;
-    margin-bottom: 2rem;
+.book-detail-flex {
+    display: flex;
+    gap: 32px;
+    align-items: flex-start;
 }
-
-/* Image Gallery */
-.image-gallery {
-    position: relative;
+.left-image {
+    flex: 0 0 350px;
+    max-width: 350px;
 }
-
 .main-image {
-    position: relative;
-    background: var(--background-light);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    border: 1px solid var(--border-color);
-}
-
-.main-book-image {
     width: 100%;
-    height: 500px;
-    object-fit: cover;
-    transition: transform 0.3s ease;
+    max-width: 350px;
+    min-height: 200px;
+    background: #f8fafd;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
 }
-
-.main-book-image:hover {
-    transform: scale(1.05);
+.right-info {
+    flex: 1;
+    min-width: 0;
+}
+@media (max-width: 991px) {
+    .book-detail-flex {
+        flex-direction: column;
+        gap: 16px;
+    }
+    .left-image, .right-info {
+        max-width: 100%;
+        flex: 1 1 100%;
+    }
+    .book-detail-wrapper {
+        padding: 16px 8px;
+    }
+}
+.main-book-image {
+    max-width: 100%;
+    max-height: 400px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
 }
 
 .placeholder-image {
@@ -839,36 +879,36 @@
     .book-detail-container {
         padding: 1rem;
     }
-    
+
     .book-title {
         font-size: 1.5rem;
     }
-    
+
     .current-price {
         font-size: 1.5rem;
     }
-    
+
     .action-buttons {
         flex-direction: column;
     }
-    
+
     .btn {
         justify-content: center;
     }
-    
+
     .shipping-info {
         flex-direction: column;
         gap: 1rem;
     }
-    
+
     .trust-badges {
         justify-content: center;
     }
-    
+
     .tab-navigation {
         flex-wrap: wrap;
     }
-    
+
     .tab-btn {
         flex: none;
         min-width: 50%;
@@ -879,14 +919,44 @@
     .main-book-image {
         height: 300px;
     }
-    
+
     .placeholder-image {
         height: 300px;
     }
-    
+
     .tab-btn {
         min-width: 100%;
     }
+}
+
+.thumbnails-gallery-horizontal {
+    width: 100%;
+    margin-top: 8px;
+}
+.swiper {
+    width: 100%;
+    padding-bottom: 10px;
+}
+.swiper-wrapper {
+    display: flex;
+}
+.swiper-slide {
+    width: 60px !important;
+    display: flex;
+    justify-content: center;
+}
+.thumb-img {
+    width: 60px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 2px solid #eee;
+    cursor: pointer;
+    transition: border 0.2s, box-shadow 0.2s;
+}
+.thumb-img.active {
+    border: 2px solid #e74c3c;
+    box-shadow: 0 2px 8px rgba(231,76,60,0.15);
 }
 </style>
 
@@ -912,15 +982,15 @@ function decreaseQuantity() {
 document.addEventListener('DOMContentLoaded', function() {
     const tabBtns = document.querySelectorAll('.tab-btn');
     const tabContents = document.querySelectorAll('.tab-content');
-    
+
     tabBtns.forEach(btn => {
         btn.addEventListener('click', function() {
             const targetTab = this.getAttribute('data-tab');
-            
+
             // Remove active class from all tabs and contents
             tabBtns.forEach(b => b.classList.remove('active'));
             tabContents.forEach(c => c.classList.remove('active'));
-            
+
             // Add active class to clicked tab and corresponding content
             this.classList.add('active');
             document.getElementById(targetTab).classList.add('active');
@@ -946,5 +1016,32 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+function showMainImage(el) {
+    const mainImg = document.getElementById('mainBookImage');
+    if (mainImg) {
+        mainImg.src = el.src;
+    }
+    document.querySelectorAll('.thumb-img').forEach(img => img.classList.remove('active'));
+    el.classList.add('active');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    new Swiper('.thumbnails-swiper', {
+        slidesPerView: 4,
+        spaceBetween: 10,
+        navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+        },
+        breakpoints: {
+            600: { slidesPerView: 4 },
+            400: { slidesPerView: 3 }
+        }
+    });
+});
 </script>
+
+<!-- Swiper JS -->
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 @endsection

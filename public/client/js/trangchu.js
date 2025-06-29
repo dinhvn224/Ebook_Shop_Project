@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-window.onload = function () {
-=======
 function renderTrangChu() {
->>>>>>> bb0dd456760762e21f130d1cde44876af4484162
 	khoiTao();
 
 	// Thêm hình vào banner
@@ -46,8 +42,6 @@ function renderTrangChu() {
 	} else { // ko có filter : trang chính mặc định sẽ hiển thị các sp hot, ...
 		var soLuong = (window.innerWidth < 1200 ? 4 : 5); // màn hình nhỏ thì hiển thị 4 sp, to thì hiển thị 5
 
-<<<<<<< HEAD
-=======
 		// Lấy toàn bộ sản phẩm
 		var allProducts = list_products.slice(); // copy mảng
 
@@ -58,21 +52,11 @@ function renderTrangChu() {
 		var group4 = allProducts.splice(0, 5);
 		var group5 = allProducts.splice(0, 5);
 
->>>>>>> bb0dd456760762e21f130d1cde44876af4484162
 		// Các màu
 		var yellow_red = ['#ff9c00', '#ec1f1f'];
 		var blue = ['#42bcf4', '#004c70'];
 		var green = ['#5de272', '#007012'];
 
-<<<<<<< HEAD
-		// Thêm các khung sản phẩm
-		var div = document.getElementsByClassName('contain-khungSanPham')[0];
-		addKhungSanPham('NỔI BẬT NHẤT', yellow_red, ['star=3', 'sort=rateCount-decrease'], soLuong, div);
-		addKhungSanPham('SẢN PHẨM MỚI', blue, ['promo=moiramat', 'sort=rateCount-decrease'], soLuong, div);
-		addKhungSanPham('GIÁ SỐC ONLINE', green, ['promo=giareonline', 'sort=rateCount-decrease'], soLuong, div);
-		addKhungSanPham('GIẢM GIÁ LỚN', yellow_red, ['promo=giamgia'], soLuong, div);
-		addKhungSanPham('GIÁ RẺ CHO MỌI NHÀ', green, ['price=0-3000000', 'sort=price'], soLuong, div);
-=======
 		// Thêm các khung sản phẩm (không filter, chỉ truyền mảng 5 sp)
 		var div = document.getElementsByClassName('contain-khungSanPham')[0];
 		addKhungSanPhamCustom('NỔI BẬT NHẤT', yellow_red, group1, div);
@@ -80,7 +64,6 @@ function renderTrangChu() {
 		addKhungSanPhamCustom('GIÁ SỐC ONLINE', green, group3, div);
 		addKhungSanPhamCustom('GIẢM GIÁ LỚN', yellow_red, group4, div);
 		addKhungSanPhamCustom('GIÁ RẺ CHO MỌI NHÀ', green, group5, div);
->>>>>>> bb0dd456760762e21f130d1cde44876af4484162
 	}
 
 	// Thêm chọn mức giá
@@ -113,11 +96,7 @@ function renderTrangChu() {
 
 	// Thêm filter đã chọn
 	addAllChoosedFilter();
-<<<<<<< HEAD
-};
-=======
 }
->>>>>>> bb0dd456760762e21f130d1cde44876af4484162
 
 var soLuongSanPhamMaxTrongMotTrang = 15;
 
@@ -710,8 +689,6 @@ function hideSanPhamKhongThuoc(list) {
 		if (hide) hideLi(allLi[i]);
 	}
 }
-<<<<<<< HEAD
-=======
 
 // Thêm hàm custom để render nhóm sản phẩm không filter
 function addKhungSanPhamCustom(tenKhung, color, products, ele) {
@@ -735,4 +712,3 @@ function addKhungSanPhamCustom(tenKhung, color, products, ele) {
 
 	ele.innerHTML += s;
 }
->>>>>>> bb0dd456760762e21f130d1cde44876af4484162

@@ -32,6 +32,13 @@
                     </ul>
                 </li>
 
+                <li>
+                    <a href="{{ route('admin.images.index') }}">
+                        <i class="fas fa-image me-2"></i>
+                        <span>Quản lý ảnh</span>
+                    </a>
+                </li>
+
                 <li class="submenu">
                     <a href="javascript:void(0);">
                         <i class="fas fa-user-edit me-2"></i>

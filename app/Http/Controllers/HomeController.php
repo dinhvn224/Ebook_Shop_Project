@@ -12,8 +12,8 @@ class HomeController extends Controller
     public function index()
     {
         // Lấy tất cả sách với thông tin chi tiết, tác giả, nhà xuất bản và danh mục
-        $books = Book::with(['author', 'publisher', 'category', 'details' => function($query) {
-            $query->where('is_active', true);
+        $books = Book::with(['author', 'publisher', 'category', 'details', 'images' => function($q) {
+            $q->where('is_main', 1);
         }])
         ->whereHas('details', function($query) {
             $query->where('is_active', true);

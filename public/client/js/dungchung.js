@@ -14,13 +14,6 @@ function setListAdmin(l) {
 
 // Hàm khởi tạo, tất cả các trang đều cần
 function khoiTao() {
-<<<<<<< HEAD
-    // get data từ localstorage
-    list_products = getListProducts() || list_products;
-=======
-    // KHÔNG lấy list_products từ localStorage nữa, luôn dùng biến toàn cục (API)
-    // list_products = getListProducts() || list_products;
->>>>>>> bb0dd456760762e21f130d1cde44876af4484162
     adminInfo = getListAdmin() || adminInfo;
 
     setupEventTaiKhoan();
@@ -31,15 +24,6 @@ function khoiTao() {
 // ========= Các hàm liên quan tới danh sách sản phẩm =========
 // Localstorage cho dssp: 'ListProducts
 function setListProducts(newList) {
-<<<<<<< HEAD
-=======
-    // Đảm bảo mọi sản phẩm đều có book_id
-    for (var i = 0; i < newList.length; i++) {
-        if (!newList[i].book_id && newList[i].masp) {
-            newList[i].book_id = newList[i].masp;
-        }
-    }
->>>>>>> bb0dd456760762e21f130d1cde44876af4484162
     window.localStorage.setItem('ListProducts', JSON.stringify(newList));
 }
 
@@ -298,10 +282,7 @@ function checkTaiKhoan() {
 // Tạo event, hiệu ứng cho form tài khoản
 function setupEventTaiKhoan() {
     var taikhoan = document.getElementsByClassName('taikhoan')[0];
-<<<<<<< HEAD
-=======
     if (!taikhoan) return; // Nếu không có phần tử, thoát hàm luôn
->>>>>>> bb0dd456760762e21f130d1cde44876af4484162
     var list = taikhoan.getElementsByTagName('input');
 
     // Tạo eventlistener cho input để tạo hiệu ứng label
@@ -531,10 +512,6 @@ function addTags(nameTag, link) {
 
 // Thêm sản phẩm vào trang
 function addProduct(p, ele, returnString) {
-<<<<<<< HEAD
-    promo = new Promo(p.promo.name, p.promo.value); // class Promo
-    product = new Product(p.masp, p.name, p.img, p.price, p.star, p.rateCount, promo); // Class product
-=======
     if (!p.book_id && p.masp) {
         p.book_id = p.masp;
     }
@@ -544,7 +521,6 @@ function addProduct(p, ele, returnString) {
     }
     promo = new Promo(p.promo.name, p.promo.value); // class Promo
     product = new Product(p.masp, p.name, p.img, p.price, p.star, p.rateCount, promo, p.book_id); // Class product
->>>>>>> bb0dd456760762e21f130d1cde44876af4484162
 
     return addToWeb(product, ele, returnString);
 }
