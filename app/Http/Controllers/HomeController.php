@@ -9,18 +9,22 @@ use App\Models\Category;
 
 class HomeController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // Lấy tất cả sách với thông tin chi tiết, tác giả, nhà xuất bản và danh mục
-        $books = Book::with(['author', 'publisher', 'category', 'details', 'images' => function($q) {
+        $query = Book::with(['author', 'publisher', 'category', 'details', 'images' => function($q) {
             $q->where('is_main', 1);
         }])
         ->whereHas('details', function($query) {
             $query->where('is_active', true);
-        })
-        ->get();
+        });
 
-        // Lấy danh mục sách
+        // Lọc theo từ khóa tìm kiếm
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where('name', 'like', "%{$search}%");
+        }
+
+        $books = $query->get();
         $categories = Category::all();
 
         return view('client.home', compact('books', 'categories'));
