@@ -24,7 +24,7 @@
             <div class="login-content">
                 <div class="login-userset">
                     <div class="login-logo">
-                        <img src="{{ asset('assets/img/logo.png') }}" alt="logo">
+                        <img src="{{ asset('client/img/trangchu.png') }}" alt="logo">
                     </div>
                     <div class="login-userheading">
                         <h3>Đăng nhập</h3>
