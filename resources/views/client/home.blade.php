@@ -24,7 +24,28 @@
             </div>
         </div>
     </section>
+<section>
+    @if(auth()->check())
+    @php
+        $notifications = \App\Models\Notification::where('user_id', auth()->id())
+            ->latest()->limit(10)->get();
+    @endphp
 
+    <div class="notification-panel">
+        <h5>🔔 Thông báo của bạn</h5>
+        <ul class="list-unstyled">
+            @foreach($notifications as $note)
+                <div class="notification-item {{ $note->is_read ? 'text-muted' : 'fw-bold' }}">
+                    <strong>{{ $note->title }}</strong><br>
+                    {!! $note->message !!}
+                    <div><small>{{ $note->created_at->diffForHumans() }}</small></div>
+                </div>
+            @endforeach
+
+        </ul>
+    </div>
+@endif
+</section>
     <!-- Filter Section -->
     <section class="filter-section">
         <div class="container">

@@ -9,7 +9,7 @@ use App\Models\Book;
 
 class BookDetail extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
     protected $table = 'book_details';
 
@@ -35,6 +35,10 @@ class BookDetail extends Model
     public function book()
     {
         return $this->belongsTo(Book::class);
+    }
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
     }
 
     public function images()

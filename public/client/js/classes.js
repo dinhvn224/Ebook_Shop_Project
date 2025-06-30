@@ -48,10 +48,14 @@ function Promo(name, value) { // khuyen mai
 }
 
 <<<<<<< HEAD
+function Product(masp, name, img, price, star, rateCount, promo, book_id) {
+=======
+<<<<<<< HEAD
 function Product(masp, name, img, price, star, rateCount, promo) {
 =======
 function Product(masp, name, img, price, star, rateCount, promo, book_id) {
 >>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
 	this.masp = masp;
 	this.img = img;
 	this.name = name;
@@ -60,10 +64,13 @@ function Product(masp, name, img, price, star, rateCount, promo, book_id) {
 	this.rateCount = rateCount;
 	this.promo = promo;
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
 }
 
 function addToWeb(p, ele, returnString) {
 =======
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
 	this.book_id = book_id || masp;
 }
 
@@ -74,7 +81,10 @@ function addToWeb(p, ele, returnString) {
 	}
 	var chitietSp = '/product/' + p.book_id;
 
+<<<<<<< HEAD
+=======
 >>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
 	// Chuyển star sang dạng tag html
 	var rating = "";
 	if (p.rateCount > 0) {
@@ -99,6 +109,8 @@ function addToWeb(p, ele, returnString) {
 	// tách theo dấu ' ' vào gắn lại bằng dấu '-', code này giúp bỏ hết khoảng trắng và thay vào bằng dấu '-'.
 	// Tạo link tới chi tiết sản phẩm, chuyển tất cả ' ' thành '-'
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
 <<<<<<< HEAD
 	var chitietSp = 'chitietsanpham.html?' + p.name.split(' ').join('-');
 =======
@@ -106,6 +118,7 @@ function addToWeb(p, ele, returnString) {
 =======
 	var chitietSp = 'chitietsanpham.html?' + p.name.split(' ').join('-');
 >>>>>>> 403b81004c524c3a82f6e1695d2e1bea02830cdf
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
 
 	// Cho mọi thứ vào tag <li>... </li>
 	var newLi =
@@ -137,5 +150,9 @@ function addToWeb(p, ele, returnString) {
 <<<<<<< HEAD
 }
 =======
+<<<<<<< HEAD
+}
+=======
 }
 >>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb

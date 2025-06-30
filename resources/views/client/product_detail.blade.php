@@ -23,7 +23,9 @@
         </div>
         <div class="chitietSanpham" style="margin-bottom: 100px">
             <h1>Sách </h1>
-            <div class="rating"></div>
+            <div class="rating" onclick="redirectToReview()"> <!-- Thêm sự kiện onclick -->
+                <!-- Sao sẽ được cập nhật bởi JavaScript -->
+            </div>
             <div class="rowdetail group">
                 <div class="picture">
                     <img src="" onclick="opencertain()">
@@ -68,13 +70,24 @@
                 </div>
             </div>
             <div id="overlaycertainimg" class="overlaycertainimg">
-                <div class="close" onclick="closecertain()">&times;</div>
+                <div class="close" onclick="closecertain()">×</div>
                 <div class="overlaycertainimg-content">
                     <img id="bigimg" class="bigimg" src="">
                     <div class="div_smallimg owl-carousel"></div>
                 </div>
             </div>
         </div>
+        <form action="{{ route('reviews.store') }}" method="POST">
+    @csrf
+    <input type="hidden" name="book_detail_id" value="{{ $book->id }}">
+    <label for="rating">Số sao:</label>
+    <select name="rating" id="rating">
+        @for($i=1; $i<=5; $i++) <option value="{{ $i }}">{{ $i }}</option> @endfor
+    </select>
+    <textarea name="comment" placeholder="Viết đánh giá..."></textarea>
+    <button type="submit">Gửi đánh giá</button>
+</form>
+
         <div id="goiYSanPham"></div>
     </section>
 </div>

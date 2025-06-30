@@ -43,16 +43,22 @@ function addChart(id, chartOption) {
 function createChartConfig(
     title = 'Title',
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
     charType = 'bar', 
     labels = ['nothing'], 
     data = [2], 
     colors = ['red'], 
 =======
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
     charType = 'bar',
     labels = ['nothing'],
     data = [2],
     colors = ['red'],
+<<<<<<< HEAD
+=======
 >>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
 ) {
     return {
         type: charType,
@@ -120,12 +126,17 @@ function addThongKe() {
     // addChart('myChart1', createChartConfig(
     //     'Số lượng bán ra',
 <<<<<<< HEAD
+    //     'bar',
+    //     Object.keys(thongKeHang),
+=======
+<<<<<<< HEAD
     //     'bar', 
     //     Object.keys(thongKeHang), 
 =======
     //     'bar',
     //     Object.keys(thongKeHang),
 >>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
     //     Object.values(thongKeHang).map(_ =>  _.soLuongBanRa),
     //     colors,
     // ));
@@ -133,16 +144,22 @@ function addThongKe() {
     // addChart1('myChart2', createChartConfig(
     //     'Doanh thu',
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
     //     'doughnut', 
     //     // Object.keys(thongKeHang), 
     //     Object.values(thongKeHang).map(_ =>  _.doanhThu),
         
 =======
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
     //     'doughnut',
     //     // Object.keys(thongKeHang),
     //     Object.values(thongKeHang).map(_ =>  _.doanhThu),
 
+<<<<<<< HEAD
+=======
 >>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
     //     // colors,
     // ));
 
@@ -214,8 +231,12 @@ function addTableProducts() {
 <<<<<<< HEAD
                 <a title="Xem chi tiết" target="_blank" href="chitietsanpham.html?` + p.name.split(' ').join('-') + `">` + p.name + `</a>
 =======
+<<<<<<< HEAD
+                <a title="Xem chi tiết" target="_blank" href="chitietsanpham.html?` + p.name.split(' ').join('-') + `">` + p.name + `</a>
+=======
                 <a title="Xem chi tiết" target="_blank" href="/product/` + p.book_id + `">` + p.name + `</a>
 >>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
                 <img src="` + p.img + `"></img>
             </td>
             <td style="width: 15%">` + p.price + `</td>
@@ -278,8 +299,12 @@ function layThongTinSanPhamTuTable(id) {
 <<<<<<< HEAD
    
 =======
+<<<<<<< HEAD
+   
+=======
 
 >>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
 
     if(isNaN(price)) {
         alert('Giá phải là số nguyên');
@@ -299,9 +324,13 @@ function layThongTinSanPhamTuTable(id) {
     try {
         return {
 <<<<<<< HEAD
+            "book_id": masp,
+=======
+<<<<<<< HEAD
 =======
             "book_id": masp,
 >>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
             "name": name,
             "company": company,
             "img": previewSrc,
@@ -346,8 +375,12 @@ function themSanPham() {
 <<<<<<< HEAD
  
 =======
+<<<<<<< HEAD
+ 
+=======
 
 >>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
      // Vẽ lại table
      addTableProducts();
 
@@ -382,8 +415,12 @@ function xoaSanPham(masp, tensp) {
 <<<<<<< HEAD
         // Vẽ lại table 
 =======
+<<<<<<< HEAD
+        // Vẽ lại table 
+=======
         // Vẽ lại table
 >>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
         addTableProducts();
     }
 }
@@ -395,8 +432,12 @@ function suaSanPham(masp) {
 <<<<<<< HEAD
     
 =======
+<<<<<<< HEAD
+    
+=======
 
 >>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
     for(var p of list_products) {
         if(p.masp == masp && p.masp != sp.masp) {
             alert('Mã sản phẩm bị trùng !!');
@@ -454,8 +495,12 @@ function addKhungSuaSanPham(masp) {
 <<<<<<< HEAD
                     
 =======
+<<<<<<< HEAD
+                    
+=======
 
 >>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
     var company = [""];
     for(var c of company) {
         if(sp.company == c)
@@ -515,8 +560,12 @@ function addKhungSuaSanPham(masp) {
 <<<<<<< HEAD
         
 =======
+<<<<<<< HEAD
+        
+=======
 
 >>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
         <tr>
             <td colspan="2"  class="table-footer"> <button onclick="suaSanPham('`+sp.masp+`')">SỬA</button> </td>
         </tr>
@@ -533,8 +582,12 @@ function capNhatAnhSanPham(files, id) {
 <<<<<<< HEAD
     
 =======
+<<<<<<< HEAD
+    
+=======
 
 >>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
     // document.getElementById(id).src = url;
 
     const reader = new FileReader();
@@ -550,8 +603,12 @@ function capNhatAnhSanPham(files, id) {
 <<<<<<< HEAD
 } 
 =======
+<<<<<<< HEAD
+} 
+=======
 }
 >>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
 
 // Sắp Xếp sản phẩm
 function sortProductsTable(loai) {
@@ -561,8 +618,12 @@ function sortProductsTable(loai) {
 <<<<<<< HEAD
     quickSort(tr, 0, tr.length-1, loai, getValueOfTypeInTable_SanPham); // type cho phép lựa chọn sort theo mã hoặc tên hoặc giá ... 
 =======
+<<<<<<< HEAD
+    quickSort(tr, 0, tr.length-1, loai, getValueOfTypeInTable_SanPham); // type cho phép lựa chọn sort theo mã hoặc tên hoặc giá ... 
+=======
     quickSort(tr, 0, tr.length-1, loai, getValueOfTypeInTable_SanPham); // type cho phép lựa chọn sort theo mã hoặc tên hoặc giá ...
 >>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
     decrease = !decrease;
 }
 
@@ -610,8 +671,12 @@ function addTableDonHang() {
 <<<<<<< HEAD
                 
 =======
+<<<<<<< HEAD
+                
+=======
 
 >>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
             </td>
         </tr>`;
         TONGTIEN += stringToNum(d.tongtien);
@@ -678,8 +743,12 @@ function duyet(maDonHang, duyetDon) {
 <<<<<<< HEAD
                     
 =======
+<<<<<<< HEAD
+                    
+=======
 
 >>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
                     } else if(u[i].donhang[j].tinhTrang == 'Đã hủy') {
                         alert('Không thể duyệt đơn đã hủy !');
                         return;
@@ -691,8 +760,12 @@ function duyet(maDonHang, duyetDon) {
 <<<<<<< HEAD
                     
 =======
+<<<<<<< HEAD
+                    
+=======
 
 >>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
                     } else if(u[i].donhang[j].tinhTrang == 'Đã giao hàng') {
                         alert('Không thể hủy đơn hàng đã giao !');
                         return;
@@ -752,10 +825,14 @@ function sortDonHangTable(loai) {
     var tr = list.getElementsByTagName('tr');
 
 <<<<<<< HEAD
+    quickSort(tr, 0, tr.length-1, loai, getValueOfTypeInTable_DonHang);
+=======
+<<<<<<< HEAD
     quickSort(tr, 0, tr.length-1, loai, getValueOfTypeInTable_DonHang); 
 =======
     quickSort(tr, 0, tr.length-1, loai, getValueOfTypeInTable_DonHang);
 >>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
     decrease = !decrease;
 }
 
@@ -845,8 +922,12 @@ function voHieuHoaNguoiDung(inp, taikhoan) {
 <<<<<<< HEAD
             
 =======
+<<<<<<< HEAD
+            
+=======
 
 >>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
             setTimeout(() => alert(`${value ? 'Khoá' : 'Mở khoá'} tải khoản ${u.username} thành công.`), 500);
             break;
         }
@@ -880,8 +961,12 @@ function sortKhachHangTable(loai) {
 <<<<<<< HEAD
     quickSort(tr, 0, tr.length-1, loai, getValueOfTypeInTable_KhachHang); 
 =======
+<<<<<<< HEAD
+    quickSort(tr, 0, tr.length-1, loai, getValueOfTypeInTable_KhachHang); 
+=======
     quickSort(tr, 0, tr.length-1, loai, getValueOfTypeInTable_KhachHang);
 >>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
     decrease = !decrease;
 }
 
@@ -895,9 +980,14 @@ function getValueOfTypeInTable_KhachHang(tr, loai) {
         case 'taikhoan' : return td[3].innerHTML.toLowerCase();    
         case 'matkhau' : return td[4].innerHTML.toLowerCase(); 
 =======
+<<<<<<< HEAD
+        case 'taikhoan' : return td[3].innerHTML.toLowerCase();    
+        case 'matkhau' : return td[4].innerHTML.toLowerCase(); 
+=======
         case 'taikhoan' : return td[3].innerHTML.toLowerCase();
         case 'matkhau' : return td[4].innerHTML.toLowerCase();
 >>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
     }
     return false;
 }
@@ -928,8 +1018,12 @@ function partition(arr, pivot, left, right, loai, func) {
 <<<<<<< HEAD
     
 =======
+<<<<<<< HEAD
+    
+=======
 
 >>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
     for (var i = left; i < right; i++) {
         if (decrease && func(arr[i], loai) > pivotValue
         || !decrease && func(arr[i], loai) < pivotValue) {
@@ -978,5 +1072,9 @@ function progress(percent, bg, width, height) {
 <<<<<<< HEAD
 // console.log(JSON.stringify(list_products));
 =======
+<<<<<<< HEAD
+// console.log(JSON.stringify(list_products));
+=======
 // console.log(JSON.stringify(list_products));
 >>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb

@@ -5,12 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\SoftDeletes;
+// use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notification;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, SoftDeletes;
+    use HasFactory, Notifiable;
 
     const ROLE_ADMIN = 'ADMIN';
     const ROLE_USER  = 'USER';
@@ -39,7 +39,6 @@ class User extends Authenticatable
         'updated_at' => 'datetime',
     ];
 
-    // ================= RELATIONS =================
 
     public function orders()
     {
@@ -57,7 +56,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(Notification::class);
     }
-
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
     // ================= HELPERS =================
 
     public function isAdmin(): bool
@@ -69,6 +71,7 @@ class User extends Authenticatable
     {
         return $this->role === self::ROLE_USER;
     }
+
     public function getAvatarUrlAttribute($value)
     {
         return $value ?: 'https://ui-avatars.com/api/?name=' . urlencode($this->name);

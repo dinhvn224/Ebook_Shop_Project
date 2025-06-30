@@ -28,16 +28,22 @@ function addProductToTable(user) {
 		s += `
 			<tr>
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
 				<td colspan="7"> 
 					<h1 style="color:red; background-color:white; font-weight:bold; text-align:center; padding: 15px 0;">
 						Bạn chưa đăng nhập !!
 					</h1> 
 =======
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
 				<td colspan="7">
 					<h1 style="color:red; background-color:white; font-weight:bold; text-align:center; padding: 15px 0;">
 						Bạn chưa đăng nhập !!
 					</h1>
+<<<<<<< HEAD
+=======
 >>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
 				</td>
 			</tr>
 		`;
@@ -47,16 +53,22 @@ function addProductToTable(user) {
 		s += `
 			<tr>
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
 				<td colspan="7"> 
 					<h1 style="color:green; background-color:white; font-weight:bold; text-align:center; padding: 15px 0;">
 						Giỏ hàng trống !!
 					</h1> 
 =======
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
 				<td colspan="7">
 					<h1 style="color:green; background-color:white; font-weight:bold; text-align:center; padding: 15px 0;">
 						Giỏ hàng trống !!
 					</h1>
+<<<<<<< HEAD
+=======
 >>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
 				</td>
 			</tr>
 		`;
@@ -80,8 +92,12 @@ function addProductToTable(user) {
 <<<<<<< HEAD
 					<a target="_blank" href="chitietsanpham.html?` + p.name.split(' ').join('-') + `" title="Xem chi tiết">
 =======
+<<<<<<< HEAD
+					<a target="_blank" href="chitietsanpham.html?` + p.name.split(' ').join('-') + `" title="Xem chi tiết">
+=======
 					<a target="_blank" href="/product/` + p.book_id + `" title="Xem chi tiết">
 >>>>>>> bb0dd456760762e21f130d1cde44876af4484162
+>>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb
 						` + p.name + `
 						<img src="` + p.img + `">
 					</a>

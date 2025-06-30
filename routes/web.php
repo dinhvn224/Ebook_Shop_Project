@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Admin\{
+    AdminReviewController,
     UserController,
     AuthorController,
     BookController,
@@ -19,6 +20,7 @@ use App\Http\Controllers\Client\BookController as ClientBookController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Client\CartController;
 use App\Http\Controllers\Client\CartController as ClientCartController;
+use App\Http\Controllers\Client\ClientReviewController;
 use App\Http\Controllers\Client\UserProfileController;
 
 //
@@ -34,12 +36,12 @@ Route::get('/book/{book}', [ClientBookController::class, 'show'])->name('book.de
 Route::middleware(['auth', 'role:user'])->get('/home', fn() => view('client.home'))
     ->name('home.user');
 
-     // Các route giỏ hàng
-    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-    Route::post('/cart/add', [CartController::class, 'addToCart'])->name('cart.add');
-    Route::post('/cart/update/{id}', [CartController::class, 'updateQuantity'])->name('cart.update');
-    Route::post('/cart/remove/{id}', [CartController::class, 'removeFromCart'])->name('cart.remove');
-    Route::post('/cart/clear', [CartController::class, 'clearCart'])->name('cart.clear');
+// Các route giỏ hàng
+Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+Route::post('/cart/add', [CartController::class, 'addToCart'])->name('cart.add');
+Route::post('/cart/update/{id}', [CartController::class, 'updateQuantity'])->name('cart.update');
+Route::post('/cart/remove/{id}', [CartController::class, 'removeFromCart'])->name('cart.remove');
+Route::post('/cart/clear', [CartController::class, 'clearCart'])->name('cart.clear');
 
 //
 // 🔐 AUTH ROUTES
@@ -96,6 +98,11 @@ Route::prefix('admin')
             Route::get('/', [VoucherProductController::class, 'index'])->name('index');
             Route::post('/attach', [VoucherProductController::class, 'attach'])->name('attach');
             Route::post('/detach', [VoucherProductController::class, 'detach'])->name('detach');
+        });
+
+        Route::prefix('reviews')->as('reviews.')->group(function () {
+            Route::get('/', [AdminReviewController::class, 'index'])->name('index');                      // Danh sách đánh giá
+            Route::patch('/{review}/status', [AdminReviewController::class, 'updateStatus'])->name('updateStatus'); // Duyệt / ẩn / chờ
         });
 
         //
@@ -170,3 +177,10 @@ Route::prefix('admin')
     ->group(function () {
         Route::resource('images', ImageController::class);
     });
+
+Route::prefix('reviews')->name('reviews.')->group(function () {
+    Route::middleware(['auth', 'role:user'])->group(function () {
+        Route::post('/', [ClientReviewController::class, 'store'])->name('store');         // Viết mới
+        Route::put('/{review}', [ClientReviewController::class, 'update'])->name('update'); // Cập nhật trong 24h
+    });
+});

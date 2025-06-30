@@ -82,7 +82,7 @@ class HomeController extends Controller
                         'xuatsu' => $book->publisher->name ?? 'N/A'
                     ],
                     'masp' => $masp,
-                    'book_id' => $masp // Đảm bảo luôn có book_id
+                    'book_id' => $book->id // Đảm bảo luôn có book_id
                 ];
                 $maspCounter++;
             }
