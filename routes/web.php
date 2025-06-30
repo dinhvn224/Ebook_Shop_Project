@@ -12,12 +12,14 @@ use App\Http\Controllers\Admin\{
     CounterSaleController,
     DashboardController,
     VoucherController,
-    VoucherProductController,
-    ImageController
+    VoucherProductController
 };
 use App\Http\Controllers\Client\BookController as ClientBookController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\Client\CartController;
+use App\Http\Controllers\Client\CartController as ClientCartController;
 use App\Http\Controllers\Client\UserProfileController;
+
 //
 // 🌐 PUBLIC CLIENT ROUTES
 //
@@ -31,6 +33,12 @@ Route::get('/book/{book}', [ClientBookController::class, 'show'])->name('book.de
 Route::middleware(['auth', 'role:user'])->get('/home', fn() => view('client.home'))
     ->name('home.user');
 
+     // Các route giỏ hàng
+    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+    Route::post('/cart/add', [CartController::class, 'addToCart'])->name('cart.add');
+    Route::post('/cart/update/{id}', [CartController::class, 'updateQuantity'])->name('cart.update');
+    Route::post('/cart/remove/{id}', [CartController::class, 'removeFromCart'])->name('cart.remove');
+    Route::post('/cart/clear', [CartController::class, 'clearCart'])->name('cart.clear');
 
 //
 // 🔐 AUTH ROUTES
@@ -46,14 +54,15 @@ Route::controller(AuthController::class)->group(function () {
 //
 // 🛠 ADMIN DASHBOARD
 //
-Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
+Route::middleware(['auth', 'role:ADMIN'])->get('/admin', fn() => view('admin.dashboard'))
+    ->name('admin.dashboard');
 
 //
 // ⚙️ ADMIN CORE ROUTES
 //
 Route::prefix('admin')
     ->as('admin.')
-    ->middleware(['auth', 'role:admin'])
+    ->middleware(['auth', 'role:ADMIN'])
     ->group(function () {
 
         // 👤 Users
@@ -94,7 +103,7 @@ Route::prefix('admin')
 
 Route::prefix('admin')
     ->as('admin.')
-    ->middleware(['auth', 'role:admin'])
+    ->middleware(['auth', 'role:ADMIN'])
     ->group(function () {
 
         // 💵 ROUTES cho quản lý đơn hàng tại quầy
@@ -135,6 +144,8 @@ Route::prefix('admin')
             });
     });
 
+Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
+
 Route::prefix('admin')->name('admin.')->group(function () {
 
     Route::resource('books', BookController::class)->except(['show']);
@@ -143,12 +154,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::delete('books/{book}/details/{detail}', [BookController::class, 'deleteDetail'])->name('books.details.delete');
 });
 
-Route::prefix('admin')
-    ->as('admin.')
-    ->middleware(['auth', 'role:admin'])
-    ->group(function () {
-        Route::resource('images', ImageController::class);
-    });
 Route::middleware(['auth', 'role:user'])
     ->prefix('profile')
     ->name('profile.')
