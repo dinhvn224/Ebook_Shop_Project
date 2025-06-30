@@ -14,7 +14,6 @@ use App\Http\Controllers\Admin\{
     VoucherController,
     VoucherProductController,
     ImageController
-
 };
 use App\Http\Controllers\Client\BookController as ClientBookController;
 use App\Http\Controllers\HomeController;
@@ -53,7 +52,7 @@ Route::controller(AuthController::class)->group(function () {
 //
 // 🛠 ADMIN DASHBOARD
 //
-Route::middleware(['auth', 'role:ADMIN'])->get('/admin', fn() => view('admin.dashboard'))
+Route::middleware(['auth', 'role:admin'])->get('/admin', fn() => view('admin.dashboard'))
     ->name('admin.dashboard');
 
 //
@@ -61,7 +60,7 @@ Route::middleware(['auth', 'role:ADMIN'])->get('/admin', fn() => view('admin.das
 //
 Route::prefix('admin')
     ->as('admin.')
-    ->middleware(['auth', 'role:ADMIN'])
+    ->middleware(['auth', 'role:admin'])
     ->group(function () {
 
         // 👤 Users
@@ -104,7 +103,7 @@ Route::prefix('admin')
 
 Route::prefix('admin')
     ->as('admin.')
-    ->middleware(['auth', 'role:ADMIN'])
+    ->middleware(['auth', 'role:admin'])
     ->group(function () {
 
         // 💵 ROUTES cho quản lý đơn hàng tại quầy
