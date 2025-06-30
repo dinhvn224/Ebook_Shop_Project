@@ -2,21 +2,19 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Notifications\Notification;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, SoftDeletes;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
+    const ROLE_ADMIN = 'ADMIN';
+    const ROLE_USER  = 'USER';
+
     protected $fillable = [
         'name',
         'email',
@@ -29,36 +27,50 @@ class User extends Authenticatable
         'is_active',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
+    protected $casts = [
+        'is_active'  => 'boolean',
+        'birth_date' => 'date',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
+    // ================= RELATIONS =================
+
+    public function orders()
     {
-        return [
-            'birth_date' => 'date',
-            'is_active' => 'boolean',
-            'password' => 'hashed',
-        ];
+        return $this->hasMany(Order::class);
     }
-     public function isAdmin(): bool
+
+    public function vouchers()
     {
-        return $this->role === 'admin';
+        return $this->belongsToMany(Voucher::class)
+            ->withPivot('used_at')
+            ->withTimestamps();
+    }
+
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
+    }
+
+    // ================= HELPERS =================
+
+    public function isAdmin(): bool
+    {
+        return $this->role === self::ROLE_ADMIN;
     }
 
     public function isUser(): bool
     {
-        return $this->role === 'user';
+        return $this->role === self::ROLE_USER;
+    }
+    public function getAvatarUrlAttribute($value)
+    {
+        return $value ?: 'https://ui-avatars.com/api/?name=' . urlencode($this->name);
     }
 }
