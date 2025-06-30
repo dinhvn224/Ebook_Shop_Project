@@ -101,7 +101,7 @@
             </div>
 
             <!-- Active Filters Display -->
-            <div class="active-filters" style="display: none;">
+            <div class="active-filters">
                 <div class="filter-tags">
                     <!-- Active filter tags will appear here -->
                 </div>
@@ -127,7 +127,7 @@
             <div class="products-grid" id="products">
                 @forelse ($books as $book)
                     @foreach ($book->details as $detail)
-                        <div class="product-card" data-book-id="{{ $book->id }}">
+                        <div class="product-card" data-book-id="{{ $book->id }}" data-price="{{ $detail->promotion_price && $detail->promotion_price < $detail->price ? $detail->promotion_price : $detail->price }}" data-promo="@if ($detail->promotion_price && $detail->promotion_price < $detail->price) sale @elseif ($detail->promotion_price && $detail->promotion_price == $detail->price) new @else none @endif" data-rating="{{ rand(3, 5) }}">
                             <div class="product-image">
                                 @php
                                     $img = $book->images->first()->url ?? 'client/img/products/noimage.png';
@@ -817,40 +817,103 @@ function addContainTaiKhoan() {
 
 // Filter products by name
 function filterProductsName(input) {
-    const searchTerm = input.value.toLowerCase();
+    const searchTerm = input.value.trim().toLowerCase();
     const products = document.querySelectorAll('.product-card');
+    let found = false;
 
-    products.forEach(product => {
-        const title = product.querySelector('.product-title a').textContent.toLowerCase();
-        if (title.includes(searchTerm)) {
-            product.style.display = 'block';
-        } else {
-            product.style.display = 'none';
+    if (searchTerm.length > 0) {
+        products.forEach(product => {
+            const title = product.querySelector('.product-title a').textContent.trim().toLowerCase();
+            if (title.includes(searchTerm)) {
+                product.style.display = '';
+                found = true;
+            } else {
+                product.style.display = 'none';
+            }
+        });
+    } else {
+        products.forEach(product => {
+            product.style.display = '';
+            found = true;
+        });
+    }
+
+    // Hiện thông báo nếu không có sản phẩm
+    let noProductsMsg = document.querySelector('.no-products');
+    if (!found) {
+        if (!noProductsMsg) {
+            const productsGrid = document.querySelector('.products-grid');
+            const noProductsDiv = document.createElement('div');
+            noProductsDiv.className = 'no-products';
+            noProductsDiv.innerHTML = `
+                <div class=\"no-products-icon\">\n                    <i class=\"fas fa-book-open\"></i>\n                </div>\n                <h3>Không tìm thấy sản phẩm</h3>\n                <p>Không có sản phẩm nào phù hợp với từ khóa tìm kiếm</p>\n            `;
+            productsGrid.appendChild(noProductsDiv);
         }
-    });
-
-    // Show/hide no products message
-    const visibleProducts = Array.from(products).filter(p => p.style.display !== 'none');
-    const noProductsMsg = document.querySelector('.no-products');
-
-    if (visibleProducts.length === 0 && !noProductsMsg) {
-        const productsGrid = document.querySelector('.products-grid');
-        const noProductsDiv = document.createElement('div');
-        noProductsDiv.className = 'no-products';
-        noProductsDiv.innerHTML = `
-            <div class="no-products-icon">
-                <i class="fas fa-book-open"></i>
-            </div>
-            <h3>Không tìm thấy sản phẩm</h3>
-            <p>Không có sản phẩm nào phù hợp với từ khóa tìm kiếm</p>
-        `;
-        productsGrid.appendChild(noProductsDiv);
-    } else if (visibleProducts.length > 0 && noProductsMsg) {
+    } else if (noProductsMsg) {
         noProductsMsg.remove();
     }
 }
 
-// Initialize page functionality
+// Lọc tổng hợp theo filter
+function filterProductsAll() {
+    const minPrice = parseInt(document.querySelector('.price-range input[placeholder="0"]').value) || 0;
+    const maxPrice = parseInt(document.querySelector('.price-range input[placeholder="1000000"]').value) || 1000000;
+    const promoChecked = Array.from(document.querySelectorAll('.filter-options input[type="checkbox"]:checked')).map(cb => cb.value);
+    const rating = parseInt(document.querySelector('.rating-options input[type="radio"]:checked')?.value || 0);
+    const sort = document.querySelector('.sort-options input[type="radio"]:checked')?.value || '';
+
+    let products = Array.from(document.querySelectorAll('.product-card'));
+    let found = false;
+
+    // Lọc theo giá
+    products.forEach(product => {
+        const price = parseInt(product.getAttribute('data-price'));
+        const promo = product.getAttribute('data-promo');
+        const rate = parseInt(product.getAttribute('data-rating'));
+        let show = true;
+
+        if (price < minPrice || price > maxPrice) show = false;
+        if (promoChecked.length > 0 && !promoChecked.includes(promo)) show = false;
+        if (rating > 0 && rate < rating) show = false;
+
+        product.style.display = show ? '' : 'none';
+        if (show) found = true;
+    });
+
+    // Sắp xếp
+    if (sort) {
+        let sorted = products.filter(p => p.style.display !== 'none');
+        if (sort === 'price-low') {
+            sorted.sort((a, b) => parseInt(a.getAttribute('data-price')) - parseInt(b.getAttribute('data-price')));
+        } else if (sort === 'price-high') {
+            sorted.sort((a, b) => parseInt(b.getAttribute('data-price')) - parseInt(a.getAttribute('data-price')));
+        } else if (sort === 'newest') {
+            // Không có dữ liệu ngày, bỏ qua
+        } else if (sort === 'popular') {
+            sorted.sort((a, b) => parseInt(b.getAttribute('data-rating')) - parseInt(a.getAttribute('data-rating')));
+        }
+        const grid = document.querySelector('.products-grid');
+        sorted.forEach(p => grid.appendChild(p));
+    }
+
+    // Hiện thông báo nếu không có sản phẩm
+    let noProductsMsg = document.querySelector('.no-products');
+    if (!found) {
+        if (!noProductsMsg) {
+            const productsGrid = document.querySelector('.products-grid');
+            const noProductsDiv = document.createElement('div');
+            noProductsDiv.className = 'no-products';
+            noProductsDiv.innerHTML = `
+                <div class=\"no-products-icon\">\n                    <i class=\"fas fa-book-open\"></i>\n                </div>\n                <h3>Không tìm thấy sản phẩm</h3>\n                <p>Không có sản phẩm nào phù hợp với bộ lọc</p>\n            `;
+            productsGrid.appendChild(noProductsDiv);
+        }
+    } else if (noProductsMsg) {
+        noProductsMsg.remove();
+    }
+}
+
+// Gắn sự kiện cho filter
+
 document.addEventListener('DOMContentLoaded', function() {
     // View toggle functionality
     const viewBtns = document.querySelectorAll('.view-btn');
@@ -921,6 +984,41 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 500);
         });
     });
+
+    // Khoảng giá
+    document.querySelector('.price-range .apply-btn').addEventListener('click', function() {
+        filterProductsAll();
+    });
+    // Khuyến mãi
+    document.querySelectorAll('.filter-options input[type="checkbox"]').forEach(cb => {
+        cb.addEventListener('change', filterProductsAll);
+    });
+    // Đánh giá
+    document.querySelectorAll('.rating-options input[type="radio"]').forEach(radio => {
+        radio.addEventListener('change', filterProductsAll);
+    });
+    // Sắp xếp
+    document.querySelectorAll('.sort-options input[type="radio"]').forEach(radio => {
+        radio.addEventListener('change', filterProductsAll);
+    });
+
+    // Reset filter
+    const resetBtn = document.getElementById('deleteAllFilter');
+    if (resetBtn) {
+        resetBtn.addEventListener('click', function() {
+            // Reset khoảng giá
+            document.querySelector('.price-range input[placeholder="0"]').value = '';
+            document.querySelector('.price-range input[placeholder="1000000"]').value = '';
+            // Reset khuyến mãi
+            document.querySelectorAll('.filter-options input[type="checkbox"]').forEach(cb => cb.checked = false);
+            // Reset đánh giá
+            document.querySelectorAll('.rating-options input[type="radio"]').forEach(radio => radio.checked = false);
+            // Reset sắp xếp
+            document.querySelectorAll('.sort-options input[type="radio"]').forEach(radio => radio.checked = false);
+            // Hiện lại tất cả sản phẩm
+            filterProductsAll();
+        });
+    }
 });
 
 // Call the function when page loads
