@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\{
     OrderController,
     CounterSaleController,
     DashboardController,
+    ImageController,
     VoucherController,
     VoucherProductController
 };
@@ -62,7 +63,7 @@ Route::middleware(['auth', 'role:ADMIN'])->get('/admin', fn() => view('admin.das
 //
 Route::prefix('admin')
     ->as('admin.')
-    ->middleware(['auth', 'role:ADMIN'])
+    ->middleware(['auth', 'role:admin'])
     ->group(function () {
 
         // 👤 Users
@@ -103,7 +104,7 @@ Route::prefix('admin')
 
 Route::prefix('admin')
     ->as('admin.')
-    ->middleware(['auth', 'role:ADMIN'])
+    ->middleware(['auth', 'role:admin'])
     ->group(function () {
 
         // 💵 ROUTES cho quản lý đơn hàng tại quầy
@@ -161,4 +162,11 @@ Route::middleware(['auth', 'role:user'])
         Route::get('/', [UserProfileController::class, 'index'])->name('index');      // profile.index
         Route::get('/edit', [UserProfileController::class, 'edit'])->name('edit');    // profile.edit
         Route::put('/update', [UserProfileController::class, 'update'])->name('update'); // profile.update
+    });
+
+Route::prefix('admin')
+    ->as('admin.')
+    ->middleware(['auth', 'role:admin'])
+    ->group(function () {
+        Route::resource('images', ImageController::class);
     });
