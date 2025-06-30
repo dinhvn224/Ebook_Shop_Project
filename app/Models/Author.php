@@ -20,4 +20,9 @@ class Author extends Model
             $builder->where('deleted', false)->orWhereNull('deleted');
         });
     }
+
+    public function books()
+    {
+        return $this->hasMany(Book::class, 'author_id');
+    }
 }

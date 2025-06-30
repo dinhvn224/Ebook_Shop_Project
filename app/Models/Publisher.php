@@ -17,5 +17,10 @@ class Publisher extends Model
             $builder->where('deleted', false)->orWhereNull('deleted');
         });
     }
+
+    public function books()
+    {
+        return $this->hasMany(Book::class, 'publisher_id');
+    }
 }
 

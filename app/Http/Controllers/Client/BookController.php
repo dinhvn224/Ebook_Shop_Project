@@ -17,7 +17,7 @@ class BookController extends Controller
             'author',
             'publisher',
             'category',
-            'details' => function ($query) {
+            'details.images' => function ($query) {
                 $query->where('is_active', true)
                       ->where(function ($q) {
                           $q->where('deleted', 0)->orWhereNull('deleted');
@@ -25,7 +25,14 @@ class BookController extends Controller
             }
         ]);
 
+        // Lấy sách liên quan
+        $relatedBooks = Book::where('category_id', $book->category_id)
+            ->where('id', '!=', $book->id)
+            ->with(['author', 'details.images'])
+            ->limit(4)
+            ->get();
+
         // Trả về view
-        return view('client.book.show', compact('book'));
+        return view('client.Book.show', compact('book', 'relatedBooks'));
     }
 }

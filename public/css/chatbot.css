@@ -82,31 +82,33 @@
 .chatbot-header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: #fff;
-    padding: 20px;
+    padding: 10px 16px;
     text-align: center;
     position: relative;
+    min-height: 38px;
 }
 
 .chatbot-header h3 {
     margin: 0;
-    font-size: 18px;
+    font-size: 15px;
     font-weight: 600;
+    line-height: 1.2;
 }
 
 .chatbot-header .status {
-    font-size: 12px;
+    font-size: 11px;
     opacity: 0.8;
-    margin-top: 5px;
+    margin-top: 2px;
 }
 
 .chatbot-close {
     position: absolute;
-    top: 15px;
-    right: 15px;
+    top: 8px;
+    right: 10px;
     background: none;
     border: none;
     color: white;
-    font-size: 20px;
+    font-size: 18px;
     cursor: pointer;
     opacity: 0.7;
     transition: opacity 0.3s;
@@ -369,7 +371,7 @@
 @media (max-width: 768px) {
     .chatbot-window {
         width: calc(100vw - 40px);
-        height: calc(100vh - 120px);
+        max-width: 320px;
         bottom: 80px;
         right: 20px;
         left: 20px;
@@ -390,6 +392,7 @@
 @media (max-width: 480px) {
     .chatbot-window {
         width: calc(100vw - 20px);
+        max-width: 95vw;
         right: 10px;
         left: 10px;
     }

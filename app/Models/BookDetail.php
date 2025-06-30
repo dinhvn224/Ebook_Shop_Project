@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\Book;
+use App\Models\Image;
 
 class BookDetail extends Model
 {
@@ -34,12 +35,12 @@ class BookDetail extends Model
 
     public function book()
     {
-        return $this->belongsTo(Book::class);
+        return $this->belongsTo(Book::class, 'book_id');
     }
 
     public function images()
     {
-        return $this->hasMany(\App\Models\Image::class, 'book_id', 'book_id');
+        return $this->hasMany(Image::class, 'book_id', 'book_id');
     }
 
     public function mainImage()

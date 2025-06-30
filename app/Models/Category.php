@@ -17,5 +17,10 @@ class Category extends Model
             $builder->where('deleted', false)->orWhereNull('deleted');
         });
     }
+
+    public function books()
+    {
+        return $this->hasMany(Book::class, 'category_id');
+    }
 }
 

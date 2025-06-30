@@ -1,10 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Client;
 
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Controller;
+// ... existing code ...
 
 class AuthController extends Controller
 {
@@ -29,9 +31,8 @@ class AuthController extends Controller
         ]);
 
         Auth::login($user);
-        return redirect()->route('home'); // Đúng vì role là 'user'
+        return redirect()->route('home');
     }
-
 
     public function showLoginForm()
     {
@@ -44,8 +45,6 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-
-            // Phân quyền điều hướng
             $user = Auth::user();
             if ($user->role === 'admin') {
                 return redirect()->route('admin.dashboard');
@@ -53,10 +52,8 @@ class AuthController extends Controller
                 return redirect()->route('home');
             }
         }
-
         return back()->withErrors(['email' => 'Sai thông tin đăng nhập']);
     }
-
 
     public function logout(Request $request)
     {

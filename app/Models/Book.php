@@ -32,27 +32,27 @@ class Book extends Model
     // Relationships
     public function author()
     {
-        return $this->belongsTo(Author::class);
+        return $this->belongsTo(Author::class, 'author_id');
     }
 
     public function publisher()
     {
-        return $this->belongsTo(Publisher::class);
+        return $this->belongsTo(Publisher::class, 'publisher_id');
     }
 
     public function category()
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsTo(Category::class, 'category_id');
     }
 
     public function details()
     {
-        return $this->hasMany(BookDetail::class);
+        return $this->hasMany(BookDetail::class, 'book_id');
     }
 
     public function vouchers()
     {
-        return $this->belongsToMany(Voucher::class, 'book_voucher');
+        return $this->belongsToMany(Voucher::class, 'book_voucher', 'book_id', 'voucher_id');
     }
 
     public function images()

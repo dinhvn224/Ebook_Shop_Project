@@ -15,19 +15,22 @@ use App\Http\Controllers\Admin\{
     VoucherProductController,
     ImageController
 };
+use App\Http\Controllers\Client\AuthController as ClientAuthController;
 use App\Http\Controllers\Client\BookController as ClientBookController;
+use App\Http\Controllers\Client\CategoryController as ClientCategoryController;
+use App\Http\Controllers\Client\ChatBotController as ClientChatBotController;
+use App\Http\Controllers\Client\HomeController as ClientHomeController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\ChatBotController;
+use App\Http\Controllers\ExportController;
 
 //
 // 🌐 PUBLIC CLIENT ROUTES
 //
-Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/', [ClientHomeController::class, 'index'])->name('home');
 
-Route::get('/books', [BookController::class, 'index'])->name('books.index');
+Route::get('/books', [ClientBookController::class, 'index'])->name('books.index');
 
-
-Route::get('/book/{book}', [ClientBookController::class, 'show'])->name('book.detail');
+// Route::get('/book/{book}', [ClientBookController::class, 'show'])->name('book.detail');
 
 Route::middleware(['auth', 'role:user'])->get('/home', fn() => view('client.home'))
     ->name('home.user');
@@ -145,7 +148,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
 // 🤖 CHATBOT ROUTES
 //
-Route::post('/chatbot/webhook', [ChatBotController::class, 'webhook'])->name('chatbot.webhook');
+Route::post('/chatbot/webhook', [ClientChatBotController::class, 'webhook'])->name('chatbot.webhook');
 
 Route::prefix('admin')
     ->as('admin.')
@@ -154,10 +157,11 @@ Route::prefix('admin')
         Route::resource('images', ImageController::class);
     });
 
+Route::get('/export/products/pdf', [ExportController::class, 'exportProductsPdf'])->name('export.products.pdf');
 
-Route::prefix('admin')
-    ->as('admin.')
-    ->middleware(['auth', 'role:admin'])
-    ->group(function () {
-        Route::resource('images', ImageController::class);
-    });
+Route::get('/category/{id}', [ClientCategoryController::class, 'show'])->name('category.show');
+
+Route::get('/authors', [App\Http\Controllers\AuthorController::class, 'index'])->name('authors.index');
+Route::get('/author/{id}', [App\Http\Controllers\AuthorController::class, 'show'])->name('author.show');
+
+Route::get('/book/{id}', [App\Http\Controllers\Client\BookController::class, 'show'])->name('book.show');

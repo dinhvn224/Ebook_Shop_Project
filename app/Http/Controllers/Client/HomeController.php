@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Client;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Book;
 use App\Models\BookDetail;
@@ -11,7 +12,6 @@ class HomeController extends Controller
 {
     public function index()
     {
-        // Lấy tất cả sách với thông tin chi tiết, tác giả, nhà xuất bản và danh mục
         $books = Book::with(['author', 'publisher', 'category', 'details', 'images' => function($q) {
             $q->where('is_main', 1);
         }])
@@ -20,10 +20,10 @@ class HomeController extends Controller
         })
         ->get();
 
-        // Lấy danh mục sách
         $categories = Category::all();
+        $publishers = \App\Models\Publisher::all();
 
-        return view('client.home', compact('books', 'categories'));
+        return view('client.home', compact('books', 'categories', 'publishers'));
     }
 
     public function getProductsData()
@@ -41,10 +41,7 @@ class HomeController extends Controller
 
         foreach ($books as $book) {
             foreach ($book->details as $detail) {
-                // Tạo masp duy nhất
                 $masp = 'DB' . $maspCounter;
-
-                // Xác định loại khuyến mãi
                 $promo = ['name' => '', 'value' => '0'];
                 if ($detail->promotion_price && $detail->promotion_price < $detail->price) {
                     $promo = [
@@ -57,20 +54,14 @@ class HomeController extends Controller
                         'value' => '0'
                     ];
                 }
-
-                // Tạo giá dạng string có dấu chấm
                 $priceStr = number_format($detail->promotion_price && $detail->promotion_price < $detail->price ? $detail->promotion_price : $detail->price, 0, '', '.');
-
-                // Lấy ảnh nếu có, nếu không thì lấy noimage
                 $img = 'client/img/products/noimage.png';
-                // Nếu bạn có trường ảnh trong db thì thay ở đây
-
                 $products[] = [
                     'name' => $book->name,
                     'company' => $book->publisher->name ?? '',
                     'img' => $img,
                     'price' => $priceStr,
-                    'star' => rand(3, 5), // random cho đẹp
+                    'star' => rand(3, 5),
                     'rateCount' => rand(10, 999),
                     'promo' => $promo,
                     'detail' => [
@@ -78,12 +69,11 @@ class HomeController extends Controller
                         'xuatsu' => $book->publisher->name ?? 'N/A'
                     ],
                     'masp' => $masp,
-                    'book_id' => $masp // Đảm bảo luôn có book_id
+                    'book_id' => $masp
                 ];
                 $maspCounter++;
             }
         }
-
         return response()->json($products);
     }
 }

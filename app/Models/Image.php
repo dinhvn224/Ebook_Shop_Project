@@ -20,4 +20,9 @@ class Image extends Model
     {
         return $this->belongsTo(Book::class, 'book_id');
     }
+
+    public function bookDetail()
+    {
+        return $this->belongsTo(BookDetail::class, 'book_detail_id');
+    }
 }
