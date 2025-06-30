@@ -2,6 +2,7 @@
 
 @section('content')
 @php use Illuminate\Support\Str; @endphp
+
 <div class="homepage-container">
     <!-- Hero Banner Section -->
     <section class="hero-banner">
@@ -28,88 +29,122 @@
     <!-- Filter Section -->
     <section class="filter-section">
         <div class="container">
-            <div class="filter-bar">
-                <div class="filter-group">
-                    <div class="filter-dropdown">
-                        <button class="filter-btn" data-filter="price">
-                            <i class="fas fa-dollar-sign"></i>
-                            <span>Khoảng giá</span>
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                        <div class="dropdown-menu">
-                            <div class="price-range">
-                                <label>Từ: <input type="number" placeholder="0" class="price-input"></label>
-                                <label>Đến: <input type="number" placeholder="1000000" class="price-input"></label>
-                                <button class="apply-btn">Áp dụng</button>
+            <form method="GET" action="{{ route('home') }}" id="filterForm">
+                <div class="filter-bar">
+                    <div class="filter-group">
+                        <!-- Thể loại -->
+                        <div class="filter-dropdown">
+                            <button type="button" class="filter-btn" data-filter="category">
+                                <i class="fas fa-list"></i>
+                                <span>Thể loại</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="dropdown-menu">
+                                <select name="category_id" onchange="document.getElementById('filterForm').submit()">
+                                    <option value="">-- Tất cả --</option>
+                                    @foreach($categories as $cat)
+                                        <option value="{{ $cat->id }}" {{ request('category_id') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <!-- Tác giả -->
+                        <div class="filter-dropdown">
+                            <button type="button" class="filter-btn" data-filter="author">
+                                <i class="fas fa-user"></i>
+                                <span>Tác giả</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="dropdown-menu">
+                                <select name="author_id" onchange="document.getElementById('filterForm').submit()">
+                                    <option value="">-- Tất cả --</option>
+                                    @foreach($authors as $author)
+                                        <option value="{{ $author->id }}" {{ request('author_id') == $author->id ? 'selected' : '' }}>{{ $author->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <!-- Nhà xuất bản -->
+                        <div class="filter-dropdown">
+                            <button type="button" class="filter-btn" data-filter="publisher">
+                                <i class="fas fa-building"></i>
+                                <span>Nhà xuất bản</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="dropdown-menu">
+                                <select name="publisher_id" onchange="document.getElementById('filterForm').submit()">
+                                    <option value="">-- Tất cả --</option>
+                                    @foreach($publishers as $pub)
+                                        <option value="{{ $pub->id }}" {{ request('publisher_id') == $pub->id ? 'selected' : '' }}>{{ $pub->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="filter-dropdown">
+                            <button type="button" class="filter-btn" data-filter="price">
+                                <i class="fas fa-dollar-sign"></i>
+                                <span>Khoảng giá</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="dropdown-menu">
+                                <div class="price-range" style="display: flex; flex-direction: column; gap: 8px;">
+                                    <label>
+                                        <input type="radio" name="price_range" value="0-50000" {{ request('price_range') == '0-50000' ? 'checked' : '' }} onchange="this.form.submit();">
+                                        Dưới 50.000₫
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="price_range" value="50000-100000" {{ request('price_range') == '50000-100000' ? 'checked' : '' }} onchange="this.form.submit();">
+                                        50.000₫ - 100.000₫
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="price_range" value="100000-200000" {{ request('price_range') == '100000-200000' ? 'checked' : '' }} onchange="this.form.submit();">
+                                        100.000₫ - 200.000₫
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="price_range" value="200000-100000000" {{ request('price_range') == '200000-100000000' ? 'checked' : '' }} onchange="this.form.submit();">
+                                        Trên 200.000₫
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Sắp xếp -->
+                        <div class="filter-dropdown">
+                            <button type="button" class="filter-btn" data-filter="sort">
+                                <i class="fas fa-sort"></i>
+                                <span>Sắp xếp</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="dropdown-menu">
+                                <div style="display: flex; gap: 10px;">
+                                    <select name="sort_name" onchange="this.form.submit()">
+                                        <option value="">-- Sắp xếp tên --</option>
+                                        <option value="az" {{ request('sort_name') == 'az' ? 'selected' : '' }}>A-Z</option>
+                                        <option value="za" {{ request('sort_name') == 'za' ? 'selected' : '' }}>Z-A</option>
+                                    </select>
+                                    <select name="sort_date" onchange="this.form.submit()">
+                                        <option value="">-- Sắp xếp ngày --</option>
+                                        <option value="newest" {{ request('sort_date') == 'newest' ? 'selected' : '' }}>Mới nhất</option>
+                                        <option value="oldest" {{ request('sort_date') == 'oldest' ? 'selected' : '' }}>Cũ nhất</option>
+                                    </select>
+                                    <select name="sort_price" onchange="this.form.submit()">
+                                        <option value="">-- Sắp xếp giá --</option>
+                                        <option value="price_asc" {{ request('sort_price') == 'price_asc' ? 'selected' : '' }}>Giá tăng dần</option>
+                                        <option value="price_desc" {{ request('sort_price') == 'price_desc' ? 'selected' : '' }}>Giá giảm dần</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     </div>
-
-                    <div class="filter-dropdown">
-                        <button class="filter-btn" data-filter="promotion">
-                            <i class="fas fa-tags"></i>
-                            <span>Khuyến mãi</span>
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                        <div class="dropdown-menu">
-                            <div class="filter-options">
-                                <label><input type="checkbox" value="sale"> Đang giảm giá</label>
-                                <label><input type="checkbox" value="new"> Sách mới</label>
-                                <label><input type="checkbox" value="bestseller"> Bán chạy</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="filter-dropdown">
-                        <button class="filter-btn" data-filter="rating">
-                            <i class="fas fa-star"></i>
-                            <span>Đánh giá</span>
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                        <div class="dropdown-menu">
-                            <div class="rating-options">
-                                <label><input type="radio" name="rating" value="5"> 5 sao</label>
-                                <label><input type="radio" name="rating" value="4"> 4 sao trở lên</label>
-                                <label><input type="radio" name="rating" value="3"> 3 sao trở lên</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="filter-dropdown">
-                        <button class="filter-btn" data-filter="sort">
-                            <i class="fas fa-sort"></i>
-                            <span>Sắp xếp</span>
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                        <div class="dropdown-menu">
-                            <div class="sort-options">
-                                <label><input type="radio" name="sort" value="newest"> Mới nhất</label>
-                                <label><input type="radio" name="sort" value="price-low"> Giá thấp đến cao</label>
-                                <label><input type="radio" name="sort" value="price-high"> Giá cao đến thấp</label>
-                                <label><input type="radio" name="sort" value="popular"> Phổ biến</label>
-                            </div>
+                    <!-- Tìm kiếm -->
+                    <div class="search-filter">
+                        <div class="search-box">
+                            <input type="text" id="search-input" name="search" placeholder="Tìm kiếm sách hoặc tác giả..." class="search-input" value="{{ request('search') }}">
+                            <button class="search-btn" type="submit"><i class="fas fa-search"></i></button>
+                            <div id="suggestions" class="suggestions-list"></div>
                         </div>
                     </div>
                 </div>
-
-                <div class="search-filter">
-                    <div class="search-box">
-                        <input type="text" placeholder="Tìm kiếm sách..." class="search-input" onkeyup="filterProductsName(this)">
-                        <button class="search-btn"><i class="fas fa-search"></i></button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Active Filters Display -->
-            <div class="active-filters" style="display: none;">
-                <div class="filter-tags">
-                    <!-- Active filter tags will appear here -->
-                </div>
-                <button class="clear-all-btn" id="deleteAllFilter">
-                    <i class="fas fa-times"></i>
-                    Xóa tất cả bộ lọc
-                </button>
-            </div>
+            </form>
         </div>
     </section>
 
@@ -126,7 +161,8 @@
 
             <div class="products-grid" id="products">
                 @forelse ($books as $book)
-                    @foreach ($book->details as $detail)
+                    @php $detail = $book->details->first(); @endphp
+                    @if($detail)
                         <div class="product-card" data-book-id="{{ $book->id }}">
                             <div class="product-image">
                                 @php
@@ -134,9 +170,9 @@
                                 @endphp
                                 <img src="{{ asset('storage/' . $img) }}" alt="{{ $book->name }}" loading="lazy">
                                 <div class="product-overlay">
-                                    <button class="quick-view-btn" title="Xem nhanh">
+                                    <a href="{{ route('book.detail', $book->id) }}" class="quick-view-btn" title="Xem nhanh">
                                         <i class="fas fa-eye"></i>
-                                    </button>
+                                    </a>
                                     <button class="wishlist-btn" title="Yêu thích">
                                         <i class="far fa-heart"></i>
                                     </button>
@@ -151,13 +187,11 @@
                             </div>
 
                             <div class="product-info">
-<h3 class="product-title">
-    <a href="{{ route('book.detail', $book->id) }}" title="{{ $book->name }}">
-        {{ $book->name }}
-    </a>
-</h3>
-
-
+                                <h3 class="product-title">
+                                    <a href="{{ route('book.detail', $book->id) }}" title="{{ $book->name }}">
+                                        {{ $book->name }}
+                                    </a>
+                                </h3>
                                 <div class="product-author">
                                     <i class="fas fa-user"></i>
                                     <span>Tác giả: {{ $book->author->name ?? 'Chưa cập nhật' }}</span>
@@ -199,7 +233,7 @@
                                 </div>
                             </div>
                         </div>
-                    @endforeach
+                    @endif
                 @empty
                     <div class="no-products">
                         <div class="no-products-icon">
@@ -213,11 +247,11 @@
             </div>
 
             {{-- Pagination --}}
-            @if(isset($books) && method_exists($books, 'links'))
-                <div class="pagination-wrapper">
-                    {{ $books->links() }}
-                </div>
-            @endif
+        @if(isset($books) && method_exists($books, 'links'))
+            <div class="pagination-wrapper">
+                {{ $books->links('pagination::bootstrap-5') }}
+            </div>
+        @endif
         </div>
     </section>
 
@@ -239,573 +273,573 @@
 </div>
 
 <style>
-/* General Styles */
-.homepage-container {
-    background-color: #f8f9fa;
-}
-
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 15px;
-}
-
-.section-title {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #2c3e50;
-    margin-bottom: 2rem;
-    text-align: center;
-    position: relative;
-}
-
-.section-title::after {
-    content: '';
-    position: absolute;
-    bottom: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 60px;
-    height: 3px;
-    background: linear-gradient(90deg, #3498db, #2980b9);
-    border-radius: 2px;
-}
-
-/* Hero Banner */
-.hero-banner {
-    margin-bottom: 3rem;
-}
-
-.promotional-banner {
-    margin-top: 1rem;
-}
-
-.promo-image {
-    width: 100%;
-    height: auto;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-}
-
-/* Category Section */
-.category-section {
-    background: white;
-    padding: 3rem 0;
-    margin-bottom: 2rem;
-    border-radius: 15px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-}
-
-/* Filter Section */
-.filter-section {
-    background: white;
-    padding: 2rem 0;
-    margin-bottom: 2rem;
-    border-radius: 15px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-}
-
-.filter-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
-}
-
-.filter-group {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-}
-
-.filter-dropdown {
-    position: relative;
-}
-
-.filter-btn {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.25rem;
-    background: #f8f9fa;
-    border: 2px solid #e9ecef;
-    border-radius: 8px;
-    color: #495057;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.filter-btn:hover {
-    background: #e9ecef;
-    border-color: #3498db;
-    color: #3498db;
-}
-
-.dropdown-menu {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    background: white;
-    border: 1px solid #e9ecef;
-    border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    min-width: 200px;
-    z-index: 1000;
-    display: none;
-    padding: 1rem;
-}
-
-.filter-dropdown:hover .dropdown-menu {
-    display: block;
-}
-
-.price-range {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-}
-
-.price-input {
-    padding: 0.5rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    width: 100px;
-}
-
-.apply-btn {
-    padding: 0.5rem 1rem;
-    background: #3498db;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.filter-options, .rating-options, .sort-options {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.filter-options label, .rating-options label, .sort-options label {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    cursor: pointer;
-    padding: 0.25rem 0;
-}
-
-.search-filter {
-    flex: 1;
-    max-width: 400px;
-}
-
-.search-box {
-    display: flex;
-    border: 2px solid #e9ecef;
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-.search-input {
-    flex: 1;
-    padding: 0.75rem 1rem;
-    border: none;
-    outline: none;
-    font-size: 1rem;
-}
-
-.search-btn {
-    padding: 0.75rem 1rem;
-    background: #3498db;
-    color: white;
-    border: none;
-    cursor: pointer;
-    transition: background 0.3s ease;
-}
-
-.search-btn:hover {
-    background: #2980b9;
-}
-
-.active-filters {
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid #e9ecef;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.clear-all-btn {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    background: #e74c3c;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 0.9rem;
-}
-
-/* Products Section */
-.products-section {
-    padding: 2rem 0;
-}
-
-.section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-}
-
-.view-options {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.view-btn {
-    padding: 0.5rem;
-    background: #f8f9fa;
-    border: 1px solid #e9ecef;
-    border-radius: 4px;
-    cursor: pointer;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.view-btn.active {
-    background: #3498db;
-    color: white;
-    border-color: #3498db;
-}
-
-.products-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 2rem;
-    margin-bottom: 3rem;
-}
-
-.product-card {
-    background: white;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 2px 15px rgba(0,0,0,0.08);
-    transition: all 0.3s ease;
-    position: relative;
-}
-
-.product-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-}
-
-.product-image {
-    position: relative;
-    overflow: hidden;
-    height: 250px;
-}
-
-.product-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.3s ease;
-}
-
-.product-card:hover .product-image img {
-    transform: scale(1.05);
-}
-
-.product-overlay {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.product-card:hover .product-overlay {
-    opacity: 1;
-}
-
-.quick-view-btn, .wishlist-btn {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    border: none;
-    background: rgba(255,255,255,0.9);
-    color: #666;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s ease;
-}
-
-.quick-view-btn:hover, .wishlist-btn:hover {
-    background: #3498db;
-    color: white;
-}
-
-.discount-badge, .new-badge {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: white;
-}
-
-.discount-badge {
-    background: #e74c3c;
-}
-
-.new-badge {
-    background: #27ae60;
-}
-
-.product-info {
-    padding: 1.5rem;
-}
-
-.product-title {
-    margin: 0 0 0.5rem 0;
-    font-size: 1.1rem;
-    font-weight: 600;
-    line-height: 1.4;
-}
-
-.product-title a {
-    color: #2c3e50;
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
-
-.product-title a:hover {
-    color: #3498db;
-}
-
-.product-author {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: #666;
-    font-size: 0.9rem;
-    margin-bottom: 0.75rem;
-}
-
-.product-rating {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-}
-
-.stars {
-    display: flex;
-    gap: 2px;
-}
-
-.stars i {
-    color: #ddd;
-    font-size: 0.9rem;
-}
-
-.stars i.active {
-    color: #f39c12;
-}
-
-.rating-text {
-    font-size: 0.8rem;
-    color: #666;
-}
-
-.product-price {
-    margin-bottom: 1rem;
-}
-
-.current-price {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: #e74c3c;
-}
-
-.original-price {
-    font-size: 1rem;
-    color: #999;
-    text-decoration: line-through;
-    margin-left: 0.5rem;
-}
-
-.product-actions {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.add-to-cart-btn, .buy-now-btn {
-    flex: 1;
-    padding: 0.75rem;
-    border: none;
-    border-radius: 6px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.add-to-cart-btn {
-    background: #f8f9fa;
-    color: #3498db;
-    border: 1px solid #3498db;
-}
-
-.add-to-cart-btn:hover {
-    background: #3498db;
-    color: white;
-}
-
-.buy-now-btn {
-    background: #3498db;
-    color: white;
-}
-
-.buy-now-btn:hover {
-    background: #2980b9;
-}
-
-.no-products {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 4rem 2rem;
-    background: white;
-    border-radius: 12px;
-}
-
-.no-products-icon {
-    font-size: 4rem;
-    color: #bdc3c7;
-    margin-bottom: 1rem;
-}
-
-.no-products h3 {
-    font-size: 1.5rem;
-    color: #2c3e50;
-    margin-bottom: 0.5rem;
-}
-
-.no-products p {
-    color: #666;
-    margin-bottom: 1.5rem;
-}
-
-.reset-filter-btn {
-    padding: 0.75rem 1.5rem;
-    background: #3498db;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-}
-
-/* Newsletter Section */
-.newsletter-section {
-    background: linear-gradient(135deg, #3498db, #2980b9);
-    color: white;
-    padding: 3rem 0;
-    margin-top: 3rem;
-}
-
-.newsletter-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 2rem;
-}
-
-.newsletter-text h3 {
-    font-size: 1.5rem;
-    margin-bottom: 0.5rem;
-}
-
-.newsletter-form {
-    display: flex;
-    gap: 0.5rem;
-    max-width: 400px;
-    flex: 1;
-}
-
-.email-input {
-    flex: 1;
-    padding: 0.75rem;
-    border: none;
-    border-radius: 6px;
-    outline: none;
-}
-
-.subscribe-btn {
-    padding: 0.75rem 1.5rem;
-    background: #e74c3c;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 500;
-    white-space: nowrap;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .filter-bar {
-        flex-direction: column;
-        align-items: stretch;
+    /* General Styles */
+    .homepage-container {
+        background-color: #f8f9fa;
     }
 
-    .filter-group {
-        justify-content: center;
-    }
-
-    .products-grid {
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-        gap: 1rem;
-    }
-
-    .newsletter-content {
-        flex-direction: column;
-        text-align: center;
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 15px;
     }
 
     .section-title {
-        font-size: 1.5rem;
+        font-size: 2rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 2rem;
+        text-align: center;
+        position: relative;
     }
-}
 
-@media (max-width: 480px) {
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60px;
+        height: 3px;
+        background: linear-gradient(90deg, #3498db, #2980b9);
+        border-radius: 2px;
+    }
+
+    /* Hero Banner */
+    .hero-banner {
+        margin-bottom: 3rem;
+    }
+
+    .promotional-banner {
+        margin-top: 1rem;
+    }
+
+    .promo-image {
+        width: 100%;
+        height: auto;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    /* Category Section */
+    .category-section {
+        background: white;
+        padding: 3rem 0;
+        margin-bottom: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    /* Filter Section */
+    .filter-section {
+        background: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .filter-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .filter-group {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .filter-dropdown {
+        position: relative;
+    }
+
+    .filter-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.25rem;
+        background: #f8f9fa;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        color: #495057;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .filter-btn:hover {
+        background: #e9ecef;
+        border-color: #3498db;
+        color: #3498db;
+    }
+
+    .dropdown-menu {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        min-width: 200px;
+        z-index: 1000;
+        display: none;
+        padding: 1rem;
+    }
+
+    .filter-dropdown:hover .dropdown-menu {
+        display: block;
+    }
+
+    .price-range {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .price-input {
+        padding: 0.5rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        width: 100px;
+    }
+
+    .apply-btn {
+        padding: 0.5rem 1rem;
+        background: #3498db;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .filter-options, .rating-options, .sort-options {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .filter-options label, .rating-options label, .sort-options label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        padding: 0.25rem 0;
+    }
+
+    .search-filter {
+        flex: 1;
+        max-width: 400px;
+    }
+
+    .search-box {
+        display: flex;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        /* overflow: hidden; */
+    }
+
+    .search-input {
+        flex: 1;
+        padding: 0.75rem 1rem;
+        border: none;
+        outline: none;
+        font-size: 1rem;
+    }
+
+    .search-btn {
+        padding: 0.75rem 1rem;
+        background: #3498db;
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: background 0.3s ease;
+    }
+
+    .search-btn:hover {
+        background: #2980b9;
+    }
+
+    .active-filters {
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #e9ecef;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .clear-all-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: #e74c3c;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.9rem;
+    }
+
+    /* Products Section */
+    .products-section {
+        padding: 2rem 0;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .view-options {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .view-btn {
+        padding: 0.5rem;
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 4px;
+        cursor: pointer;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .view-btn.active {
+        background: #3498db;
+        color: white;
+        border-color: #3498db;
+    }
+
     .products-grid {
-        grid-template-columns: 1fr;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+
+    .product-card {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+
+    .product-image {
+        position: relative;
+        overflow: hidden;
+        height: 250px;
+    }
+
+    .product-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .product-card:hover .product-image img {
+        transform: scale(1.05);
+    }
+
+    .product-overlay {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .product-card:hover .product-overlay {
+        opacity: 1;
+    }
+
+    .quick-view-btn, .wishlist-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: none;
+        background: rgba(255,255,255,0.9);
+        color: #666;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+
+    .quick-view-btn:hover, .wishlist-btn:hover {
+        background: #3498db;
+        color: white;
+    }
+
+    .discount-badge, .new-badge {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: white;
+    }
+
+    .discount-badge {
+        background: #e74c3c;
+    }
+
+    .new-badge {
+        background: #27ae60;
+    }
+
+    .product-info {
+        padding: 1.5rem;
+    }
+
+    .product-title {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+        line-height: 1.4;
+    }
+
+    .product-title a {
+        color: #2c3e50;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+    .product-title a:hover {
+        color: #3498db;
+    }
+
+    .product-author {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #666;
+        font-size: 0.9rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .product-rating {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .stars {
+        display: flex;
+        gap: 2px;
+    }
+
+    .stars i {
+        color: #ddd;
+        font-size: 0.9rem;
+    }
+
+    .stars i.active {
+        color: #f39c12;
+    }
+
+    .rating-text {
+        font-size: 0.8rem;
+        color: #666;
+    }
+
+    .product-price {
+        margin-bottom: 1rem;
+    }
+
+    .current-price {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #e74c3c;
+    }
+
+    .original-price {
+        font-size: 1rem;
+        color: #999;
+        text-decoration: line-through;
+        margin-left: 0.5rem;
     }
 
     .product-actions {
-        flex-direction: column;
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .add-to-cart-btn, .buy-now-btn {
+        flex: 1;
+        padding: 0.75rem;
+        border: none;
+        border-radius: 6px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .add-to-cart-btn {
+        background: #f8f9fa;
+        color: #3498db;
+        border: 1px solid #3498db;
+    }
+
+    .add-to-cart-btn:hover {
+        background: #3498db;
+        color: white;
+    }
+
+    .buy-now-btn {
+        background: #3498db;
+        color: white;
+    }
+
+    .buy-now-btn:hover {
+        background: #2980b9;
+    }
+
+    .no-products {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 4rem 2rem;
+        background: white;
+        border-radius: 12px;
+    }
+
+    .no-products-icon {
+        font-size: 4rem;
+        color: #bdc3c7;
+        margin-bottom: 1rem;
+    }
+
+    .no-products h3 {
+        font-size: 1.5rem;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+    }
+
+    .no-products p {
+        color: #666;
+        margin-bottom: 1.5rem;
+    }
+
+    .reset-filter-btn {
+        padding: 0.75rem 1.5rem;
+        background: #3498db;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+
+    /* Newsletter Section */
+    .newsletter-section {
+        background: linear-gradient(135deg, #3498db, #2980b9);
+        color: white;
+        padding: 3rem 0;
+        margin-top: 3rem;
+    }
+
+    .newsletter-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 2rem;
+    }
+
+    .newsletter-text h3 {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
     }
 
     .newsletter-form {
-        flex-direction: column;
+        display: flex;
+        gap: 0.5rem;
+        max-width: 400px;
+        flex: 1;
     }
-}
+
+    .email-input {
+        flex: 1;
+        padding: 0.75rem;
+        border: none;
+        border-radius: 6px;
+        outline: none;
+    }
+
+    .subscribe-btn {
+        padding: 0.75rem 1.5rem;
+        background: #e74c3c;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 500;
+        white-space: nowrap;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .filter-bar {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .filter-group {
+            justify-content: center;
+        }
+
+        .products-grid {
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .newsletter-content {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .products-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .product-actions {
+            flex-direction: column;
+        }
+
+        .newsletter-form {
+            flex-direction: column;
+        }
+    }
 </style>
 
 <script>
@@ -922,7 +956,26 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+$('#search-input').on('input', function() {
+       let query = $(this).val();
+       if (query.length < 2) {
+           $('#suggestions').empty();
+           return;
+       }
+       $.get('/search-suggestions', { q: query }, function(data) {
+           let html = '';
+           data.forEach(function(item) {
+               html += '<div class="suggestion-item">' + item + '</div>';
+           });
+           $('#suggestions').html(html);
+       });
+   });
 
+   // Khi click vào gợi ý
+   $(document).on('click', '.suggestion-item', function() {
+       $('#search-input').val($(this).text());
+       $('#suggestions').empty();
+   });
 // Call the function when page loads
 addContainTaiKhoan();
 </script>

@@ -1,5 +1,5 @@
 .companyMenu {
-	margin: 10px 0 30px; 
+	margin: 10px 0 30px;
 }
 
 .companyMenu a {
@@ -62,9 +62,9 @@
 	    text-decoration: none;
 	    display: block;
 	}
-	.dropdown-content a:hover { 
+	.dropdown-content a:hover {
 		color: white;
-		background-color: #555 
+		background-color: #555
 	}
 	.dropdown:hover .dropdown-content {
 	    /* khi hover vào thì cần hiện content ra => xoay 0 độ => trờ về như cũ */
@@ -94,7 +94,7 @@
 }
 .filterName input:focus {
 	border: 2px solid orange;
-} 
+}
 
 /* Choosed filter */
 .choosedFilter { margin: 10px auto; }
@@ -112,14 +112,14 @@
 
 /* Các khung sản phẩm */
 .contain-khungSanPham {
-	
+
 }
 
 .khungSanPham {
 	width: 100%;
 	margin: 50px 0;
 	border-radius: 5px;
-	border: 2px solid #ff4d00; 
+	border: 2px solid #ff4d00;
 	box-sizing: border-box; /* dùng để width ko vượt ra ngoài khi có border */
 }
 
@@ -134,7 +134,7 @@
 }
 
 .khungSanPham li {
-	list-style-type: none; 
+	list-style-type: none;
 }
 
 /* Nút xem tất cả */
@@ -154,4 +154,40 @@
 .xemTatCa:hover {
 	background-color: #ccc;
 	color: #000;
+}
+.search-box {
+    position: relative;
+    display: flex;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    /* overflow: hidden;  <-- KHÔNG dùng dòng này */
+}
+
+.suggestions-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-top: none;
+    z-index: 9999;
+    max-height: 220px;
+    overflow-y: auto;
+    width: 100%;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    display: block; /* Đảm bảo hiển thị */
+}
+
+.suggestion-item {
+    padding: 8px 16px;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.suggestion-item:hover {
+    background: #f0f0f0;
 }

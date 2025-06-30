@@ -67,26 +67,31 @@
 
                     <!-- Price Section -->
                     <div class="price-section">
-                        @foreach ($book->details as $detail)
-                            <div class="price-container">
-                                @if ($detail->promotion_price && $detail->promotion_price < $detail->price)
-                                    <div class="price-row">
-                                        <span class="current-price">{{ number_format($detail->promotion_price) }}₫</span>
-                                        <span class="original-price">{{ number_format($detail->price) }}₫</span>
-                                    </div>
-                                    <div class="discount-info">
-                                        <span class="discount-percent">
-                                            -{{ round((($detail->price - $detail->promotion_price) / $detail->price) * 100) }}%
-                                        </span>
-                                        <span class="save-amount">
-                                            Tiết kiệm {{ number_format($detail->price - $detail->promotion_price) }}₫
-                                        </span>
-                                    </div>
-                                @else
-                                    <span class="current-price">{{ number_format($detail->price) }}₫</span>
-                                @endif
-                            </div>
-                        @endforeach
+
+                        @php
+                        $detail = $book->details->first();
+                    @endphp
+
+                    @if ($detail)
+                        <div class="price-container">
+                            @if (!is_null($detail->promotion_price) && $detail->promotion_price > 0 && $detail->promotion_price < $detail->price)
+                                <div class="price-row">
+                                    <span class="current-price">{{ number_format($detail->promotion_price) }}₫</span>
+                                    <span class="original-price">{{ number_format($detail->price) }}₫</span>
+                                </div>
+                                <div class="discount-info">
+                                    <span class="discount-percent">
+                                        -{{ round((($detail->price - $detail->promotion_price) / $detail->price) * 100) }}%
+                                    </span>
+                                    <span class="save-amount">
+                                        Tiết kiệm {{ number_format($detail->price - $detail->promotion_price) }}₫
+                                    </span>
+                                </div>
+                            @else
+                                <span class="current-price">{{ number_format($detail->price) }}₫</span>
+                            @endif
+                        </div>
+                    @endif
                     </div>
 
                     <!-- Book Details -->
@@ -281,683 +286,804 @@
             </div>
         </div>
     </div>
+
+    {{-- Sách liên quan --}}
+    <div class="container mt-5">
+        <h3 class="related-main-title" style="font-size:1.5rem; font-weight:700; color:#2563eb; margin-bottom:1.5rem;">Sách liên quan</h3>
+        @php
+            $allRelatedBooks = collect();
+            if(isset($relatedByAuthor)) $allRelatedBooks = $allRelatedBooks->merge($relatedByAuthor);
+            if(isset($relatedByCategory)) $allRelatedBooks = $allRelatedBooks->merge($relatedByCategory);
+            if(isset($relatedByPublisher)) $allRelatedBooks = $allRelatedBooks->merge($relatedByPublisher);
+            // Loại bỏ trùng lặp theo id
+            $allRelatedBooks = $allRelatedBooks->unique('id');
+        @endphp
+        @if($allRelatedBooks->count())
+            <div class="related-books-list">
+                @foreach($allRelatedBooks as $related)
+                    <a href="{{ route('book.detail', $related->id) }}" class="related-book-card">
+                        @php
+                            $img = $related->images->first()->url ?? 'client/img/products/noimage.png';
+                            $detail = $related->details->first();
+                        @endphp
+                        <div class="related-book-img-wrap">
+                            <img src="{{ asset('storage/' . $img) }}" alt="{{ $related->name }}" class="related-book-img">
+                        </div>
+                        <div class="related-book-title">{{ $related->name }}</div>
+                        @if($detail)
+                            @if($detail->promotion_price && $detail->promotion_price < $detail->price)
+                                <div class="related-book-price">
+                                    <span class="related-current-price">{{ number_format($detail->promotion_price) }}₫</span>
+                                    <span class="related-original-price">{{ number_format($detail->price) }}₫</span>
+                                </div>
+                            @else
+                                <div class="related-book-price">
+                                    <span class="related-current-price">{{ number_format($detail->price) }}₫</span>
+                                </div>
+                            @endif
+                        @endif
+                    </a>
+                @endforeach
+            </div>
+        @endif
+    </div>
 </div>
 
 <style>
-/* Modern Design System */
-:root {
-    --primary-color: #2563eb;
-    --secondary-color: #64748b;
-    --success-color: #10b981;
-    --warning-color: #f59e0b;
-    --danger-color: #ef4444;
-    --text-primary: #1e293b;
-    --text-secondary: #64748b;
-    --border-color: #e2e8f0;
-    --background-light: #f8fafc;
-    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-    --radius: 8px;
-    --radius-lg: 12px;
-}
-
-.book-detail-wrapper {
-    max-width: 1100px;
-    margin: 32px auto;
-    background: #fff;
-    border-radius: 16px;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.07);
-    padding: 32px 40px;
-}
-
-.breadcrumb-custom {
-    background: #f5f5f5;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-size: 15px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 24px;
-    font-weight: 500;
-}
-.breadcrumb-custom a {
-    color: #2c3e50;
-    text-decoration: none;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    transition: color 0.2s;
-}
-.breadcrumb-custom a:hover {
-    color: #e74c3c;
-}
-.breadcrumb-custom .divider {
-    color: #888;
-    font-size: 16px;
-    margin: 0 2px;
-}
-.breadcrumb-custom span:last-child {
-    color: #222;
-    text-transform: uppercase;
-}
-
-.book-detail-flex {
-    display: flex;
-    gap: 32px;
-    align-items: flex-start;
-}
-.left-image {
-    flex: 0 0 350px;
-    max-width: 350px;
-}
-.main-image {
-    width: 100%;
-    max-width: 350px;
-    min-height: 200px;
-    background: #f8fafd;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 16px;
-}
-.right-info {
-    flex: 1;
-    min-width: 0;
-}
-@media (max-width: 991px) {
-    .book-detail-flex {
-        flex-direction: column;
-        gap: 16px;
+    /* Modern Design System */
+    :root {
+        --primary-color: #2563eb;
+        --secondary-color: #64748b;
+        --success-color: #10b981;
+        --warning-color: #f59e0b;
+        --danger-color: #ef4444;
+        --text-primary: #1e293b;
+        --text-secondary: #64748b;
+        --border-color: #e2e8f0;
+        --background-light: #f8fafc;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        --radius: 8px;
+        --radius-lg: 12px;
     }
-    .left-image, .right-info {
-        max-width: 100%;
-        flex: 1 1 100%;
-    }
+
     .book-detail-wrapper {
-        padding: 16px 8px;
-    }
-}
-.main-book-image {
-    max-width: 100%;
-    max-height: 400px;
-    width: auto;
-    height: auto;
-    object-fit: contain;
-    display: block;
-    margin: 0 auto;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-}
-
-.placeholder-image {
-    height: 500px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-secondary);
-    background: var(--background-light);
-}
-
-.placeholder-image i {
-    font-size: 4rem;
-    margin-bottom: 1rem;
-}
-
-.image-overlay {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    opacity: 0;
-    transition: opacity 0.3s;
-}
-
-.main-image:hover .image-overlay {
-    opacity: 1;
-}
-
-/* Book Information */
-.book-info {
-    height: 100%;
-}
-
-.book-header {
-    margin-bottom: 1.5rem;
-}
-
-.book-title {
-    font-size: 1.75rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    line-height: 1.3;
-    margin-bottom: 0.75rem;
-}
-
-.rating-section {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-}
-
-.rating-stars {
-    display: flex;
-    gap: 2px;
-}
-
-.rating-stars i {
-    font-size: 1rem;
-    color: #d1d5db;
-    transition: color 0.2s;
-}
-
-.rating-stars i.active {
-    color: var(--warning-color);
-}
-
-.rating-count {
-    color: var(--text-secondary);
-    font-size: 0.875rem;
-}
-
-.sold-count {
-    color: var(--text-secondary);
-    font-size: 0.875rem;
-}
-
-/* Price Section */
-.price-section {
-    background: linear-gradient(135deg, #fef7f0 0%, #fef3ec 100%);
-    border: 1px solid #fed7aa;
-    border-radius: var(--radius-lg);
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-}
-
-.price-row {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 0.5rem;
-}
-
-.current-price {
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--danger-color);
-}
-
-.original-price {
-    font-size: 1.125rem;
-    color: var(--text-secondary);
-    text-decoration: line-through;
-}
-
-.discount-info {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.discount-percent {
-    background: var(--danger-color);
-    color: white;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    font-weight: 600;
-}
-
-.save-amount {
-    color: var(--success-color);
-    font-size: 0.875rem;
-    font-weight: 500;
-}
-
-/* Book Details */
-.book-details {
-    margin-bottom: 1.5rem;
-}
-
-.detail-grid {
-    display: grid;
-    gap: 0.75rem;
-}
-
-.detail-item {
-    display: flex;
-    align-items: center;
-    padding: 0.75rem 0;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.detail-item:last-child {
-    border-bottom: none;
-}
-
-.detail-label {
-    font-weight: 500;
-    color: var(--text-secondary);
-    min-width: 120px;
-}
-
-.detail-value {
-    color: var(--text-primary);
-    font-weight: 500;
-}
-
-.author-link {
-    color: var(--primary-color);
-    cursor: pointer;
-    transition: color 0.2s;
-}
-
-.author-link:hover {
-    color: var(--primary-color);
-    text-decoration: underline;
-}
-
-.category-tag {
-    background: var(--primary-color);
-    color: white;
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 500;
-}
-
-.stock-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
-    color: var(--success-color);
-    font-weight: 500;
-}
-
-/* Shipping Info */
-.shipping-info {
-    background: var(--background-light);
-    border-radius: var(--radius);
-    padding: 1rem;
-    margin-bottom: 1.5rem;
-    display: flex;
-    gap: 1.5rem;
-}
-
-.shipping-item {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-}
-
-.shipping-item i {
-    color: var(--primary-color);
-    font-size: 1.25rem;
-}
-
-.shipping-text strong {
-    display: block;
-    font-size: 0.875rem;
-    color: var(--text-primary);
-}
-
-.shipping-text span {
-    font-size: 0.75rem;
-    color: var(--text-secondary);
-}
-
-/* Purchase Section */
-.purchase-section {
-    margin-bottom: 1.5rem;
-}
-
-.quantity-section {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 1rem;
-}
-
-.quantity-label {
-    font-weight: 500;
-    color: var(--text-primary);
-}
-
-.quantity-controls {
-    display: flex;
-    align-items: center;
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius);
-    overflow: hidden;
-}
-
-.qty-btn {
-    background: white;
-    border: none;
-    padding: 0.5rem 0.75rem;
-    cursor: pointer;
-    color: var(--text-secondary);
-    transition: all 0.2s;
-}
-
-.qty-btn:hover {
-    background: var(--background-light);
-    color: var(--text-primary);
-}
-
-.qty-input {
-    border: none;
-    padding: 0.5rem;
-    width: 60px;
-    text-align: center;
-    font-weight: 500;
-    outline: none;
-    border-left: 1px solid var(--border-color);
-    border-right: 1px solid var(--border-color);
-}
-
-.action-buttons {
-    display: flex;
-    gap: 0.75rem;
-    flex-wrap: wrap;
-}
-
-.btn {
-    padding: 0.75rem 1.5rem;
-    border-radius: var(--radius);
-    font-weight: 500;
-    transition: all 0.2s;
-    border: none;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    text-decoration: none;
-    font-size: 0.875rem;
-}
-
-.btn-primary {
-    background: var(--primary-color);
-    color: white;
-}
-
-.btn-primary:hover {
-    background: #1d4ed8;
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-md);
-}
-
-.btn-success {
-    background: var(--success-color);
-    color: white;
-}
-
-.btn-success:hover {
-    background: #059669;
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-md);
-}
-
-.btn-outline {
-    background: white;
-    color: var(--text-secondary);
-    border: 1px solid var(--border-color);
-}
-
-.btn-outline:hover {
-    background: var(--background-light);
-    color: var(--danger-color);
-    border-color: var(--danger-color);
-}
-
-/* Trust Badges */
-.trust-badges {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-}
-
-.badge-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--text-secondary);
-    font-size: 0.875rem;
-}
-
-.badge-item i {
-    color: var(--success-color);
-}
-
-/* Product Tabs */
-.product-tabs {
-    background: white;
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--border-color);
-    overflow: hidden;
-}
-
-.tab-navigation {
-    display: flex;
-    background: var(--background-light);
-    border-bottom: 1px solid var(--border-color);
-}
-
-.tab-btn {
-    flex: 1;
-    padding: 1rem 1.5rem;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    font-weight: 500;
-    color: var(--text-secondary);
-    transition: all 0.2s;
-    position: relative;
-}
-
-.tab-btn:hover {
-    color: var(--primary-color);
-    background: rgba(37, 99, 235, 0.05);
-}
-
-.tab-btn.active {
-    color: var(--primary-color);
-    background: white;
-}
-
-.tab-btn.active::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: var(--primary-color);
-}
-
-.tab-content-container {
-    padding: 2rem;
-}
-
-.tab-content {
-    display: none;
-}
-
-.tab-content.active {
-    display: block;
-}
-
-.tab-content h4 {
-    color: var(--text-primary);
-    margin-bottom: 1rem;
-    font-weight: 600;
-}
-
-.content-text {
-    line-height: 1.7;
-    color: var(--text-secondary);
-}
-
-.spec-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.spec-table tr {
-    border-bottom: 1px solid var(--border-color);
-}
-
-.spec-table td {
-    padding: 0.75rem 0;
-    vertical-align: top;
-}
-
-.spec-table td:first-child {
-    font-weight: 500;
-    color: var(--text-secondary);
-    width: 150px;
-}
-
-.spec-table td:last-child {
-    color: var(--text-primary);
-}
-
-/* Reviews */
-.review-summary {
-    background: var(--background-light);
-    border-radius: var(--radius);
-    padding: 1.5rem;
-    margin-bottom: 1rem;
-}
-
-.overall-rating {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.rating-number {
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--warning-color);
-}
-
-.total-reviews {
-    color: var(--text-secondary);
-    font-size: 0.875rem;
-}
-
-/* Policy Content */
-.policy-content {
-    display: grid;
-    gap: 1.5rem;
-}
-
-.policy-item h6 {
-    color: var(--text-primary);
-    margin-bottom: 0.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.policy-item h6 i {
-    color: var(--primary-color);
-}
-
-.policy-item p {
-    color: var(--text-secondary);
-    line-height: 1.6;
-    margin: 0;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .book-detail-container {
-        padding: 1rem;
+        max-width: 1100px;
+        margin: 32px auto;
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+        padding: 32px 40px;
     }
 
-    .book-title {
-        font-size: 1.5rem;
+    .breadcrumb-custom {
+        background: #f5f5f5;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 15px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 24px;
+        font-weight: 500;
+    }
+    .breadcrumb-custom a {
+        color: #2c3e50;
+        text-decoration: none;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: color 0.2s;
+    }
+    .breadcrumb-custom a:hover {
+        color: #e74c3c;
+    }
+    .breadcrumb-custom .divider {
+        color: #888;
+        font-size: 16px;
+        margin: 0 2px;
+    }
+    .breadcrumb-custom span:last-child {
+        color: #222;
+        text-transform: uppercase;
     }
 
-    .current-price {
-        font-size: 1.5rem;
+    .book-detail-flex {
+        display: flex;
+        gap: 32px;
+        align-items: flex-start;
     }
-
-    .action-buttons {
-        flex-direction: column;
+    .left-image {
+        flex: 0 0 350px;
+        max-width: 350px;
     }
-
-    .btn {
+    .main-image {
+        width: 100%;
+        max-width: 350px;
+        min-height: 200px;
+        background: #f8fafd;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
         justify-content: center;
+        margin-bottom: 16px;
     }
-
-    .shipping-info {
-        flex-direction: column;
-        gap: 1rem;
+    .right-info {
+        flex: 1;
+        min-width: 0;
     }
-
-    .trust-badges {
-        justify-content: center;
+    @media (max-width: 991px) {
+        .book-detail-flex {
+            flex-direction: column;
+            gap: 16px;
+        }
+        .left-image, .right-info {
+            max-width: 100%;
+            flex: 1 1 100%;
+        }
+        .book-detail-wrapper {
+            padding: 16px 8px;
+        }
     }
-
-    .tab-navigation {
-        flex-wrap: wrap;
-    }
-
-    .tab-btn {
-        flex: none;
-        min-width: 50%;
-    }
-}
-
-@media (max-width: 576px) {
     .main-book-image {
-        height: 300px;
+        max-width: 100%;
+        max-height: 400px;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+        display: block;
+        margin: 0 auto;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
     }
 
     .placeholder-image {
-        height: 300px;
+        height: 500px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-secondary);
+        background: var(--background-light);
+    }
+
+    .placeholder-image i {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+    }
+
+    .image-overlay {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .main-image:hover .image-overlay {
+        opacity: 1;
+    }
+
+    /* Book Information */
+    .book-info {
+        height: 100%;
+    }
+
+    .book-header {
+        margin-bottom: 1.5rem;
+    }
+
+    .book-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        line-height: 1.3;
+        margin-bottom: 0.75rem;
+    }
+
+    .rating-section {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .rating-stars {
+        display: flex;
+        gap: 2px;
+    }
+
+    .rating-stars i {
+        font-size: 1rem;
+        color: #d1d5db;
+        transition: color 0.2s;
+    }
+
+    .rating-stars i.active {
+        color: var(--warning-color);
+    }
+
+    .rating-count {
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+    }
+
+    .sold-count {
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+    }
+
+    /* Price Section */
+    .price-section {
+        background: linear-gradient(135deg, #fef7f0 0%, #fef3ec 100%);
+        border: 1px solid #fed7aa;
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .price-row {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .current-price {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--danger-color);
+    }
+
+    .original-price {
+        font-size: 1.125rem;
+        color: var(--text-secondary);
+        text-decoration: line-through;
+    }
+
+    .discount-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .discount-percent {
+        background: var(--danger-color);
+        color: white;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .save-amount {
+        color: var(--success-color);
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    /* Book Details */
+    .book-details {
+        margin-bottom: 1.5rem;
+    }
+
+    .detail-grid {
+        display: grid;
+        gap: 0.75rem;
+    }
+
+    .detail-item {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .detail-item:last-child {
+        border-bottom: none;
+    }
+
+    .detail-label {
+        font-weight: 500;
+        color: var(--text-secondary);
+        min-width: 120px;
+    }
+
+    .detail-value {
+        color: var(--text-primary);
+        font-weight: 500;
+    }
+
+    .author-link {
+        color: var(--primary-color);
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+
+    .author-link:hover {
+        color: var(--primary-color);
+        text-decoration: underline;
+    }
+
+    .category-tag {
+        background: var(--primary-color);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+
+    .stock-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        color: var(--success-color);
+        font-weight: 500;
+    }
+
+    /* Shipping Info */
+    .shipping-info {
+        background: var(--background-light);
+        border-radius: var(--radius);
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        gap: 1.5rem;
+    }
+
+    .shipping-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .shipping-item i {
+        color: var(--primary-color);
+        font-size: 1.25rem;
+    }
+
+    .shipping-text strong {
+        display: block;
+        font-size: 0.875rem;
+        color: var(--text-primary);
+    }
+
+    .shipping-text span {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+    }
+
+    /* Purchase Section */
+    .purchase-section {
+        margin-bottom: 1.5rem;
+    }
+
+    .quantity-section {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .quantity-label {
+        font-weight: 500;
+        color: var(--text-primary);
+    }
+
+    .quantity-controls {
+        display: flex;
+        align-items: center;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius);
+        overflow: hidden;
+    }
+
+    .qty-btn {
+        background: white;
+        border: none;
+        padding: 0.5rem 0.75rem;
+        cursor: pointer;
+        color: var(--text-secondary);
+        transition: all 0.2s;
+    }
+
+    .qty-btn:hover {
+        background: var(--background-light);
+        color: var(--text-primary);
+    }
+
+    .qty-input {
+        border: none;
+        padding: 0.5rem;
+        width: 60px;
+        text-align: center;
+        font-weight: 500;
+        outline: none;
+        border-left: 1px solid var(--border-color);
+        border-right: 1px solid var(--border-color);
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: var(--radius);
+        font-weight: 500;
+        transition: all 0.2s;
+        border: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+        font-size: 0.875rem;
+    }
+
+    .btn-primary {
+        background: var(--primary-color);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #1d4ed8;
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .btn-success {
+        background: var(--success-color);
+        color: white;
+    }
+
+    .btn-success:hover {
+        background: #059669;
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .btn-outline {
+        background: white;
+        color: var(--text-secondary);
+        border: 1px solid var(--border-color);
+    }
+
+    .btn-outline:hover {
+        background: var(--background-light);
+        color: var(--danger-color);
+        border-color: var(--danger-color);
+    }
+
+    /* Trust Badges */
+    .trust-badges {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .badge-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+    }
+
+    .badge-item i {
+        color: var(--success-color);
+    }
+
+    /* Product Tabs */
+    .product-tabs {
+        background: white;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--border-color);
+        overflow: hidden;
+    }
+
+    .tab-navigation {
+        display: flex;
+        background: var(--background-light);
+        border-bottom: 1px solid var(--border-color);
     }
 
     .tab-btn {
-        min-width: 100%;
+        flex: 1;
+        padding: 1rem 1.5rem;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        font-weight: 500;
+        color: var(--text-secondary);
+        transition: all 0.2s;
+        position: relative;
     }
-}
 
-.thumbnails-gallery-horizontal {
-    width: 100%;
-    margin-top: 8px;
-}
-.swiper {
-    width: 100%;
-    padding-bottom: 10px;
-}
-.swiper-wrapper {
-    display: flex;
-}
-.swiper-slide {
-    width: 60px !important;
-    display: flex;
-    justify-content: center;
-}
-.thumb-img {
-    width: 60px;
-    height: 80px;
-    object-fit: cover;
-    border-radius: 6px;
-    border: 2px solid #eee;
-    cursor: pointer;
-    transition: border 0.2s, box-shadow 0.2s;
-}
-.thumb-img.active {
-    border: 2px solid #e74c3c;
-    box-shadow: 0 2px 8px rgba(231,76,60,0.15);
-}
+    .tab-btn:hover {
+        color: var(--primary-color);
+        background: rgba(37, 99, 235, 0.05);
+    }
+
+    .tab-btn.active {
+        color: var(--primary-color);
+        background: white;
+    }
+
+    .tab-btn.active::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: var(--primary-color);
+    }
+
+    .tab-content-container {
+        padding: 2rem;
+    }
+
+    .tab-content {
+        display: none;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    .tab-content h4 {
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+        font-weight: 600;
+    }
+
+    .content-text {
+        line-height: 1.7;
+        color: var(--text-secondary);
+    }
+
+    .spec-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .spec-table tr {
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .spec-table td {
+        padding: 0.75rem 0;
+        vertical-align: top;
+    }
+
+    .spec-table td:first-child {
+        font-weight: 500;
+        color: var(--text-secondary);
+        width: 150px;
+    }
+
+    .spec-table td:last-child {
+        color: var(--text-primary);
+    }
+
+    /* Reviews */
+    .review-summary {
+        background: var(--background-light);
+        border-radius: var(--radius);
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .overall-rating {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .rating-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--warning-color);
+    }
+
+    .total-reviews {
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+    }
+
+    /* Policy Content */
+    .policy-content {
+        display: grid;
+        gap: 1.5rem;
+    }
+
+    .policy-item h6 {
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .policy-item h6 i {
+        color: var(--primary-color);
+    }
+
+    .policy-item p {
+        color: var(--text-secondary);
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .book-detail-container {
+            padding: 1rem;
+        }
+
+        .book-title {
+            font-size: 1.5rem;
+        }
+
+        .current-price {
+            font-size: 1.5rem;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .btn {
+            justify-content: center;
+        }
+
+        .shipping-info {
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .trust-badges {
+            justify-content: center;
+        }
+
+        .tab-navigation {
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            flex: none;
+            min-width: 50%;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .main-book-image {
+            height: 300px;
+        }
+
+        .placeholder-image {
+            height: 300px;
+        }
+
+        .tab-btn {
+            min-width: 100%;
+        }
+    }
+
+    .thumbnails-gallery-horizontal {
+        width: 100%;
+        margin-top: 8px;
+    }
+    .swiper {
+        width: 100%;
+        padding-bottom: 10px;
+    }
+    .swiper-wrapper {
+        display: flex;
+    }
+    .swiper-slide {
+        width: 60px !important;
+        display: flex;
+        justify-content: center;
+    }
+    .thumb-img {
+        width: 60px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 6px;
+        border: 2px solid #eee;
+        cursor: pointer;
+        transition: border 0.2s, box-shadow 0.2s;
+    }
+    .thumb-img.active {
+        border: 2px solid #e74c3c;
+        box-shadow: 0 2px 8px rgba(231,76,60,0.15);
+    }
+
+    .related-section {
+        margin-bottom: 2rem;
+    }
+    .related-section h4 {
+        font-size: 1.2rem;
+        color: #2563eb;
+        margin-bottom: 0.5rem;
+    }
+    .related-books-list {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        margin-bottom: 2rem;
+    }
+    .related-book-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 0.75rem 1.25rem;
+        color: #222;
+        text-decoration: none;
+        transition: box-shadow 0.2s, border 0.2s;
+        min-width: 140px;
+        max-width: 160px;
+        width: 140px;
+    }
+    .related-book-card:hover {
+        border: 1.5px solid #2563eb;
+        box-shadow: 0 2px 8px rgba(37,99,235,0.08);
+        color: #2563eb;
+    }
+    .related-book-img-wrap {
+        width: 60px;
+        height: 80px;
+        margin-bottom: 0.5em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .related-book-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 6px;
+    }
+    .related-book-title {
+        font-weight: 500;
+        font-size: 1rem;
+        text-align: center;
+        margin-bottom: 0.25em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 100%;
+    }
+    .related-book-price {
+        margin-top: 2px;
+        text-align: center;
+    }
+    .related-current-price {
+        color: #e74c3c;
+        font-weight: 600;
+        font-size: 1em;
+    }
+    .related-original-price {
+        color: #888;
+        text-decoration: line-through;
+        margin-left: 0.5em;
+        font-size: 0.95em;
+    }
+    .related-author, .related-category, .related-publisher {
+        color: #64748b;
+        font-size: 0.95em;
+        font-weight: 400;
+    }
 </style>
 
 <script>

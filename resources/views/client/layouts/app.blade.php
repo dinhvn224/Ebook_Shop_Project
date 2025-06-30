@@ -13,9 +13,11 @@
     <!-- owl carousel libraries -->
     <link rel="stylesheet" href="{{ asset('client/js/owlcarousel/owl.carousel.min.css') }}">
     <link rel="stylesheet" href="{{ asset('client/js/owlcarousel/owl.theme.default.min.css') }}">
+    <!-- Bootstrap 5 CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="{{ asset('client/js/Jquery/Jquery.min.js') }}"></script>
     <script src="{{ asset('client/js/owlcarousel/owl.carousel.min.js') }}"></script>
-
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- our files -->
     <link rel="stylesheet" href="{{ asset('client/css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('client/css/topnav.css') }}">
@@ -24,7 +26,7 @@
     <link rel="stylesheet" href="{{ asset('client/css/taikhoan.css') }}">
     <link rel="stylesheet" href="{{ asset('client/css/trangchu.css') }}">
     <link rel="stylesheet" href="{{ asset('client/css/home_products.css') }}">
-    <link rel="stylesheet" href="{{ asset('client/css/pagination_phantrang.css') }}">
+    {{-- <link rel="stylesheet" href="{{ asset('client/css/pagination_phantrang.css') }}"> --}}
     <link rel="stylesheet" href="{{ asset('client/css/footer.css') }}">
     <script>var list_products = [];</script>
     <script src="{{ asset('client/js/classes.js') }}"></script>

@@ -30,6 +30,8 @@ class BookDetail extends Model
     protected $casts = [
         'is_active' => 'boolean',
         'deleted' => 'boolean',
+        'price' => 'float',
+    'promotion_price' => 'float', // BẮT BUỘC PHẢI CÓ
     ];
 
     public function book()

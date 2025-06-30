@@ -24,7 +24,7 @@ use App\Http\Controllers\HomeController;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::get('/books', [BookController::class, 'index'])->name('books.index');
-
+Route::get('/search-suggestions', [ClientBookController::class, 'searchSuggestions'])->name('search.suggestions');
 
 Route::get('/book/{book}', [ClientBookController::class, 'show'])->name('book.detail');
 
