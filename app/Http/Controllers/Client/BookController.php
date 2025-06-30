@@ -22,20 +22,21 @@ class BookController extends Controller
             'category',
             'details' => function ($query) {
                 $query->where('is_active', true)
-                      ->where(function ($q) {
-                          $q->where('deleted', 0)->orWhereNull('deleted');
-                      });
+                    ->where(function ($q) {
+                        $q->where('deleted', 0)->orWhereNull('deleted');
+                    });
             }
         ]);
         // Lấy book detail đầu tiên làm mặc định
         $bookDetail = $book->details->first();
 
-        // Lấy danh sách đánh giá visible cho tất cả các biến thể của sách
+        // Lấy danh sách tất cả bình luận
         $reviews = Review::with(['user', 'bookDetail'])
             ->whereHas('bookDetail', function ($query) use ($book) {
                 $query->where('book_id', $book->id)->where('is_active', true);
             })
             ->where('status', 'visible')
+            ->latest()
             ->get();
 
         // Kiểm tra trạng thái người dùng
@@ -46,23 +47,36 @@ class BookController extends Controller
             ->whereHas('bookDetail', function ($query) use ($book) {
                 $query->where('book_id', $book->id);
             })
+            ->whereNotNull('rating')
             ->first() : null;
 
-        // Tính trung bình số sao và tổng số đánh giá cho tất cả biến thể của sách
+        // Tính trung bình số sao và tổng số đánh giá chỉ với những review có rating
         $avgRating = Review::whereHas('bookDetail', function ($query) use ($book) {
                 $query->where('book_id', $book->id)->where('is_active', true);
             })
             ->where('status', 'visible')
+            ->whereNotNull('rating')
             ->avg('rating') ?? 0;
+
         $totalReviews = Review::whereHas('bookDetail', function ($query) use ($book) {
                 $query->where('book_id', $book->id)->where('is_active', true);
             })
             ->where('status', 'visible')
+            ->whereNotNull('rating')
             ->count();
 
         // Trả về view
-        return view('client.book.show', compact('book', 'bookDetail', 'reviews', 'hasPurchased', 'existingReview', 'avgRating', 'totalReviews'));
+        return view('client.book.show', compact(
+            'book',
+            'bookDetail',
+            'reviews',
+            'hasPurchased',
+            'existingReview',
+            'avgRating',
+            'totalReviews'
+        ));
     }
+
 
 private function hasUserPurchasedBook($userId, $book)
 {

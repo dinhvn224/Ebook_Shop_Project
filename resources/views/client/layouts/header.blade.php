@@ -65,8 +65,4 @@
             -->
         </div><!-- End Tools Member -->
     </div> <!-- End Content -->
-<<<<<<< HEAD
 </div> <!-- End Header -->
-=======
-</div> <!-- End Header -->
->>>>>>> f498497bcaf1d03a18025d7f6b4cc4ce27f19beb

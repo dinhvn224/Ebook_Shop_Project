@@ -243,109 +243,186 @@
                         </div>
 
                         <!-- Form đánh giá hoặc hiển thị đánh giá đã có -->
-                        @if ($existingReview)
-                            <p>Bạn đã đánh giá sản phẩm này</p>
-                            <div class="review-rating mb-2">
-                                @for ($i = 1; $i <= 5; $i++)
-                                    @if ($i <= $existingReview->rating)
-                                        <i class="fas fa-star rated"></i>
-                                    @else
-                                        <i class="fas fa-star"></i>
-                                    @endif
-                                @endfor
-                            </div>
-                            <p>Bình luận: "{{ $existingReview->comment }}"</p>
-                            <span class="review-date">{{ $existingReview->created_at->format('d/m/Y H:i') }}</span>
+@if ($hasPurchased && $existingReview)
+    {{-- KHÁCH ĐÃ MUA và ĐÃ ĐÁNH GIÁ RATING --}}
+    <p>Bạn đã đánh giá sản phẩm này</p>
+    @if($existingReview->rating)
+        <div class="review-rating mb-2">
+            @for ($i = 1; $i <= 5; $i++)
+                <i class="fas fa-star {{ $i <= $existingReview->rating ? 'rated' : '' }}"></i>
+            @endfor
+        </div>
+    @endif
 
-                            @if ($existingReview->created_at->diffInHours(now()) <= 24)
-                                <div class="mt-2">
-                                    <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editReviewModal">Chỉnh sửa</button>
-                                </div>
-                            @endif
-                        @elseif ($hasPurchased)
-                            <form action="{{ route('reviews.store') }}" method="POST" class="review-form mt-3">
-                                @csrf
-                                <input type="hidden" name="book_detail_id" value="{{ $bookDetail->id }}">
-                                <div class="form-group">
-                                    <label for="rating">Đánh giá (1-5 sao)</label>
-                                    <div class="star-rating">
-                                        @for ($i = 1; $i <= 5; $i++)
-                                            <input type="radio" id="star{{ $i }}" name="rating" value="{{ $i }}" required hidden>
-                                            <label for="star{{ $i }}" class="star" data-value="{{ $i }}"><i class="fas fa-star"></i></label>
-                                        @endfor
-                                    </div>
-                                </div>
-                                <div class="form-group mt-3">
-                                    <label for="comment">Bình luận</label>
-                                    <textarea name="comment" class="form-control" rows="4" maxlength="1000"></textarea>
-                                </div>
-                                <button type="submit" class="btn btn-primary mt-3">Gửi đánh giá</button>
-                            </form>
-                        @endif
+    <p>Bình luận: "{{ $existingReview->comment }}"</p>
+    @if ($existingReview->created_at)
+        <span class="review-date">{{ $existingReview->created_at->format('d/m/Y H:i') }}</span>
+    @endif
+
+    @if ($existingReview && $existingReview->created_at && $existingReview->created_at->diffInHours(now()) <= 24)
+        <div class="mt-2">
+            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editReviewModal">Chỉnh sửa</button>
+        </div>
+    @endif
+
+@elseif($hasPurchased && !$existingReview)
+    {{-- KHÁCH ĐÃ MUA nhưng CHƯA ĐÁNH GIÁ => HIỆN FORM ĐÁNH GIÁ --}}
+    <form action="{{ route('reviews.store') }}" method="POST" class="review-form mt-3">
+        @csrf
+        <input type="hidden" name="book_detail_id" value="{{ $bookDetail->id }}">
+        <div class="form-group">
+            <label for="rating">Đánh giá (1-5 sao)</label>
+            <div class="star-rating">
+                @for ($i = 1; $i <= 5; $i++)
+                    <input type="radio" id="star{{ $i }}" name="rating" value="{{ $i }}" required hidden>
+                    <label for="star{{ $i }}" class="star" data-value="{{ $i }}"><i class="fas fa-star"></i></label>
+                @endfor
+            </div>
+        </div>
+        <div class="form-group mt-3">
+            <label for="comment">Bình luận</label>
+            <textarea name="comment" class="form-control" rows="4" maxlength="1000"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">Gửi đánh giá</button>
+    </form>
+
+@else
+    {{-- KHÁCH CHƯA MUA => LUÔN CÓ FORM BÌNH LUẬN --}}
+    <form action="{{ route('reviews.store') }}" method="POST" class="review-form mt-3">
+        @csrf
+        <input type="hidden" name="book_detail_id" value="{{ $bookDetail->id }}">
+        <div class="form-group mt-3">
+            <label for="comment">Bình luận</label>
+            <textarea name="comment" class="form-control" rows="4" maxlength="1000"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">Gửi bình luận</button>
+    </form>
+@endif
+
+
 
                         <!-- Danh sách đánh giá -->
                         <div class="review-list mt-4">
                             @forelse($reviews as $review)
-                                <div class="review-card">
-                                    <div class="review-header">
-                                        <strong>{{ $review->user->name }}</strong>
-                                        <span class="review-date">{{ $review->created_at->format('d/m/Y H:i') }}</span>
-                                    </div>
+                            <div class="review-card">
+                                <div class="review-header">
+                                    <strong>{{ $review->user->name }}</strong>
+                                    <span class="review-date">{{ optional($review->created_at)->format('d/m/Y H:i') }}</span>
+                                </div>
+
+                                @if($review->rating)
                                     <div class="review-rating">
                                         @for ($i = 1; $i <= 5; $i++)
                                             <i class="fas fa-star {{ $i <= $review->rating ? 'rated' : '' }}"></i>
                                         @endfor
                                     </div>
-                                    <div class="review-comment">
-                                        {{ $review->comment }}
+                                @endif
+
+                                <div class="review-comment">
+                                    @if(Auth::id() === $review->user_id && $review->created_at->diffInHours(now()) <= 24)
+                                    <div class="modal fade" id="editCommentModal-{{ $review->id }}" tabindex="-1" role="dialog" aria-labelledby="editCommentModalLabel-{{ $review->id }}" aria-hidden="true">
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Chỉnh sửa bình luận</h5>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <form action="{{ route('reviews.update', $review->id) }}" method="POST">
+                                                        @csrf
+                                                        @method('PUT')
+                                                        <input type="hidden" name="book_detail_id" value="{{ $review->book_detail_id }}">
+
+                                                        @if($review->rating !== null)
+                                                        <div class="form-group">
+                                                            <label for="rating">Đánh giá (1-5 sao)</label>
+                                                            <div class="star-rating">
+                                                                @for ($i = 1; $i <= 5; $i++)
+                                                                    <input type="radio" id="edit-{{ $review->id }}-star{{ $i }}" name="rating" value="{{ $i }}"
+                                                                        {{ $review->rating == $i ? 'checked' : '' }} hidden>
+                                                                    <label for="edit-{{ $review->id }}-star{{ $i }}" class="star {{ $review->rating >= $i ? 'selected' : '' }}" data-value="{{ $i }}">
+                                                                        <i class="fas fa-star"></i>
+                                                                    </label>
+                                                                @endfor
+                                                            </div>
+                                                        </div>
+                                                        @endif
+
+                                                        <div class="form-group mt-3">
+                                                            <label for="comment">Bình luận</label>
+                                                            <textarea name="comment" class="form-control" rows="4" maxlength="1000">{{ $review->comment }}</textarea>
+                                                        </div>
+                                                        <button type="submit" class="btn btn-primary mt-3">Cập nhật</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
+                                    @endif
+                                    {{ $review->comment }}
                                 </div>
+                                    @if(Auth::id() === $review->user_id && $review->created_at->diffInHours(now()) <= 24)
+                                        <div class="edit-link mt-2">
+                                            <a href="#"
+                                            data-toggle="modal"
+                                            data-target="#editCommentModal-{{ $review->id }}">
+                                            Chỉnh sửa
+                                            </a>
+                                        </div>
+                                    @endif
+                            </div>
+
                             @empty
                                 <p>Chưa có đánh giá nào cho sản phẩm này.</p>
                             @endforelse
                         </div>
 
                         <!-- Modal chỉnh sửa -->
-                        @if ($existingReview && $existingReview->created_at->diffInHours(now()) <= 24)
-                            <div class="modal fade" id="editReviewModal" tabindex="-1" role="dialog" aria-labelledby="editReviewModalLabel" aria-hidden="true">
-                                <div class="modal-dialog" role="document">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="editReviewModalLabel">Chỉnh sửa đánh giá</h5>
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <form action="{{ route('reviews.update', $existingReview->id) }}" method="POST">
-                                                @csrf
-                                                @method('PUT')
-                                                <input type="hidden" name="book_detail_id" value="{{ $bookDetail->id }}">
+                        @if ($existingReview && $existingReview->created_at && $existingReview->created_at->diffInHours(now()) <= 24)
+                        <div class="modal fade" id="editReviewModal" tabindex="-1" role="dialog" aria-labelledby="editReviewModalLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="editReviewModalLabel">Chỉnh sửa đánh giá</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form action="{{ route('reviews.update', $existingReview->id) }}" method="POST">
+                                            @csrf
+                                            @method('PUT')
+                                            <input type="hidden" name="book_detail_id" value="{{ $bookDetail->id }}">
 
-                                                <div class="form-group">
-                                                    <label for="rating">Đánh giá (1-5 sao)</label>
-                                                    <div class="star-rating">
-                                                        @for ($i = 1; $i <= 5; $i++)
-                                                            <input type="radio" id="edit-star{{ $i }}" name="rating" value="{{ $i }}"
-                                                                {{ $existingReview->rating == $i ? 'checked' : '' }} required hidden>
-                                                            <label for="edit-star{{ $i }}" class="star {{ $existingReview->rating >= $i ? 'selected' : '' }}" data-value="{{ $i }}">
-                                                                <i class="fas fa-star"></i>
-                                                            </label>
-                                                        @endfor
-                                                    </div>
+                                            @if($existingReview->rating)
+                                            <div class="form-group">
+                                                <label for="rating">Đánh giá (1-5 sao)</label>
+                                                <div class="star-rating">
+                                                    @for ($i = 1; $i <= 5; $i++)
+                                                        <input type="radio" id="edit-star{{ $i }}" name="rating" value="{{ $i }}"
+                                                            {{ $existingReview->rating == $i ? 'checked' : '' }} required hidden>
+                                                        <label for="edit-star{{ $i }}" class="star {{ $existingReview->rating >= $i ? 'selected' : '' }}" data-value="{{ $i }}">
+                                                            <i class="fas fa-star"></i>
+                                                        </label>
+                                                    @endfor
                                                 </div>
+                                            </div>
+                                            @endif
 
-                                                <div class="form-group mt-3">
-                                                    <label for="comment">Bình luận</label>
-                                                    <textarea name="comment" class="form-control" rows="4" maxlength="1000">{{ $existingReview->comment }}</textarea>
-                                                </div>
-                                                <button type="submit" class="btn btn-primary mt-3">Cập nhật</button>
-                                            </form>
-                                        </div>
+                                            <div class="form-group mt-3">
+                                                <label for="comment">Bình luận</label>
+                                                <textarea name="comment" class="form-control" rows="4" maxlength="1000">{{ $existingReview->comment }}</textarea>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary mt-3">Cập nhật</button>
+                                        </form>
                                     </div>
                                 </div>
                             </div>
+                        </div>
                         @endif
+
                     </div>
                 </div>
 

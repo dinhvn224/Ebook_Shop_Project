@@ -13,12 +13,13 @@ use App\Http\Controllers\Admin\{
     DashboardController,
     VoucherController,
     VoucherProductController,
-    ImageController
+    ImageController,
+    AdminReviewController
 
 };
 use App\Http\Controllers\Client\BookController as ClientBookController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\Client\ClientReviewController;
 
 //
 // 🌐 PUBLIC CLIENT ROUTES
@@ -34,8 +35,8 @@ Route::middleware(['auth', 'role:user'])->get('/home', fn() => view('client.home
 
 Route::prefix('reviews')->name('reviews.')->group(function () {
     Route::middleware(['auth', 'role:user'])->group(function () {
-        Route::post('/', [ReviewController::class, 'store'])->name('store');         // Viết mới
-        Route::put('/{review}', [ReviewController::class, 'update'])->name('update'); // Cập nhật trong 24h
+        Route::post('/', [ClientReviewController::class, 'store'])->name('store');         // Viết mới
+        Route::put('/{review}', [ClientReviewController::class, 'update'])->name('update'); // Cập nhật trong 24h
     });
 });
 
@@ -97,8 +98,8 @@ Route::prefix('admin')
         });
         // ⭐ Reviews - ADMIN
         Route::prefix('reviews')->as('reviews.')->group(function () {
-            Route::get('/', [ReviewController::class, 'index'])->name('index');                      // Danh sách đánh giá
-            Route::patch('/{review}/status', [ReviewController::class, 'updateStatus'])->name('updateStatus'); // Duyệt / ẩn / chờ
+            Route::get('/', [AdminReviewController::class, 'index'])->name('index');                      // Danh sách đánh giá
+            Route::patch('/{review}/status', [AdminReviewController::class, 'updateStatus'])->name('updateStatus'); // Duyệt / ẩn / chờ
         });
     });
 
