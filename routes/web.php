@@ -26,7 +26,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/books', [BookController::class, 'index'])->name('books.index');
 
 
-Route::get('/book/{book}', [ClientBookController::class, 'show'])->name('book.detail');
+Route::get('/book/{book}', [ClientBookController::class, 'show'])->name('client.books.show');
 
 Route::middleware(['auth', 'role:user'])->get('/home', fn() => view('client.home'))
     ->name('home.user');

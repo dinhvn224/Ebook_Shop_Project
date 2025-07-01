@@ -281,6 +281,9 @@
             </div>
         </div>
     </div>
+
+    <!-- Sách liên quan -->
+    @include('client.Book._related', ['relatedBooks' => $relatedBooks])
 </div>
 
 <style>
