@@ -15,12 +15,15 @@ class CartController extends Controller
     // Hiển thị giỏ hàng
     public function index()
     {
+        // Lấy giỏ hàng của người dùng hiện tại
         $cart = Cart::where('user_id', Auth::id())->with(['items.bookDetail'])->first();
+        
+        // Trả về view giỏ hàng với dữ liệu giỏ hàng
         return view('client.cart.index', compact('cart'));
     }
 
     // Thêm sản phẩm vào giỏ hàng
-   public function addToCart(Request $request)
+  public function addToCart(Request $request)
 {
     $validator = Validator::make($request->all(), [
         'book_detail_id' => 'required|exists:book_details,id',
@@ -28,7 +31,7 @@ class CartController extends Controller
     ]);
 
     if ($validator->fails()) {
-        return response()->json(['success' => false, 'message' => 'Dữ liệu không hợp lệ'], 400);
+        return redirect()->route('cart.index')->with('error', 'Dữ liệu không hợp lệ');
     }
 
     $cart = Cart::firstOrCreate(
@@ -55,48 +58,60 @@ class CartController extends Controller
         ]);
     }
 
-    return response()->json(['success' => true, 'message' => 'Đã thêm vào giỏ hàng!']);
+    // Chuyển hướng tới giỏ hàng với thông báo thành công
+    return redirect()->route('cart.index')->with('success', 'Đã thêm vào giỏ hàng!');
 }
 
 
     // Cập nhật số lượng sản phẩm
     public function updateQuantity(Request $request, $id)
     {
+        // Tìm sản phẩm trong giỏ hàng
         $cartItem = CartItem::findOrFail($id);
 
+        // Kiểm tra hành động tăng hoặc giảm số lượng
         if ($request->query('action') == 'increase') {
             $cartItem->quantity += 1;
         } elseif ($request->query('action') == 'decrease' && $cartItem->quantity > 1) {
             $cartItem->quantity -= 1;
         }
 
+        // Cập nhật thời gian sửa đổi
         $cartItem->updated_at = now();
         $cartItem->save();
 
+        // Quay lại trang giỏ hàng với thông báo thành công
         return redirect()->route('cart.index')->with('success', 'Đã cập nhật giỏ hàng.');
     }
 
-    // Xóa một sản phẩm
+    // Xóa một sản phẩm khỏi giỏ hàng
     public function removeFromCart($id)
     {
+        // Tìm sản phẩm cần xóa
         $cartItem = CartItem::findOrFail($id);
+        // Đánh dấu sản phẩm là đã xóa
         $cartItem->deleted = true;
         $cartItem->save();
 
+        // Quay lại trang giỏ hàng với thông báo thành công
         return redirect()->route('cart.index')->with('success', 'Đã xóa sản phẩm khỏi giỏ hàng.');
     }
 
     // Xóa toàn bộ giỏ hàng
     public function clearCart()
     {
+        // Lấy giỏ hàng của người dùng
         $cart = Cart::where('user_id', Auth::id())->first();
+        
         if ($cart) {
+            // Duyệt qua tất cả các sản phẩm trong giỏ và đánh dấu là đã xóa
             foreach ($cart->items as $item) {
                 $item->deleted = true;
                 $item->save();
             }
         }
 
+        // Quay lại trang giỏ hàng với thông báo thành công
         return redirect()->route('cart.index')->with('success', 'Đã xóa toàn bộ giỏ hàng.');
     }
 }

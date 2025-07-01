@@ -1,9 +1,8 @@
-
 @extends('client.layouts.app')
 
 @section('content')
 <section style="min-height: 85vh; padding: 24px;">
-    <h2 style="margin: 0 0 24px 0; text-align:center; font-size: 32px; color: #333;"> Giỏ hàng của bạn</h2>
+    <h2 style="margin: 0 0 24px 0; text-align:center; font-size: 32px; color: #333;">Giỏ hàng của bạn</h2>
 
     @if (session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
@@ -36,7 +35,7 @@
                                 <img src="{{ asset('storage/' . $item->bookDetail->image) }}" alt="Product Image">
                             </td>
                             <td class="align-right">{{ number_format($item->bookDetail->price, 0, ',', '.') }} ₫</td>
-                            <td class="soluong">
+                            <td class="quantity">
                                 <form action="{{ route('cart.update', $item->id) }}" method="POST" class="d-flex">
                                     @csrf
                                     <button type="submit" formaction="{{ route('cart.update', $item->id) }}?action=decrease" class="btn btn-secondary">−</button>
@@ -45,11 +44,10 @@
                                 </form>
                             </td>
                             <td class="align-right">{{ number_format($subtotal, 0, ',', '.') }} ₫</td>
-
                             <td>
                                 <form action="{{ route('cart.remove', $item->id) }}" method="POST">
                                     @csrf
-                                    <button type="submit" class="btn btn-danger"><i class="fa fa-trash"></i></button>
+                                    <button type="submit" class="btn btn-danger"><i class="fa fa-trash"></i> Xóa</button>
                                 </form>
                             </td>
                         </tr>
@@ -91,6 +89,7 @@
 
     .cart-table thead {
         background-color: #f8f9fa;
+        color: #495057;
     }
 
     .cart-table th, .cart-table td {
@@ -98,12 +97,12 @@
         border: 1px solid #dee2e6;
         text-align: center;
         vertical-align: middle;
+        font-size: 14px;
     }
 
     .cart-table th {
-        font-size: 16px;
         font-weight: bold;
-        color: #495057;
+        background-color: #e9ecef;
     }
 
     .product-info {
@@ -139,16 +138,17 @@
     .align-right {
         text-align: right;
         font-weight: bold;
+        color: #28a745;
     }
 
-    .soluong form {
+    .quantity form {
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 6px;
     }
 
-    .soluong input[type="number"] {
+    .quantity input[type="number"] {
         width: 50px;
         text-align: center;
         border: 1px solid #ced4da;
@@ -200,6 +200,7 @@
 
     .cart-summary h3 span {
         color: #28a745;
+        font-weight: 700;
     }
 
     .cart-actions {
@@ -217,6 +218,16 @@
         margin: 0 auto 24px;
         text-align: center;
         font-weight: 500;
+    }
+
+    .cart-actions button {
+        width: 120px;
+        padding: 10px;
+    }
+
+    /* Tạo một số hiệu ứng hover cho toàn bộ giỏ hàng */
+    .cart-container:hover {
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     }
 </style>
 @endsection

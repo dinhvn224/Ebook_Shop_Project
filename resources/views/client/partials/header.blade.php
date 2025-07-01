@@ -12,10 +12,13 @@
         <div class="d-flex align-items-center order-lg-3">
             <div class="position-relative me-3">
                 {{-- Laravel sẽ xử lý logic giỏ hàng ở đây, tạm thời dùng onclick --}}
-                <button class="btn btn-outline-primary" onclick="showPage('cart')">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span class="cart-count" id="cartCount">0</span>
-                </button>
+                <form action="{{ route('cart.add') }}" method="POST">
+                    @csrf
+                    <button class="btn btn-outline-primary">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="cart-count" id="cartCount">0</span>
+                    </button>
+                </form>
             </div>
 
             {{-- Phần menu người dùng sẽ được JavaScript render, hoặc dùng Blade --}}
@@ -27,6 +30,7 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
         </div>
+
 
         <div class="collapse navbar-collapse" id="navbarNav">
             <div class="search-box mx-lg-auto my-2 my-lg-0">
@@ -70,7 +74,7 @@
             @auth
                 <div class="dropdown">
                     <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                        <i class="fas fa-user me-1"></i> 
+                        <i class="fas fa-user me-1"></i>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li>

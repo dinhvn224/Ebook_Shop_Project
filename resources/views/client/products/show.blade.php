@@ -184,11 +184,17 @@
                 </p>
 
                 <div class="d-flex align-items-center gap-3 mt-3">
-                    <input type="number" value="1" min="1" class="form-control" style="width: 90px;">
-                    <button class="btn btn-primary" {{ $detail->quantity < 1 ? 'disabled' : '' }}>
-                        <i class="fas fa-cart-plus me-1"></i>Thêm vào giỏ
-                    </button>
+                    <form action="{{ route('cart.add') }}" method="POST">
+                        @csrf
+                        <input type="number" name="quantity" value="1" min="1" class="form-control" style="width: 90px;">
+                        <input type="hidden" name="book_detail_id" value="{{ $detail->id }}">
+                        <button type="submit" class="btn btn-primary" {{ $detail->quantity < 1 ? 'disabled' : '' }}>
+                            <i class="fas fa-cart-plus me-1"></i>Thêm vào giỏ
+                        </button>
+                    </form>
                 </div>
+
+
             </div>
         </div>
 
@@ -246,7 +252,8 @@
                         </form>
                     @else
                         <div class="alert alert-light border mt
-                                                                <div class=" alert alert-light border mt-3">
+                                                                                        <div class=" alert alert-light border
+                            mt-3">
                             Vui lòng <a href="{{ route('login') }}">đăng nhập</a> để gửi đánh giá của bạn.
                         </div>
                     @endauth
@@ -306,8 +313,11 @@
                                 </div>
 
                                 <div class="add-btn">
-                                    <i class="fas fa-cart-plus"></i>
+                                    <a href="{{ route('cart.index') }}" class="btn btn-outline-primary">
+                                        <i class="fas fa-cart-plus"></i>
+                                    </a>
                                 </div>
+
                             </div>
                         </div>
                     @endforeach
