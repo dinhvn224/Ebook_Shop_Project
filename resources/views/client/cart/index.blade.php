@@ -50,16 +50,33 @@
                                         <span class="index-badge">{{ $index++ }}</span>
                                     </td>
                                     <td class="td-3d product-info">
-                                        <div class="product-card">
-                                            <div class="product-image-3d">
-                                                <img src="{{ asset('storage/' . $item->bookDetail->image) }}" alt="Product Image">
-                                                <div class="image-overlay"></div>
-                                            </div>
-                                            <a href="{{ route('book.detail', $item->bookDetail->book->id) }}" target="_blank"
-                                                class="product-name-3d">
-                                                {{ $item->bookDetail->book->name }}
-                                            </a>
-                                        </div>
+                            <div class="product-card">
+                                @php
+                                    $book = $item->bookDetail->book ?? null;
+                                    $image = $item->bookDetail->image ?? null;
+
+                                    $fallbackImage = 'storage/client/img/products/uHSgfoff1LYGatU5hE38DZEA6101DTziZCDqMp2t.png';
+                                    $noImage = 'client/img/products/noimage.png';
+
+                                    $imageUrl = asset($noImage); // Mặc định nếu không có ảnh
+
+                                    if ($image && file_exists(public_path('storage/' . $image))) {
+                                        $imageUrl = asset('storage/' . $image);
+                                    } elseif (file_exists(public_path($fallbackImage))) {
+                                        $imageUrl = asset($fallbackImage);
+                                    }
+                                @endphp
+
+                                <div class="product-image-3d">
+                                    <img src="{{ $imageUrl }}" alt="Product Image">
+                                    <div class="image-overlay"></div>
+                                </div>
+
+                                <a href="{{ route('product.show', $book->id ?? 0) }}" target="_blank" class="product-name-3d">
+                                    {{ $book->name ?? '[Không xác định]' }}
+                                </a>
+                            </div>
+
                                     </td>
                                     <td class="td-3d price-3d">
                                         <span class="price-tag">{{ number_format($item->bookDetail->price, 0, ',', '.') }} ₫</span>
