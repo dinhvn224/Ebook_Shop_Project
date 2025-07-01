@@ -91,12 +91,6 @@
                     </a>
                 </li>
 
-                <li>
-                    <a href="{{ route('admin.reviews.index') }}">
-                        <i class="fas fa-gift me-2"></i>
-                        <span>Quản lí đánh giá</span>
-                    </a>
-                </li>
             </ul>
 
 

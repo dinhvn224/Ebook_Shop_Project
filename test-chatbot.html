@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="test-csrf-token">
+    <title>Test Chatbot AI Gemini</title>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <!-- Chatbot CSS -->
+    <link rel="stylesheet" href="public/css/chatbot.css">
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .test-container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .test-title {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+
+        .test-description {
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .test-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .test-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .test-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .test-status {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #ddd;
+        }
+
+        .status-item.success {
+            border-left-color: #28a745;
+        }
+
+        .status-item.error {
+            border-left-color: #dc3545;
+        }
+
+        .status-item.warning {
+            border-left-color: #ffc107;
+        }
+
+        .status-icon {
+            font-size: 18px;
+        }
+
+        .status-text {
+            flex: 1;
+            margin-left: 10px;
+            text-align: left;
+        }
+
+        .status-value {
+            font-weight: bold;
+        }
+
+        .test-instructions {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .test-instructions h3 {
+            margin-top: 0;
+            color: #1976d2;
+        }
+
+        .test-instructions ol {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .test-instructions li {
+            margin-bottom: 8px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1 class="test-title">🤖 Test Chatbot AI Gemini</h1>
+        <p class="test-description">
+            Trang test để kiểm tra tính năng chatbot AI tích hợp Google Gemini API thông qua n8n workflow automation.
+        </p>
+
+        <div class="test-buttons">
+            <button class="test-btn" onclick="testLaravelConnection()">
+                <i class="fas fa-server"></i> Test Laravel
+            </button>
+            <button class="test-btn" onclick="testN8nConnection()">
+                <i class="fas fa-cogs"></i> Test n8n
+            </button>
+            <button class="test-btn" onclick="testChatbot()">
+                <i class="fas fa-comments"></i> Test Chatbot
+            </button>
+            <button class="test-btn" onclick="openChatbot()">
+                <i class="fas fa-robot"></i> Mở Chatbot
+            </button>
+        </div>
+
+        <div class="test-status" id="testStatus">
+            <h3>📊 Trạng thái hệ thống</h3>
+            <div id="statusItems">
+                <div class="status-item">
+                    <i class="fas fa-circle status-icon" style="color: #ddd;"></i>
+                    <span class="status-text">Chưa kiểm tra</span>
+                    <span class="status-value">-</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-instructions">
+            <h3>📝 Hướng dẫn test</h3>
+            <ol>
+                <li><strong>Test Laravel:</strong> Kiểm tra kết nối đến Laravel backend</li>
+                <li><strong>Test n8n:</strong> Kiểm tra kết nối đến n8n workflow</li>
+                <li><strong>Test Chatbot:</strong> Kiểm tra toàn bộ luồng chatbot</li>
+                <li><strong>Mở Chatbot:</strong> Mở giao diện chatbot để test thủ công</li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- Chatbot JavaScript -->
+    <script src="public/js/chatbot.js"></script>
+
+    <script>
+        // Test functions
+        function updateStatus(service, status, message) {
+            const statusItems = document.getElementById('statusItems');
+            const existingItem = statusItems.querySelector(`[data-service="${service}"]`);
+
+            const statusClass = status === 'success' ? 'success' :
+                              status === 'error' ? 'error' : 'warning';
+
+            const statusIcon = status === 'success' ? 'fa-check-circle' :
+                             status === 'error' ? 'fa-times-circle' :
+                             'fa-exclamation-circle';
+
+            const statusColor = status === 'success' ? '#28a745' :
+                              status === 'error' ? '#dc3545' :
+                              '#ffc107';
+
+            const html = `
+                <div class="status-item ${statusClass}" data-service="${service}">
+                    <i class="fas ${statusIcon} status-icon" style="color: ${statusColor};"></i>
+                    <span class="status-text">${message}</span>
+                    <span class="status-value">${status.toUpperCase()}</span>
+                </div>
+            `;
+
+            if (existingItem) {
+                existingItem.outerHTML = html;
+            } else {
+                statusItems.innerHTML += html;
+            }
+        }
+
+        async function testLaravelConnection() {
+            updateStatus('laravel', 'warning', 'Đang kiểm tra Laravel...');
+
+            try {
+                const response = await fetch('/chatbot/webhook', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: 'test',
+                        sessionId: 'test_session',
+                        timestamp: new Date().toISOString()
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    updateStatus('laravel', 'success', `Laravel OK - ${data.source || 'unknown'}`);
+                } else {
+                    updateStatus('laravel', 'error', `HTTP ${response.status}`);
+                }
+            } catch (error) {
+                updateStatus('laravel', 'error', error.message);
+            }
+        }
+
+        async function testN8nConnection() {
+            updateStatus('n8n', 'warning', 'Đang kiểm tra n8n...');
+
+            try {
+                const response = await fetch('http://localhost:5678/webhook/chatbot', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: 'test n8n connection',
+                        sessionId: 'test_session',
+                        timestamp: new Date().toISOString()
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    updateStatus('n8n', 'success', 'n8n OK');
+                } else {
+                    updateStatus('n8n', 'error', `HTTP ${response.status}`);
+                }
+            } catch (error) {
+                updateStatus('n8n', 'error', error.message);
+            }
+        }
+
+        async function testChatbot() {
+            updateStatus('chatbot', 'warning', 'Đang test chatbot...');
+
+            try {
+                // Test Laravel first
+                const laravelResponse = await fetch('/chatbot/webhook', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: 'Tìm sách Harry Potter',
+                        sessionId: 'test_session',
+                        timestamp: new Date().toISOString()
+                    })
+                });
+
+                if (laravelResponse.ok) {
+                    const data = await laravelResponse.json();
+
+                    if (data.source === 'database') {
+                        updateStatus('chatbot', 'success', 'Database search OK');
+                    } else {
+                        // Test n8n if needed
+                        const n8nResponse = await fetch('http://localhost:5678/webhook/chatbot', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                message: 'Giới thiệu về sách',
+                                sessionId: 'test_session',
+                                timestamp: new Date().toISOString()
+                            })
+                        });
+
+                        if (n8nResponse.ok) {
+                            updateStatus('chatbot', 'success', 'AI integration OK');
+                        } else {
+                            updateStatus('chatbot', 'error', 'n8n failed');
+                        }
+                    }
+                } else {
+                    updateStatus('chatbot', 'error', 'Laravel failed');
+                }
+            } catch (error) {
+                updateStatus('chatbot', 'error', error.message);
+            }
+        }
+
+        function openChatbot() {
+            if (window.chatbot) {
+                window.chatbot.openChatbot();
+                updateStatus('ui', 'success', 'Chatbot opened');
+            } else {
+                updateStatus('ui', 'error', 'Chatbot not initialized');
+            }
+        }
+
+        // Auto-test on page load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                testLaravelConnection();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

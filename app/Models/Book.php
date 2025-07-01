@@ -1,14 +1,11 @@
 <?php
 
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Author;
-use App\Models\Publisher;
-use App\Models\Category;
-use App\Models\BookDetail;
-use App\Models\Voucher;  // nhớ import Voucher
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Builder;
 
 class Book extends Model
 {
@@ -32,39 +29,52 @@ class Book extends Model
     // Relationships
     public function author()
     {
-        return $this->belongsTo(Author::class);
+        return $this->belongsTo(Author::class)->withDefault();
     }
 
     public function publisher()
     {
-        return $this->belongsTo(Publisher::class);
+        return $this->belongsTo(Publisher::class)->withDefault();
     }
 
     public function category()
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsTo(Category::class)->withDefault();
     }
+
     public function details()
     {
-        return $this->hasMany(BookDetail::class);
+        return $this->hasMany(BookDetail::class)->where('is_active', true);
     }
 
     public function vouchers()
     {
-        return $this->belongsToMany(Voucher::class, 'book_voucher');
+        return $this->belongsToMany(Voucher::class, 'book_voucher', 'book_id', 'voucher_id');
     }
 
     public function images()
     {
-        return $this->hasMany(\App\Models\Image::class, 'book_id');
+        return $this->hasMany(Image::class);
     }
 
+    public function mainImage()
+    {
+        return $this->hasOne(Image::class)->where('is_main', true);
+    }
 
-    // Global scope để loại bỏ sách đã bị đánh dấu xóa
+    // Scope để chỉ lấy sách chưa bị xóa
     protected static function booted()
     {
-        static::addGlobalScope('not_deleted', function ($builder) {
-            $builder->where('deleted', false)->orWhereNull('deleted');
+        static::addGlobalScope('not_deleted', function (Builder $builder) {
+            $builder->where(function ($q) {
+                $q->where('deleted', false)->orWhereNull('deleted');
+            });
         });
+    }
+
+    // Scope mở rộng nếu muốn override global scope
+    public function scopeWithTrashedFlag($query)
+    {
+        return $query->withoutGlobalScope('not_deleted');
     }
 }

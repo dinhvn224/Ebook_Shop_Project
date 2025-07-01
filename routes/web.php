@@ -1,51 +1,52 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminReviewController;
+use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\Admin\PublisherController;
+use App\Http\Controllers\Admin\BookController as AdminBookController;
+
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\Admin\{
-    AdminReviewController,
-    UserController,
-    AuthorController,
-    BookController,
-    CategoryController,
-    PublisherController,
-    OrderController,
-    CounterSaleController,
-    DashboardController,
-    ImageController,
-    VoucherController,
-    VoucherProductController
-};
-use App\Http\Controllers\Client\BookController as ClientBookController;
-use App\Http\Controllers\HomeController;
+
+// Client Controllers
+use App\Http\Controllers\Client\HomeController;
+use App\Http\Controllers\Client\ProductController;
+use App\Http\Controllers\Client\CategoryController;
 use App\Http\Controllers\Client\CartController;
-use App\Http\Controllers\Client\CartController as ClientCartController;
-use App\Http\Controllers\Client\ClientReviewController;
+use App\Http\Controllers\Client\AuthController;
+use App\Http\Controllers\Client\ReviewController;
 use App\Http\Controllers\Client\UserProfileController;
 
-//
-// 🌐 PUBLIC CLIENT ROUTES
-//
-Route::get('/', [HomeController::class, 'index'])->name('home');
 
-Route::get('/books', [BookController::class, 'index'])->name('books.index');
+// Other Controllers
+use App\Http\Controllers\AuthorController;
+use App\Http\Controllers\SearchController;
+
+// Admin Controllers
+use App\Http\Controllers\Admin\DashboardController;
+
+use App\Http\Controllers\Admin\VoucherController;
+use App\Http\Controllers\Admin\VoucherProductController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\CounterSaleController;
+use App\Http\Controllers\Admin\ImageController;
+// Admin Controllers
 
 
-Route::get('/book/{book}', [ClientBookController::class, 'show'])->name('book.detail');
 
-Route::middleware(['auth', 'role:user'])->get('/home', fn() => view('client.home'))
-    ->name('home.user');
 
-// Các route giỏ hàng
-Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-Route::post('/cart/add', [CartController::class, 'addToCart'])->name('cart.add');
-Route::post('/cart/update/{id}', [CartController::class, 'updateQuantity'])->name('cart.update');
-Route::post('/cart/remove/{id}', [CartController::class, 'removeFromCart'])->name('cart.remove');
-Route::post('/cart/clear', [CartController::class, 'clearCart'])->name('cart.clear');
 
-//
-// 🔐 AUTH ROUTES
-//
+
+/*
+|--------------------------------------------------------------------------
+| CLIENT ROUTES (Các route cho người dùng)
+|--------------------------------------------------------------------------
+*/
+
+// 🌐 Các trang công khai, không cần đăng nhập
+
+// ✍️ Authors
+
+// 🔐 Auth Routes
 Route::controller(AuthController::class)->group(function () {
     Route::get('/login', 'showLoginForm')->name('login');
     Route::post('/login', 'login');
@@ -54,10 +55,52 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('/logout', 'logout')->name('logout');
 });
 
-//
-// 🛠 ADMIN DASHBOARD
-//
-Route::middleware(['auth', 'role:ADMIN'])->get('/admin', fn() => view('admin.dashboard'))
+Route::get('/authors', [AuthorController::class, 'index'])->name('authors.index');
+Route::get('/author/{id}', [AuthorController::class, 'show'])->name('author.show');
+
+
+
+
+// 🌐 Public Routes
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/category/{id}', [CategoryController::class, 'show'])->name('category.show');
+Route::get('/product/{id}', [ProductController::class, 'show'])->name('product.show');
+Route::get('/books/{id}', [ProductController::class, 'show'])->name('books.show');
+Route::get('/search', [SearchController::class, 'index'])->name('search');
+
+
+
+// Reviews
+Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+
+
+
+// 👤 Profile Routes
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [AuthController::class, 'showProfile'])->name('profile');
+    Route::post('/profile', [AuthController::class, 'updateProfile']);
+});
+
+// 🛒 Cart & User Area (User only)
+Route::middleware(['auth', 'role:user'])->group(function () {
+    // Cart
+    Route::prefix('cart')->name('cart.')->controller(CartController::class)->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::post('/add', 'addToCart')->name('add');
+        Route::post('/update/{id}', 'updateQuantity')->name('update');
+        Route::post('/remove/{id}', 'removeFromCart')->name('remove');
+        Route::post('/clear', 'clearCart')->name('clear');
+    });
+
+    // User Profile (chi tiết)
+    Route::prefix('profile')->name('profile.')->controller(UserProfileController::class)->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/edit', 'edit')->name('edit');
+        Route::put('/update', 'update')->name('update');
+    });
+});
+
+Route::middleware(['auth', 'role:admin'])->get('/admin', fn() => view('admin.dashboard'))
     ->name('admin.dashboard');
 
 //
@@ -86,9 +129,6 @@ Route::prefix('admin')
         Route::post('publishers/{id}/restore', [PublisherController::class, 'restore'])
             ->name('publishers.restore');
 
-        // 🧾 Orders
-        Route::resource('orders', OrderController::class)
-            ->only(['index', 'show', 'update', 'destroy']);
 
         // 🎫 Vouchers
         Route::resource('vouchers', VoucherController::class);
@@ -154,13 +194,7 @@ Route::prefix('admin')
 
 Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
-Route::prefix('admin')->name('admin.')->group(function () {
 
-    Route::resource('books', BookController::class)->except(['show']);
-    Route::post('books/{book}/details', [BookController::class, 'addDetail'])->name('books.details.add');
-    Route::put('books/{book}/details/{detail}', [BookController::class, 'updateDetail'])->name('books.details.update');
-    Route::delete('books/{book}/details/{detail}', [BookController::class, 'deleteDetail'])->name('books.details.delete');
-});
 
 Route::middleware(['auth', 'role:user'])
     ->prefix('profile')
@@ -178,9 +212,27 @@ Route::prefix('admin')
         Route::resource('images', ImageController::class);
     });
 
-Route::prefix('reviews')->name('reviews.')->group(function () {
-    Route::middleware(['auth', 'role:user'])->group(function () {
-        Route::post('/', [ClientReviewController::class, 'store'])->name('store');         // Viết mới
-        Route::put('/{review}', [ClientReviewController::class, 'update'])->name('update'); // Cập nhật trong 24h
+
+
+Route::prefix('admin')
+    ->name('admin.') // 💥 THÊM DÒNG NÀY
+    ->middleware(['auth', 'role:admin']) // 👉 Thêm middleware nếu cần bảo vệ
+    ->group(function () {
+
+        // 📚 Quản lý sách
+        Route::resource('books', AdminBookController::class);
+
+        // ➕ Chi tiết sách (BookDetail)
+        Route::post('books/{book}/details', [AdminBookController::class, 'addDetail'])->name('books.details.add');
+        Route::put('books/{book}/details/{detail}', [AdminBookController::class, 'updateDetail'])->name('books.details.update');
+        Route::delete('books/{book}/details/{detail}', [AdminBookController::class, 'deleteDetail'])->name('books.details.delete');
     });
-});
+
+Route::prefix('admin')
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.') // 👉 Đặt tên tiền tố 'admin.'
+    ->group(function () {
+        // 🧾 Orders
+        Route::resource('orders', OrderController::class)
+            ->only(['index', 'show', 'update', 'destroy']);
+    });

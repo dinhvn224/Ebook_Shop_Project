@@ -16,36 +16,34 @@ class BookController extends Controller
     {
         $query = Book::with(['author', 'publisher', 'category', 'details']);
 
-        // Tìm kiếm theo tên sách
         if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where('name', 'like', "%{$search}%")
-                  ->orWhere('id', 'like', "%{$search}%");
+            $query->where('name', 'like', "%{$request->search}%");
         }
 
-        // Lọc theo thể loại
         if ($request->filled('category_id')) {
             $query->where('category_id', $request->category_id);
         }
 
-        // Lọc theo tác giả
         if ($request->filled('author_id')) {
             $query->where('author_id', $request->author_id);
         }
 
-        // Lọc theo nhà xuất bản
         if ($request->filled('publisher_id')) {
             $query->where('publisher_id', $request->publisher_id);
         }
 
         $books = $query->paginate(10);
-
-        // Lấy dữ liệu cho dropdown filter
         $authors = Author::all();
         $publishers = Publisher::all();
         $categories = Category::all();
 
         return view('admin.books.index', compact('books', 'authors', 'publishers', 'categories'));
+    }
+
+    public function show($id)
+    {
+        $book = Book::with(['author', 'publisher', 'category', 'details'])->findOrFail($id);
+        return view('admin.books.show', compact('book'));
     }
 
     public function create()
@@ -59,19 +57,19 @@ class BookController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required',
             'author_id' => 'required|exists:authors,id',
-            'publisher_id' => 'required|exists:publisher,id',
+            'publisher_id' => 'required|exists:publishers,id',
             'category_id' => 'required|exists:categories,id',
-            'description' => 'nullable|string',
         ]);
-        $book = Book::create($request->only(['name', 'author_id', 'publisher_id', 'category_id', 'description']) + ['deleted' => false]);
-        return redirect()->route('admin.books.edit', $book->id)->with('success', 'Đã tạo sách, hãy thêm chi tiết sách!');
+
+        $book = Book::create($request->all());
+        return redirect()->route('admin.books.index')->with('success', 'Thêm sách thành công');
     }
 
     public function edit($id)
     {
-        $book = Book::with('details')->findOrFail($id);
+        $book = Book::findOrFail($id);
         $authors = Author::all();
         $publishers = Publisher::all();
         $categories = Category::all();
@@ -80,65 +78,30 @@ class BookController extends Controller
 
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'author_id' => 'required|exists:authors,id',
-            'publisher_id' => 'required|exists:publisher,id',
-            'category_id' => 'required|exists:categories,id',
-            'description' => 'nullable|string',
-        ]);
         $book = Book::findOrFail($id);
-        $book->update($request->only(['name', 'author_id', 'publisher_id', 'category_id', 'description']));
-        return redirect()->route('admin.books.index')->with('success', 'Cập nhật sách thành công!');
+        $book->update($request->all());
+        return redirect()->route('admin.books.index')->with('success', 'Cập nhật sách thành công');
     }
 
     public function destroy($id)
     {
-        $book = Book::withoutGlobalScopes()->findOrFail($id);
-        $book->update(['deleted' => true]);
-        return redirect()->route('admin.books.index')->with('success', 'Đã ẩn sách!');
+        Book::findOrFail($id)->delete();
+        return redirect()->route('admin.books.index')->with('success', 'Xoá sách thành công');
     }
 
-    // BookDetail CRUD (thêm/xóa/sửa chi tiết sách)
-    public function addDetail(Request $request, $book_id)
+    // BookDetail methods...
+    public function addDetail(Request $request, $bookId)
     {
-        $request->validate([
-            'language' => 'required|string|max:100',
-            'size' => 'required|string|max:50',
-            'publish_year' => 'required|integer',
-            'total_pages' => 'required|integer',
-            'description' => 'nullable|string',
-            'quantity' => 'required|integer',
-            'price' => 'required|numeric',
-            'promotion_price' => 'nullable|numeric',
-            'is_active' => 'boolean',
-        ]);
-        BookDetail::create($request->only(['book_id', 'language', 'size', 'publish_year', 'total_pages', 'description', 'quantity', 'price', 'promotion_price', 'is_active']) + ['book_id' => $book_id, 'deleted' => false]);
-        return redirect()->route('admin.books.edit', $book_id)->with('success', 'Đã thêm chi tiết sách!');
+        // validate và thêm chi tiết sách
     }
 
-    public function updateDetail(Request $request, $book_id, $detail_id)
+    public function updateDetail(Request $request, $bookId, $detailId)
     {
-        $request->validate([
-            'language' => 'required|string|max:100',
-            'size' => 'required|string|max:50',
-            'publish_year' => 'required|integer',
-            'total_pages' => 'required|integer',
-            'description' => 'nullable|string',
-            'quantity' => 'required|integer',
-            'price' => 'required|numeric',
-            'promotion_price' => 'nullable|numeric',
-            'is_active' => 'boolean',
-        ]);
-        $detail = BookDetail::findOrFail($detail_id);
-        $detail->update($request->only(['language', 'size', 'publish_year', 'total_pages', 'description', 'quantity', 'price', 'promotion_price', 'is_active']));
-        return redirect()->route('admin.books.edit', $book_id)->with('success', 'Đã cập nhật chi tiết sách!');
+        // validate và cập nhật chi tiết sách
     }
 
-    public function deleteDetail($book_id, $detail_id)
+    public function deleteDetail($bookId, $detailId)
     {
-        $detail = BookDetail::findOrFail($detail_id);
-        $detail->update(['deleted' => true]);
-        return redirect()->route('admin.books.edit', $book_id)->with('success', 'Đã ẩn chi tiết sách!');
+        // xoá chi tiết sách
     }
 }
