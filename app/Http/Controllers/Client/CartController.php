@@ -13,14 +13,22 @@ use Illuminate\Support\Facades\Validator;
 class CartController extends Controller
 {
     // Hiển thị giỏ hàng
-    public function index()
-    {
-        // Lấy giỏ hàng của người dùng hiện tại
-        $cart = Cart::where('user_id', Auth::id())->with(['items.bookDetail'])->first();
-        
-        // Trả về view giỏ hàng với dữ liệu giỏ hàng
-        return view('client.cart.index', compact('cart'));
-    }
+public function index()
+{
+    $cart = Cart::where('user_id', Auth::id())
+                ->with(['items.bookDetail'])
+                ->first();
+
+    // Luôn tạo collection $cartItems, dù $cart có null hay không
+    $cartItems = $cart
+        ? $cart->items->where('deleted', false)
+        : collect();
+
+    // Truyền cả $cart và $cartItems vào view
+    return view('client.cart.index', compact('cart', 'cartItems'));
+}
+
+
 
     // Thêm sản phẩm vào giỏ hàng
   public function addToCart(Request $request)
@@ -102,7 +110,7 @@ class CartController extends Controller
     {
         // Lấy giỏ hàng của người dùng
         $cart = Cart::where('user_id', Auth::id())->first();
-        
+
         if ($cart) {
             // Duyệt qua tất cả các sản phẩm trong giỏ và đánh dấu là đã xóa
             foreach ($cart->items as $item) {

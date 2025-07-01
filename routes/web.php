@@ -15,6 +15,7 @@ use App\Http\Controllers\Client\CartController;
 use App\Http\Controllers\Client\AuthController;
 use App\Http\Controllers\Client\ReviewController;
 use App\Http\Controllers\Client\UserProfileController;
+use App\Http\Controllers\Client\CheckoutController;
 
 
 // Other Controllers
@@ -243,18 +244,23 @@ Route::prefix('admin')
 Route::prefix('cart')->name('cart.')->middleware('auth')->group(function() {
     // Hiển thị giỏ hàng
     Route::get('/', [CartController::class, 'index'])->name('index');
-    
+
     // Thêm sản phẩm vào giỏ hàng
     Route::post('add', [CartController::class, 'addToCart'])->name('add');
-    
+
     // Cập nhật số lượng sản phẩm
     Route::get('update/{id}', [CartController::class, 'updateQuantity'])->name('update');
-    
+
     // Xóa một sản phẩm khỏi giỏ
     Route::delete('remove/{id}', [CartController::class, 'removeFromCart'])->name('remove');
-    
+
     // Xóa toàn bộ giỏ hàng
     Route::post('clear', [CartController::class, 'clearCart'])->name('clear');
+});
+
+Route::middleware(['auth','role:user'])->group(function() {
+    Route::get('/checkout',  [CheckoutController::class, 'showForm'])->name('checkout.form');
+    Route::post('/checkout', [CheckoutController::class, 'processOrder'])->name('checkout.process');
 });
 
 Route::get('book/{id}', [BookController::class, 'show'])->name('book.detail');

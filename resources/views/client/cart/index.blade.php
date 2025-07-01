@@ -8,7 +8,15 @@
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif
 
-    @if ($cart && $cart->items->where('deleted', false)->count())
+    {{-- Khởi tạo $cartItems từ $cart, luôn trả về Collection --}}
+    @php
+        $cartItems = $cart
+            ? $cart->items->where('deleted', false)
+            : collect();
+    @endphp
+
+
+    @if($cartItems->count() > 0)
         <div class="cart-container">
             <table class="cart-table">
                 <thead>
@@ -23,24 +31,33 @@
                 </thead>
                 <tbody>
                     @php $index = 1; $total = 0; @endphp
-                    @foreach ($cart->items->where('deleted', false) as $item)
+                    @foreach ($cartItems as $item)
                         @php
-                            $subtotal = $item->bookDetail->price * $item->quantity;
+                            $price = $item->bookDetail->promotion_price ?? $item->bookDetail->price;
+                            $subtotal = $price * $item->quantity;
                             $total += $subtotal;
                         @endphp
                         <tr>
                             <td>{{ $index++ }}</td>
                             <td class="product-info">
-                                <a href="{{ route('book.detail', $item->bookDetail->book->id) }}" target="_blank">{{ $item->bookDetail->book->name }}</a>
+                                <a href="{{ route('book.detail', $item->bookDetail->book->id) }}" target="_blank">
+                                    {{ $item->bookDetail->book->name }}
+                                </a>
                                 <img src="{{ asset('storage/' . $item->bookDetail->image) }}" alt="Product Image">
                             </td>
-                            <td class="align-right">{{ number_format($item->bookDetail->price, 0, ',', '.') }} ₫</td>
+                            <td class="align-right">{{ number_format($price, 0, ',', '.') }} ₫</td>
                             <td class="quantity">
                                 <form action="{{ route('cart.update', $item->id) }}" method="POST" class="d-flex">
                                     @csrf
-                                    <button type="submit" formaction="{{ route('cart.update', $item->id) }}?action=decrease" class="btn btn-secondary">−</button>
+                                    <button type="submit"
+                                            formaction="{{ route('cart.update', $item->id) }}?action=decrease"
+                                            class="btn btn-secondary">−
+                                    </button>
                                     <input type="number" name="quantity" value="{{ $item->quantity }}" min="1" max="50" readonly>
-                                    <button type="submit" formaction="{{ route('cart.update', $item->id) }}?action=increase" class="btn btn-secondary">+</button>
+                                    <button type="submit"
+                                            formaction="{{ route('cart.update', $item->id) }}?action=increase"
+                                            class="btn btn-secondary">+
+                                    </button>
                                 </form>
                             </td>
                             <td class="align-right">{{ number_format($subtotal, 0, ',', '.') }} ₫</td>
@@ -58,8 +75,14 @@
             <div class="cart-summary">
                 <h3>Tổng cộng: <span>{{ number_format($total, 0, ',', '.') }} ₫</span></h3>
                 <div class="cart-actions">
-                    <button class="btn btn-success" disabled style="opacity:0.5; cursor:not-allowed;">Thanh toán</button>
-                    <form action="{{ route('cart.clear') }}" method="POST">
+                    @if($cartItems->count() > 0)
+                        <a href="{{ route('checkout.form') }}" class="btn btn-success">Thanh toán</a>
+                    @else
+                        <button class="btn btn-success" disabled style="opacity:0.5; cursor:not-allowed;">
+                            Giỏ hàng trống
+                        </button>
+                    @endif
+                    <form action="{{ route('cart.clear') }}" method="POST" style="display:inline-block;">
                         @csrf
                         <button type="submit" class="btn btn-danger">Xóa hết</button>
                     </form>
@@ -67,7 +90,9 @@
             </div>
         </div>
     @else
-        <p style="text-align:center; font-size: 20px; color: #555;">Giỏ hàng của bạn đang trống.</p>
+        <p style="text-align:center; font-size: 20px; color: #555;">
+            Giỏ hàng của bạn đang trống.
+        </p>
     @endif
 </section>
 
