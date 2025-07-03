@@ -2,6 +2,14 @@
     <div class="sidebar-inner slimscroll">
         <div id="sidebar-menu" class="sidebar-menu">
             <ul>
+
+                <li>
+                    <a href="{{ route('admin.dashboard') }}">
+                        <i class="fas fa-image me-2"></i>
+                        <span>dashboard</span>
+                    </a>
+                </li>
+
                 <li class="submenu">
                     <a href="javascript:void(0);">
                         <i class="fas fa-book me-2"></i>
@@ -13,6 +21,8 @@
                         <li><a href="{{ route('admin.books.create') }}">Thêm sách mới</a></li>
                     </ul>
                 </li>
+
+
 
                 <li>
                     <a href="{{ route('admin.images.index') }}">
@@ -88,6 +98,14 @@
                     <a href="{{ route('admin.voucher-products.index') }}">
                         <i class="fas fa-gift me-2"></i>
                         <span>Sản phẩm Voucher</span>
+                    </a>
+                </li>
+
+
+                <li>
+                    <a href="{{ route('admin.reviews.index') }}">
+                        <i class="fas fa-image me-2"></i>
+                        <span>Rivew</span>
                     </a>
                 </li>
 

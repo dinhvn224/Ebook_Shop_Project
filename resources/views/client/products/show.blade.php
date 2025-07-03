@@ -132,71 +132,71 @@
         </style>
 
         {{-- Chi tiết sản phẩm --}}
-        <div class="row g-5">
-            <div class="col-md-4">
-                @php
-                    $mainImage = optional($book->images)->firstWhere('is_main', true)
-                        ?? optional($book->images)->where('deleted', 0)->first();
+            <div class="row g-5">
+                <div class="col-md-4">
+                    @php
+                        $mainImage = optional($book->images)->firstWhere('is_main', true)
+                            ?? optional($book->images)->where('deleted', 0)->first();
 
-                    $fallbackImage = 'storage/client/img/products/uHSgfoff1LYGatU5hE38DZEA6101DTziZCDqMp2t.png';
-                    $noImage = 'client/img/products/noimage.png';
+                        $fallbackImage = 'storage/client/img/products/uHSgfoff1LYGatU5hE38DZEA6101DTziZCDqMp2t.png';
+                        $noImage = 'client/img/products/noimage.png';
 
-                    $imageUrl = $noImage;
+                        $imageUrl = $noImage;
 
-                    if ($mainImage && !empty($mainImage->url)) {
-                        $imagePath = public_path($mainImage->url);
-                        if (file_exists($imagePath)) {
-                            $imageUrl = $mainImage->url;
-                        } elseif (file_exists(public_path($fallbackImage))) {
-                            $imageUrl = $fallbackImage;
+                        if ($mainImage && !empty($mainImage->url)) {
+                            $imagePath = public_path($mainImage->url);
+                            if (file_exists($imagePath)) {
+                                $imageUrl = $mainImage->url;
+                            } elseif (file_exists(public_path($fallbackImage))) {
+                                $imageUrl = $fallbackImage;
+                            }
                         }
-                    }
-                @endphp
+                    @endphp
 
-                <img src="{{ asset($imageUrl) }}" class="book-cover w-100 rounded shadow-sm" alt="{{ $book->name }}">
+                    <img src="{{ asset($imageUrl) }}" class="book-cover w-100 rounded shadow-sm" alt="{{ $book->name }}">
+                </div>
+
+                <div class="col-md-8">
+                    <h2 class="book-title">{{ $book->name }}</h2>
+                    <p class="book-meta"><strong>Tác giả:</strong> {{ $book->author->name ?? 'N/A' }}</p>
+                    <p class="book-meta"><strong>Nhà xuất bản:</strong> {{ $book->publisher->name ?? 'N/A' }}</p>
+
+                    <div class="rating mb-2">
+                        @for($i = 1; $i <= 5; $i++)
+                            <i
+                                class="fas fa-star {{ $i <= round($book->details->first()->reviews->avg('rating') ?? 4) ? '' : 'text-muted' }}"></i>
+                        @endfor
+                        <span class="ms-1 text-muted">
+                            ({{ number_format($book->details->first()->reviews->avg('rating') ?? 4, 1) }}/5)
+                        </span>
+                    </div>
+
+                    @php $detail = $book->details->first(); @endphp
+                    <div class="price mt-3">
+                        {{ number_format($detail->promotion_price ?? $detail->price, 0, '', '.') }}₫
+                        @if($detail->promotion_price && $detail->promotion_price < $detail->price)
+                            <span class="old">{{ number_format($detail->price, 0, '', '.') }}₫</span>
+                        @endif
+                    </div>
+
+                    <p class="out-stock mt-2">
+                        {{ $detail->quantity > 0 ? 'Còn hàng' : 'Hết hàng' }}
+                    </p>
+
+                    <div class="d-flex align-items-center gap-3 mt-3">
+                        <form action="{{ route('cart.add') }}" method="POST">
+                            @csrf
+                            <input type="number" name="quantity" value="1" min="1" class="form-control" style="width: 90px;">
+                            <input type="hidden" name="book_detail_id" value="{{ $detail->id }}">
+                            <button type="submit" class="btn btn-primary" {{ $detail->quantity < 1 ? 'disabled' : '' }}>
+                                <i class="fas fa-cart-plus me-1"></i>Thêm vào giỏ
+                            </button>
+                        </form>
+                    </div>
+
+
+                </div>
             </div>
-
-            <div class="col-md-8">
-                <h2 class="book-title">{{ $book->name }}</h2>
-                <p class="book-meta"><strong>Tác giả:</strong> {{ $book->author->name ?? 'N/A' }}</p>
-                <p class="book-meta"><strong>Nhà xuất bản:</strong> {{ $book->publisher->name ?? 'N/A' }}</p>
-
-                <div class="rating mb-2">
-                    @for($i = 1; $i <= 5; $i++)
-                        <i
-                            class="fas fa-star {{ $i <= round($book->details->first()->reviews->avg('rating') ?? 4) ? '' : 'text-muted' }}"></i>
-                    @endfor
-                    <span class="ms-1 text-muted">
-                        ({{ number_format($book->details->first()->reviews->avg('rating') ?? 4, 1) }}/5)
-                    </span>
-                </div>
-
-                @php $detail = $book->details->first(); @endphp
-                <div class="price mt-3">
-                    {{ number_format($detail->promotion_price ?? $detail->price, 0, '', '.') }}₫
-                    @if($detail->promotion_price && $detail->promotion_price < $detail->price)
-                        <span class="old">{{ number_format($detail->price, 0, '', '.') }}₫</span>
-                    @endif
-                </div>
-
-                <p class="out-stock mt-2">
-                    {{ $detail->quantity > 0 ? 'Còn hàng' : 'Hết hàng' }}
-                </p>
-
-                <div class="d-flex align-items-center gap-3 mt-3">
-                    <form action="{{ route('cart.add') }}" method="POST">
-                        @csrf
-                        <input type="number" name="quantity" value="1" min="1" class="form-control" style="width: 90px;">
-                        <input type="hidden" name="book_detail_id" value="{{ $detail->id }}">
-                        <button type="submit" class="btn btn-primary" {{ $detail->quantity < 1 ? 'disabled' : '' }}>
-                            <i class="fas fa-cart-plus me-1"></i>Thêm vào giỏ
-                        </button>
-                    </form>
-                </div>
-
-
-            </div>
-        </div>
 
 
         {{-- Tabs --}}
