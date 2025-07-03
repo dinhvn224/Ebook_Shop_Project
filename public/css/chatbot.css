@@ -1,8 +1,8 @@
 /* Chatbot CSS - Modern Design */
 .chatbot-container {
     position: fixed;
-    bottom: 80px;
-    right: 30px;
+    bottom: 24px;
+    right: 24px;
     z-index: 1000;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
@@ -49,7 +49,7 @@
 /* Chatbot Window */
 .chatbot-window {
     position: absolute;
-    bottom: 80px;
+    bottom: 70px;
     right: 0;
     width: 350px;
     height: 500px;
@@ -265,8 +265,15 @@
     align-items: center;
 }
 
+.input-container {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 10px;
+}
+
 .chatbot-input {
-    flex: 1;
+    flex: 1 1 auto;
     padding: 12px 16px;
     border: 2px solid #e1e5e9;
     border-radius: 25px;
@@ -276,6 +283,9 @@
     resize: none;
     max-height: 100px;
     min-height: 20px;
+    width: 100%;
+    margin-right: 10px;
+    box-sizing: border-box;
 }
 
 .chatbot-input:focus {
@@ -287,8 +297,8 @@
 }
 
 .chatbot-send {
-    width: 40px;
-    height: 40px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     border: none;
@@ -298,7 +308,8 @@
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease;
-    font-size: 16px;
+    font-size: 20px;
+    flex-shrink: 0;
 }
 
 .chatbot-send:hover {
@@ -387,6 +398,26 @@
         height: 50px;
         font-size: 20px;
     }
+
+    .chatbot-input-area {
+        padding: 12px;
+    }
+
+    .input-container {
+        gap: 6px;
+    }
+
+    .chatbot-input {
+        font-size: 13px;
+        padding: 10px 12px;
+        margin-right: 6px;
+    }
+
+    .chatbot-send {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -438,4 +469,129 @@
         background: #333;
         border-color: #444;
     }
+}
+
+/* Notification Badge */
+.notification-badge {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    background: #ff4d4f;
+    color: #fff;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-weight: bold;
+    z-index: 2;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+/* Chatbot Action Button (Clear chat) */
+.chatbot-action {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 16px;
+    margin-right: 8px;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.3s;
+}
+.chatbot-action:hover {
+    opacity: 1;
+}
+
+/* Input Actions (Send, Attach) */
+.input-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: 8px;
+}
+.input-action {
+    background: none;
+    border: none;
+    color: #667eea;
+    font-size: 18px;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.3s;
+}
+.input-action:hover {
+    opacity: 1;
+    color: #764ba2;
+}
+
+/* Character Count */
+.character-count {
+    font-size: 12px;
+    color: #888;
+    float: right;
+    margin-top: 4px;
+}
+
+/* Input Suggestions */
+.input-suggestions {
+    background: #f7f7fa;
+    border: 1px solid #e1e5e9;
+    border-radius: 10px;
+    padding: 8px 12px;
+    margin-bottom: 6px;
+    font-size: 13px;
+    color: #555;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    display: none;
+}
+
+/* Message Meta (source icon/text) */
+.message-meta {
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.message-meta .icon {
+    font-size: 15px;
+    margin-right: 2px;
+}
+
+/* Books List in Bot Message */
+.books-list {
+    margin-top: 10px;
+    padding-left: 0;
+}
+.book-item {
+    background: #f7f7fa;
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-bottom: 6px;
+    font-size: 13px;
+    color: #333;
+    border-left: 3px solid #667eea;
+}
+.book-title {
+    font-weight: bold;
+    color: #222;
+}
+.book-author {
+    font-size: 12px;
+    color: #666;
+}
+.book-price {
+    font-size: 12px;
+    color: #4caf50;
+    font-weight: bold;
+}
+
+/* Different source color for bot message */
+.message.bot.database .message-content {
+    border-left: 4px solid #4caf50;
+}
+.message.bot.pdf .message-content {
+    border-left: 4px solid #ff9800;
+}
+.message.bot.ai .message-content {
+    border-left: 4px solid #667eea;
 }

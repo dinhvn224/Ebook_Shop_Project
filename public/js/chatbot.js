@@ -1,16 +1,20 @@
 /**
- * Chatbot AI Gemini Integration
- * Handles chat interface and communication with backend
+ * Advanced Chatbot AI with Database, PDF, and AI Integration
+ * Priority: Database → PDF → AI Fallback
  */
-class Chatbot {
+class AdvancedChatbot {
     constructor() {
         this.isOpen = false;
         this.isTyping = false;
         this.sessionId = this.generateSessionId();
         this.messages = [];
         this.apiUrl = '/chatbot/webhook';
-        this.n8nWebhookUrl = 'http://localhost:5678/webhook/chatbot'; // n8n webhook URL
-
+        // Configuration
+        this.config = {
+            maxRetries: 3,
+            timeout: 30000,
+            debugMode: true // Set to false in production
+        };
         this.init();
     }
 
@@ -22,6 +26,7 @@ class Chatbot {
         this.bindEvents();
         this.loadSession();
         this.addWelcomeMessage();
+        this.log('Chatbot initialized with session:', this.sessionId);
     }
 
     /**
@@ -32,51 +37,84 @@ class Chatbot {
     }
 
     /**
+     * Debug logging
+     */
+    log(...args) {
+        if (this.config.debugMode) {
+            console.log('[Chatbot]', ...args);
+        }
+    }
+
+    /**
      * Create chatbot HTML structure
      */
     createChatbotHTML() {
         const chatbotHTML = `
             <div class="chatbot-container">
                 <button class="chatbot-toggle" id="chatbotToggle">
-                    <i class="fas fa-comments"></i>
+                    <i class="fas fa-robot"></i>
+                    <span class="notification-badge" id="notificationBadge" style="display: none;">1</span>
                 </button>
-
                 <div class="chatbot-window" id="chatbotWindow">
                     <div class="chatbot-header">
-                        <h3>📚 AI Book Assistant</h3>
-                        <div class="status">Online</div>
-                        <button class="chatbot-close" id="chatbotClose">
-                            <i class="fas fa-times"></i>
-                        </button>
+                        <div class="chatbot-info">
+                            <h3>🤖 Chatbot BookStore</h3>
+                            <div class="status" id="chatbotStatus">
+                                <span class="status-dot online"></span>
+                                <span class="status-text">Đang hoạt động</span>
+                            </div>
+                        </div>
+                        <div class="chatbot-actions">
+                            <button class="chatbot-action" id="clearChat" title="Xóa lịch sử chat">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            <button class="chatbot-close" id="chatbotClose" title="Đóng chat">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
                     </div>
-
                     <div class="chatbot-messages" id="chatbotMessages">
                         <!-- Messages will be added here -->
                     </div>
-
                     <div class="typing-indicator" id="typingIndicator">
-                        <div class="typing-dots">
-                            <div class="typing-dot"></div>
-                            <div class="typing-dot"></div>
-                            <div class="typing-dot"></div>
+                        <div class="typing-content">
+                            <div class="typing-avatar">🤖</div>
+                            <div class="typing-bubble">
+                                <div class="typing-dots">
+                                    <div class="typing-dot"></div>
+                                    <div class="typing-dot"></div>
+                                    <div class="typing-dot"></div>
+                                </div>
+                                <div class="typing-text" id="typingText">Đang tìm kiếm...</div>
+                            </div>
                         </div>
                     </div>
-
                     <div class="chatbot-input-area">
-                        <textarea
-                            class="chatbot-input"
-                            id="chatbotInput"
-                            placeholder="Nhập câu hỏi của bạn..."
-                            rows="1"
-                        ></textarea>
-                        <button class="chatbot-send" id="chatbotSend">
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
+                        <div class="input-suggestions" id="inputSuggestions" style="display: none;"></div>
+                        <div class="input-container">
+                            <textarea
+                                class="chatbot-input"
+                                id="chatbotInput"
+                                placeholder="Hỏi tôi về sách, tác giả, giá cả..."
+                                rows="1"
+                                maxlength="500"
+                            ></textarea>
+                            <div class="input-actions">
+                                <button class="input-action" id="attachFile" title="Đính kèm file" style="display: none;">
+                                    <i class="fas fa-paperclip"></i>
+                                </button>
+                                <button class="chatbot-send" id="chatbotSend" title="Gửi tin nhắn">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="input-footer">
+                            <span class="character-count" id="characterCount">0/500</span>
+                        </div>
                     </div>
                 </div>
             </div>
         `;
-
         document.body.insertAdjacentHTML('beforeend', chatbotHTML);
     }
 
@@ -84,22 +122,18 @@ class Chatbot {
      * Bind event listeners
      */
     bindEvents() {
-        // Toggle chatbot
         document.getElementById('chatbotToggle').addEventListener('click', () => {
             this.toggleChatbot();
         });
-
-        // Close chatbot
         document.getElementById('chatbotClose').addEventListener('click', () => {
             this.closeChatbot();
         });
-
-        // Send message
+        document.getElementById('clearChat').addEventListener('click', () => {
+            this.clearSession();
+        });
         document.getElementById('chatbotSend').addEventListener('click', () => {
             this.sendMessage();
         });
-
-        // Input events
         const input = document.getElementById('chatbotInput');
         input.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
@@ -107,28 +141,30 @@ class Chatbot {
                 this.sendMessage();
             }
         });
-
-        input.addEventListener('input', () => {
+        input.addEventListener('input', (e) => {
             this.autoResizeInput();
+            this.updateCharacterCount();
+            this.handleTyping();
         });
-
-        // Escape key to close
+        input.addEventListener('focus', () => {
+            this.showSuggestions();
+        });
+        input.addEventListener('blur', () => {
+            setTimeout(() => this.hideSuggestions(), 200);
+        });
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && this.isOpen) {
                 this.closeChatbot();
             }
         });
-
-        // Click outside to close
         document.addEventListener('click', (e) => {
             const container = document.querySelector('.chatbot-container');
-            const window = document.getElementById('chatbotWindow');
-
-            if (this.isOpen &&
-                !container.contains(e.target) &&
-                !e.target.closest('.chatbot-container')) {
+            if (this.isOpen && !container.contains(e.target)) {
                 this.closeChatbot();
             }
+        });
+        window.addEventListener('beforeunload', () => {
+            this.saveSession();
         });
     }
 
@@ -136,9 +172,6 @@ class Chatbot {
      * Toggle chatbot visibility
      */
     toggleChatbot() {
-        const window = document.getElementById('chatbotWindow');
-        const toggle = document.getElementById('chatbotToggle');
-
         if (this.isOpen) {
             this.closeChatbot();
         } else {
@@ -151,18 +184,15 @@ class Chatbot {
      */
     openChatbot() {
         const window = document.getElementById('chatbotWindow');
-        const toggle = document.getElementById('chatbotToggle');
-
+        const badge = document.getElementById('notificationBadge');
         window.classList.add('active');
+        badge.style.display = 'none';
         this.isOpen = true;
-
-        // Focus input
         setTimeout(() => {
             document.getElementById('chatbotInput').focus();
         }, 300);
-
-        // Scroll to bottom
         this.scrollToBottom();
+        this.log('Chatbot opened');
     }
 
     /**
@@ -172,140 +202,174 @@ class Chatbot {
         const window = document.getElementById('chatbotWindow');
         window.classList.remove('active');
         this.isOpen = false;
+        this.log('Chatbot closed');
     }
 
     /**
-     * Send message
+     * Send message with advanced processing
      */
     async sendMessage() {
         const input = document.getElementById('chatbotInput');
         const message = input.value.trim();
-
         if (!message || this.isTyping) return;
-
-        // Clear input
+        if (message.length > 500) {
+            this.showError('Tin nhắn quá dài. Vui lòng nhập dưới 500 ký tự.');
+            return;
+        }
         input.value = '';
         this.autoResizeInput();
-
-        // Add user message
+        this.updateCharacterCount();
+        this.hideSuggestions();
         this.addMessage(message, 'user');
-
-        // Show typing indicator
-        this.showTyping();
-
-        try {
-            // First try Laravel backend
-            const response = await this.sendToLaravel(message);
-
-            if (response.success) {
-                if (response.source === 'database') {
-                    // Database result
-                    this.hideTyping();
-                    this.addMessage(response.message, 'bot');
+        this.log('User message:', message);
+        this.showEnhancedTyping();
+        let retryCount = 0;
+        const maxRetries = this.config.maxRetries;
+        while (retryCount < maxRetries) {
+            try {
+                this.updateTypingStatus('Đang phân tích câu hỏi...');
+                const response = await this.sendToBackend(message);
+                this.hideTyping();
+                this.log('Backend response:', response);
+                if (response.success) {
+                    this.addEnhancedMessage(response);
+                    break;
                 } else {
-                    // Need AI processing - send to n8n
-                    const aiResponse = await this.sendToN8n(message);
-                    this.hideTyping();
-                    this.addMessage(aiResponse.message, 'bot');
+                    throw new Error(response.message || 'Có lỗi xảy ra từ server');
                 }
-            } else {
-                throw new Error(response.message || 'Có lỗi xảy ra');
+            } catch (error) {
+                retryCount++;
+                this.log(`Attempt ${retryCount} failed:`, error);
+                if (retryCount < maxRetries) {
+                    this.updateTypingStatus(`Thử lại lần ${retryCount + 1}...`);
+                    await this.delay(1000);
+                } else {
+                    this.hideTyping();
+                    this.addMessage(
+                        `Xin lỗi, tôi gặp sự cố kỹ thuật. Vui lòng thử lại sau. (Lỗi: ${error.message})`,
+                        'bot',
+                        'error'
+                    );
+                    break;
+                }
             }
+        }
+    }
+
+    /**
+     * Send message to backend with timeout
+     */
+    async sendToBackend(message) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), this.config.timeout);
+        try {
+            const response = await fetch(this.apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': this.getCSRFToken(),
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    message: message,
+                    sessionId: this.sessionId,
+                    timestamp: new Date().toISOString()
+                }),
+                signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            return await response.json();
         } catch (error) {
-            console.error('Chatbot error:', error);
-            this.hideTyping();
-            this.addMessage('Xin lỗi, có lỗi xảy ra. Vui lòng thử lại sau.', 'bot');
+            clearTimeout(timeoutId);
+            if (error.name === 'AbortError') {
+                throw new Error('Yêu cầu quá thời gian chờ. Vui lòng thử lại.');
+            }
+            throw error;
         }
     }
 
     /**
-     * Send message to Laravel backend
+     * Add enhanced message with source indication
      */
-    async sendToLaravel(message) {
-        const response = await fetch(this.apiUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': this.getCSRFToken(),
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify({
-                message: message,
-                sessionId: this.sessionId,
-                timestamp: new Date().toISOString()
-            })
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+    addEnhancedMessage(response) {
+        const { source, message, books = [] } = response;
+        let sourceIcon = '🤖';
+        let sourceText = 'AI Assistant';
+        let sourceClass = 'ai';
+        switch (source) {
+            case 'database':
+                sourceIcon = '💾';
+                sourceText = 'Database';
+                sourceClass = 'database';
+                this.updateTypingStatus('Tìm thấy trong cơ sở dữ liệu');
+                break;
+            case 'pdf':
+                sourceIcon = '📄';
+                sourceText = 'PDF Document';
+                sourceClass = 'pdf';
+                this.updateTypingStatus('Tìm thấy trong tài liệu PDF');
+                break;
+            case 'ai':
+                sourceIcon = '🧠';
+                sourceText = 'AI Knowledge';
+                sourceClass = 'ai';
+                this.updateTypingStatus('Trả lời từ AI');
+                break;
         }
-
-        return await response.json();
+        setTimeout(() => {
+            this.addMessage(message, 'bot', sourceClass, {
+                sourceIcon,
+                sourceText,
+                books
+            });
+        }, 500);
     }
 
     /**
-     * Send message to n8n workflow
+     * Add message to chat (support source, books)
      */
-    async sendToN8n(message) {
-        const response = await fetch(this.n8nWebhookUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                message: message,
-                sessionId: this.sessionId,
-                timestamp: new Date().toISOString(),
-                source: 'ai'
-            })
-        });
-
-        if (!response.ok) {
-            throw new Error(`n8n HTTP error! status: ${response.status}`);
-        }
-
-        return await response.json();
-    }
-
-    /**
-     * Get CSRF token from meta tag
-     */
-    getCSRFToken() {
-        const token = document.querySelector('meta[name="csrf-token"]');
-        return token ? token.getAttribute('content') : '';
-    }
-
-    /**
-     * Add message to chat
-     */
-    addMessage(content, sender) {
+    addMessage(content, sender, sourceClass = '', meta = {}) {
         const messagesContainer = document.getElementById('chatbotMessages');
         const messageDiv = document.createElement('div');
-        messageDiv.className = `message ${sender}`;
-
+        messageDiv.className = `message ${sender} ${sourceClass}`;
         const time = new Date().toLocaleTimeString('vi-VN', {
             hour: '2-digit',
             minute: '2-digit'
         });
-
+        let metaHtml = '';
+        if (sender === 'bot' && meta.sourceIcon && meta.sourceText) {
+            metaHtml = `<div class="message-meta"><span class="icon">${meta.sourceIcon}</span> <span class="text">${meta.sourceText}</span></div>`;
+        }
+        let booksHtml = '';
+        if (sender === 'bot' && Array.isArray(meta.books) && meta.books.length > 0) {
+            booksHtml = `<div class="books-list">${meta.books.map(book => `
+                <div class="book-item">
+                    <div class="book-title">${book.name || ''}</div>
+                    <div class="book-author">${book.author || ''}</div>
+                    <div class="book-price">${book.price ? book.price + 'đ' : ''}</div>
+                </div>
+            `).join('')}</div>`;
+        }
         messageDiv.innerHTML = `
             <div class="message-content">
+                ${metaHtml}
                 ${this.formatMessage(content)}
+                ${booksHtml}
                 <div class="message-time">${time}</div>
             </div>
         `;
-
         messagesContainer.appendChild(messageDiv);
-
-        // Save to session
         this.messages.push({
             content: content,
             sender: sender,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
+            source: sourceClass,
+            meta: meta
         });
         this.saveSession();
-
-        // Scroll to bottom
         this.scrollToBottom();
     }
 
@@ -313,28 +377,33 @@ class Chatbot {
      * Format message content (support markdown-like formatting)
      */
     formatMessage(content) {
-        // Convert **text** to bold
+        if (typeof content !== 'string') {
+            content = String(content ?? '');
+        }
         content = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-
-        // Convert line breaks to <br>
         content = content.replace(/\n/g, '<br>');
-
-        // Convert URLs to links
         content = content.replace(
             /(https?:\/\/[^\s]+)/g,
             '<a href="$1" target="_blank" rel="noopener">$1</a>'
         );
-
         return content;
     }
 
     /**
-     * Show typing indicator
+     * Show enhanced typing indicator
      */
-    showTyping() {
+    showEnhancedTyping() {
         this.isTyping = true;
         document.getElementById('typingIndicator').classList.add('active');
+        this.updateTypingStatus('Đang tìm kiếm...');
         this.scrollToBottom();
+    }
+
+    /**
+     * Update typing status text
+     */
+    updateTypingStatus(text) {
+        document.getElementById('typingText').textContent = text;
     }
 
     /**
@@ -352,17 +421,16 @@ class Chatbot {
         const welcomeMessage = `
             <div class="welcome-message">
                 <h4>👋 Chào mừng bạn!</h4>
-                <p>Tôi là AI Assistant của cửa hàng sách. Tôi có thể giúp bạn:</p>
+                <p>Tôi là trợ lý chatbot của cửa hàng sách. Tôi có thể giúp bạn:</p>
                 <ul style="text-align: left; margin: 10px 0; padding-left: 20px;">
                     <li>🔍 Tìm kiếm sách theo tên, tác giả, thể loại</li>
                     <li>💰 Kiểm tra giá và khuyến mãi</li>
-                    <li>📚 Tư vấn sách phù hợp</li>
-                    <li>❓ Trả lời câu hỏi về sách</li>
+                    <li>📚 Tìm sách theo giá</li>
+
                 </ul>
                 <p>Hãy bắt đầu cuộc trò chuyện nào!</p>
             </div>
         `;
-
         document.getElementById('chatbotMessages').innerHTML = welcomeMessage;
     }
 
@@ -373,6 +441,35 @@ class Chatbot {
         const input = document.getElementById('chatbotInput');
         input.style.height = 'auto';
         input.style.height = Math.min(input.scrollHeight, 100) + 'px';
+    }
+
+    /**
+     * Update character count
+     */
+    updateCharacterCount() {
+        const input = document.getElementById('chatbotInput');
+        const count = input.value.length;
+        document.getElementById('characterCount').textContent = `${count}/500`;
+    }
+
+    /**
+     * Show suggestions (placeholder)
+     */
+    showSuggestions() {
+        // You can implement quick suggestions here
+        // For now, just show/hide the box
+        document.getElementById('inputSuggestions').style.display = 'block';
+    }
+
+    hideSuggestions() {
+        document.getElementById('inputSuggestions').style.display = 'none';
+    }
+
+    /**
+     * Handle typing (placeholder for future improvements)
+     */
+    handleTyping() {
+        // You can implement typing detection, suggestions, etc.
     }
 
     /**
@@ -392,7 +489,7 @@ class Chatbot {
         try {
             localStorage.setItem('chatbot_session', JSON.stringify({
                 sessionId: this.sessionId,
-                messages: this.messages.slice(-50) // Keep last 50 messages
+                messages: this.messages.slice(-50)
             }));
         } catch (error) {
             console.warn('Could not save chatbot session:', error);
@@ -427,28 +524,38 @@ class Chatbot {
     }
 
     /**
-     * Handle errors
+     * Get CSRF token from meta tag
      */
-    handleError(error) {
-        console.error('Chatbot error:', error);
-        this.hideTyping();
-        this.addMessage('Xin lỗi, có lỗi xảy ra. Vui lòng thử lại sau.', 'bot');
+    getCSRFToken() {
+        const token = document.querySelector('meta[name="csrf-token"]');
+        return token ? token.getAttribute('content') : '';
+    }
+
+    /**
+     * Delay utility
+     */
+    delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    /**
+     * Show error message
+     */
+    showError(msg) {
+        this.addMessage(msg, 'bot', 'error');
     }
 }
 
 // Initialize chatbot when DOM is loaded
+// Check if FontAwesome is loaded, if not load it
 document.addEventListener('DOMContentLoaded', () => {
-    // Check if FontAwesome is loaded, if not load it
     if (!document.querySelector('link[href*="fontawesome"]')) {
         const link = document.createElement('link');
         link.rel = 'stylesheet';
         link.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css';
         document.head.appendChild(link);
     }
-
-    // Initialize chatbot
-    window.chatbot = new Chatbot();
+    window.chatbot = new AdvancedChatbot();
 });
 
-// Export for global access
-window.Chatbot = Chatbot;
+window.AdvancedChatbot = AdvancedChatbot;

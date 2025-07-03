@@ -77,4 +77,9 @@ class Book extends Model
     {
         return $query->withoutGlobalScope('not_deleted');
     }
+    public function reviews()
+{
+    return $this->hasMany(Review::class, 'book_detail_id', 'id');
+}
+
 }

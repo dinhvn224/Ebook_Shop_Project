@@ -20,6 +20,7 @@ use App\Http\Controllers\Client\UserProfileController;
 // Other Controllers
 use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\ChatBotController;
 
 // Admin Controllers
 use App\Http\Controllers\Admin\DashboardController;
@@ -243,18 +244,23 @@ Route::prefix('admin')
 Route::prefix('cart')->name('cart.')->middleware('auth')->group(function() {
     // Hiển thị giỏ hàng
     Route::get('/', [CartController::class, 'index'])->name('index');
-    
+
     // Thêm sản phẩm vào giỏ hàng
     Route::post('add', [CartController::class, 'addToCart'])->name('add');
-    
+
     // Cập nhật số lượng sản phẩm
     Route::get('update/{id}', [CartController::class, 'updateQuantity'])->name('update');
-    
+
     // Xóa một sản phẩm khỏi giỏ
     Route::delete('remove/{id}', [CartController::class, 'removeFromCart'])->name('remove');
-    
+
     // Xóa toàn bộ giỏ hàng
     Route::post('clear', [CartController::class, 'clearCart'])->name('clear');
 });
 
 Route::get('book/{id}', [BookController::class, 'show'])->name('book.detail');
+
+//
+// 🤖 CHATBOT ROUTES
+//
+Route::post('/chatbot/webhook', [ChatBotController::class, 'webhook'])->name('chatbot.webhook');
