@@ -112,6 +112,8 @@ private function analyzeIntent($message)
     // Ưu tiên nhận diện intent tác giả
     if (str_contains($text, 'tác giả')) {
         $intent['type'] = 'author_search';
+    } else if (str_contains($text, 'nhà xuất bản') || str_contains($text, 'nxb') || str_contains($text, 'publisher')) {
+        $intent['type'] = 'publisher_search';
     } else {
         // Mapping intent khác
         $mapping = [
@@ -214,17 +216,48 @@ private function searchInDatabase($intent)
                 return [
                     'found' => $books->isNotEmpty(),
                     'message' => $this->formatBooks($books, $intent['type']),
-'books' => $books->map(fn($b) => [
-    'id' => $b->id,
-    'name' => $b->name,
-    'author' => optional($b->author)->name,
-    'category' => optional($b->category)->name,
-    'publisher' => optional($b->publisher)->name,
-    'price' => optional($b->details->first())->price,
-    'promotion_price' => optional($b->details->first())->promotion_price,
-    'quantity' => optional($b->details->first())->quantity,
-    'description' => $b->description,
-])->toArray(),
+                    'books' => $books->map(fn($b) => [
+                        'id' => $b->id,
+                        'name' => $b->name,
+                        'author' => optional($b->author)->name,
+                        'category' => optional($b->category)->name,
+                        'publisher' => optional($b->publisher)->name,
+                        'price' => optional($b->details->first())->price,
+                        'promotion_price' => optional($b->details->first())->promotion_price,
+                        'quantity' => optional($b->details->first())->quantity,
+                        'description' => $b->description,
+                    ])->toArray(),
+                ];
+
+            case 'publisher_search':
+                $publisherName = implode(' ', $terms);
+                $books = $query->whereHas('publisher', fn($q) =>
+                    $q->where('name', 'like', "%$publisherName%")
+                )->limit(10)->get();
+                if ($books->isEmpty()) {
+                    $query = Book::with(['author', 'category', 'publisher', 'details']);
+                    $books = $query->whereHas('publisher', function ($q) use ($terms) {
+                        $q->where(function ($subQ) use ($terms) {
+                            foreach ($terms as $term) {
+                                $subQ->orWhere('name', 'like', "%$term%");
+                            }
+                        });
+                    })->limit(10)->get();
+                }
+                return [
+                    'found' => $books->isNotEmpty(),
+                    'message' => $this->formatBooks($books, $intent['type']),
+                    'books' => $books->map(fn($b) => [
+                        'id' => $b->id,
+                        'name' => $b->name,
+                        'author' => optional($b->author)->name,
+                        'category' => optional($b->category)->name,
+                        'publisher' => optional($b->publisher)->name,
+                        'price' => optional($b->details->first())->price,
+                        'promotion_price' => optional($b->details->first())->promotion_price,
+                        'quantity' => optional($b->details->first())->quantity,
+                        'description' => $b->description,
+                    ])->toArray(),
                 ];
 
             case 'book_search':
@@ -331,7 +364,8 @@ private function searchInDatabase($intent)
             'category_search' => '📂 Sách theo thể loại:',
             'price_below' => '💰 Sách có giá dưới mức bạn yêu cầu:',
             'price_above' => '💰 Sách có giá trên mức bạn yêu cầu:',
-            'promotion_inquiry' => '🎉 Sách đang khuyến mãi:'
+            'promotion_inquiry' => '🎉 Sách đang khuyến mãi:',
+            'publisher_search' => '🏢 Sách theo nhà xuất bản:',
         ];
 
         $msg = $titles[$type] ?? '📚 Kết quả tìm kiếm:' . "\n\n";
