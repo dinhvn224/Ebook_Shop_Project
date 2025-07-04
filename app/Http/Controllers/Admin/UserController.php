@@ -9,23 +9,31 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    // Hiển thị danh sách người dùng
-    public function index()
+    // Hiển thị danh sách người dùng với tìm kiếm
+    public function index(Request $request)
     {
-        $users = User::paginate(10);
+        $query = User::query();
+
+        if ($request->has('keyword') && $request->keyword !== null) {
+            $keyword = $request->keyword;
+            $query->where(function ($q) use ($keyword) {
+                $q->where('name', 'like', '%' . $keyword . '%')
+                  ->orWhere('email', 'like', '%' . $keyword . '%');
+            });
+        }
+
+        $users = $query->paginate(10)->withQueryString();
+
         return view('admin.users.index', compact('users'));
     }
 
-    // Hiển thị form tạo người dùng mới
     public function create()
     {
         return view('admin.users.create');
     }
 
-    // Lưu người dùng mới
     public function store(Request $request)
     {
-        // Validate dữ liệu người dùng
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
@@ -37,13 +45,11 @@ class UserController extends Controller
             'birth_date' => 'nullable|date',
         ]);
 
-        // Xử lý ảnh đại diện
         $avatarPath = null;
         if ($request->hasFile('avatar')) {
             $avatarPath = $request->file('avatar')->store('avatars', 'public');
         }
 
-        // Tạo người dùng mới
         User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
@@ -58,19 +64,16 @@ class UserController extends Controller
         return redirect()->route('admin.users.index')->with('success', 'Người dùng đã được thêm thành công');
     }
 
-    // Hiển thị form chỉnh sửa người dùng
     public function edit($id)
     {
         $user = User::findOrFail($id);
         return view('admin.users.edit', compact('user'));
     }
 
-    // Cập nhật người dùng
     public function update(Request $request, $id)
     {
         $user = User::findOrFail($id);
 
-        // Validate dữ liệu người dùng
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
@@ -84,7 +87,7 @@ class UserController extends Controller
         if ($request->hasFile('avatar')) {
             $avatarPath = $request->file('avatar')->store('avatars', 'public');
         } else {
-            $avatarPath = $user->avatar_url; // Giữ lại ảnh cũ nếu không thay đổi
+            $avatarPath = $user->avatar_url;
         }
 
         $user->update([
@@ -97,7 +100,6 @@ class UserController extends Controller
             'birth_date' => $validated['birth_date'] ?? $user->birth_date,
         ]);
 
-        // Nếu có thay đổi mật khẩu
         if ($request->filled('password')) {
             $validatedPassword = $request->validate([
                 'password' => 'string|min:6|confirmed',
@@ -110,7 +112,6 @@ class UserController extends Controller
         return redirect()->route('admin.users.index')->with('success', 'Người dùng đã được cập nhật');
     }
 
-    // Xóa người dùng
     public function destroy($id)
     {
         $user = User::findOrFail($id);

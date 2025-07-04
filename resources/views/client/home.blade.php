@@ -1,1027 +1,550 @@
 @extends('client.layouts.app')
 
+@section('title', 'BookStore - Khám Phá Thế Giới Tri Thức')
+
 @section('content')
-@php use Illuminate\Support\Str; @endphp
-<div class="homepage-container">
-    <!-- Hero Banner Section -->
-    <section class="hero-banner">
-        <div class="banner-carousel">
-            <div class="owl-carousel owl-theme">
-                <!-- Carousel items will be loaded here -->
-            </div>
-        </div>
-        <div class="promotional-banner">
-            <img src="{{ asset('client/img/banners/blackFriday.gif') }}" alt="Black Friday Sale" class="promo-image">
-        </div>
-    </section>
 
-    <!-- Category Menu -->
-    <section class="category-section">
-        <div class="container">
-            <h2 class="section-title">Danh mục sách</h2>
-            <div class="category-menu">
-                <!-- Categories will be populated here -->
-            </div>
-        </div>
-    </section>
-
-    <!-- Filter Section -->
-    <section class="filter-section">
-        <div class="container">
-            <div class="filter-bar">
-                <div class="filter-group">
-                    <div class="filter-dropdown">
-                        <button class="filter-btn" data-filter="price">
-                            <i class="fas fa-dollar-sign"></i>
-                            <span>Khoảng giá</span>
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                        <div class="dropdown-menu">
-                            <div class="price-range">
-                                <label>Từ: <input type="number" placeholder="0" class="price-input"></label>
-                                <label>Đến: <input type="number" placeholder="1000000" class="price-input"></label>
-                                <button class="apply-btn">Áp dụng</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="filter-dropdown">
-                        <button class="filter-btn" data-filter="promotion">
-                            <i class="fas fa-tags"></i>
-                            <span>Khuyến mãi</span>
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                        <div class="dropdown-menu">
-                            <div class="filter-options">
-                                <label><input type="checkbox" value="sale"> Đang giảm giá</label>
-                                <label><input type="checkbox" value="new"> Sách mới</label>
-                                <label><input type="checkbox" value="bestseller"> Bán chạy</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="filter-dropdown">
-                        <button class="filter-btn" data-filter="rating">
-                            <i class="fas fa-star"></i>
-                            <span>Đánh giá</span>
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                        <div class="dropdown-menu">
-                            <div class="rating-options">
-                                <label><input type="radio" name="rating" value="5"> 5 sao</label>
-                                <label><input type="radio" name="rating" value="4"> 4 sao trở lên</label>
-                                <label><input type="radio" name="rating" value="3"> 3 sao trở lên</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="filter-dropdown">
-                        <button class="filter-btn" data-filter="sort">
-                            <i class="fas fa-sort"></i>
-                            <span>Sắp xếp</span>
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                        <div class="dropdown-menu">
-                            <div class="sort-options">
-                                <label><input type="radio" name="sort" value="newest"> Mới nhất</label>
-                                <label><input type="radio" name="sort" value="price-low"> Giá thấp đến cao</label>
-                                <label><input type="radio" name="sort" value="price-high"> Giá cao đến thấp</label>
-                                <label><input type="radio" name="sort" value="popular"> Phổ biến</label>
-                            </div>
+    {{-- Trang chủ (active mặc định) --}}
+    <div id="home" class="page active">
+        <section class="hero-section">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-lg-7">
+                        <h1 class="display-4 mb-4 fw-bold">Khám Phá Thế Giới Tri Thức</h1>
+                        <p class="lead mb-4">Hàng ngàn cuốn sách hay từ các tác giả nổi tiếng, từ văn học đến khoa học, từ
+                            tiểu thuyết đến sách giáo dục. Đặc biệt có nhiều chương trình khuyến mãi hấp dẫn!</p>
+                        <div class="d-flex gap-3">
+                            <button class="btn btn-accent btn-lg" onclick="showPage('books')">
+                                <i class="fas fa-shopping-bag me-2"></i>Mua Sách Ngay
+                            </button>
+                            <button class="btn btn-outline-light btn-lg" onclick="showPage('authors')">
+                                <i class="fas fa-users me-2"></i>Khám Phá Tác Giả
+                            </button>
                         </div>
                     </div>
                 </div>
-
-                <div class="search-filter">
-                    <div class="search-box">
-                        <input type="text" placeholder="Tìm kiếm sách..." class="search-input" onkeyup="filterProductsName(this)">
-                        <button class="search-btn"><i class="fas fa-search"></i></button>
-                    </div>
-                </div>
             </div>
+        </section>
 
-            <!-- Active Filters Display -->
-            <div class="active-filters">
-                <div class="filter-tags">
-                    <!-- Active filter tags will appear here -->
+        <section class="py-5" style="background-color: #f8f9fa;">
+            <style>
+                .product-card {
+                    border: none;
+                    perspective: 1000px;
+                    transition: transform 0.3s ease;
+                    border-radius: 6px;
+                    overflow: hidden;
+                }
+
+                .product-card-inner {
+                    transition: transform 0.5s;
+                    transform-style: preserve-3d;
+                }
+
+                .product-card:hover .product-card-inner {
+                    transform: rotateY(3deg) scale(1.02);
+                    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+                }
+
+                .product-card img {
+                    width: 100%;
+                    height: 250px;
+                    object-fit: cover;
+                    transition: transform 0.3s ease;
+                }
+
+                .product-card:hover img {
+                    transform: scale(1.03);
+                }
+
+                .discount-badge {
+                    position: absolute;
+                    top: 10px;
+                    left: 10px;
+                    background-color: #dc3545;
+                    color: white;
+                    padding: 5px 8px;
+                    font-size: 0.75rem;
+                    border-radius: 4px;
+                    z-index: 1;
+                    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+                }
+
+                .book-price {
+                    font-size: 1.1rem;
+                    font-weight: 600;
+                    color: #007bff;
+                }
+
+                .book-price .old-price {
+                    text-decoration: line-through;
+                    font-size: 0.85rem;
+                    color: #888;
+                    margin-left: 6px;
+                }
+            </style>
+
+            <div class="container">
+                <div class="d-flex justify-content-between align-items-center mb-5">
+                    <h2 class="fw-bold fs-2">Sản Phẩm Nổi Bật</h2>
+                    <a href="#" onclick="showPage('books')" class="btn btn-outline-primary">
+                        Xem Tất Cả <i class="fas fa-arrow-right ms-2"></i>
+                    </a>
                 </div>
-                <button class="clear-all-btn" id="deleteAllFilter">
-                    <i class="fas fa-times"></i>
-                    Xóa tất cả bộ lọc
-                </button>
-            </div>
-        </div>
-    </section>
 
-    <!-- Products Section -->
-    <section class="products-section">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">Sách nổi bật</h2>
-                <div class="view-options">
-                    <button class="view-btn active" data-view="grid"><i class="fas fa-th"></i></button>
-                    <button class="view-btn" data-view="list"><i class="fas fa-list"></i></button>
-                </div>
-            </div>
+                <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-4" id="newestBooks">
+                    @forelse($newestBooks->take(8) as $book)
+                        @php
+                            $detail = optional($book->details)->first();
+                            $hasPromotion = $detail && $detail->promotion_price && $detail->promotion_price < $detail->price;
 
-            <div class="products-grid" id="products">
-                @forelse ($books as $book)
-                    @foreach ($book->details as $detail)
-                        <div class="product-card" data-book-id="{{ $book->id }}" data-price="{{ $detail->promotion_price && $detail->promotion_price < $detail->price ? $detail->promotion_price : $detail->price }}" data-promo="@if ($detail->promotion_price && $detail->promotion_price < $detail->price) sale @elseif ($detail->promotion_price && $detail->promotion_price == $detail->price) new @else none @endif" data-rating="{{ rand(3, 5) }}">
-                            <div class="product-image">
-                                @php
-                                    $img = $book->images->first()->url ?? 'client/img/products/noimage.png';
-                                @endphp
-                                <img src="{{ asset('storage/' . $img) }}" alt="{{ $book->name }}" loading="lazy">
-                                <div class="product-overlay">
-                                    <button class="quick-view-btn" title="Xem nhanh">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                    <button class="wishlist-btn" title="Yêu thích">
-                                        <i class="far fa-heart"></i>
-                                    </button>
-                                </div>
-                                @if ($detail->promotion_price && $detail->promotion_price < $detail->price)
-                                    <div class="discount-badge">
-                                        -{{ round((($detail->price - $detail->promotion_price) / $detail->price) * 100) }}%
+                            $mainImage = optional($book->images)->firstWhere('is_main', true)
+                                ?? optional($book->images)->where('deleted', 0)->first();
+
+                            $fallbackImage = 'storage/client/img/products/uHSgfoff1LYGatU5hE38DZEA6101DTziZCDqMp2t.png';
+                            $noImage = 'client/img/products/noimage.png';
+
+                            $imageUrl = asset($noImage); // mặc định
+
+                            if ($mainImage && !empty($mainImage->url)) {
+                                $fullPath = public_path($mainImage->url);
+                                if (file_exists($fullPath)) {
+                                    $imageUrl = asset($mainImage->url);
+                                } elseif (file_exists(public_path($fallbackImage))) {
+                                    $imageUrl = asset($fallbackImage);
+                                }
+                            }
+                        @endphp
+
+
+                        <div class="col">
+                            <div class="card h-100 product-card">
+                                <div class="product-card-inner">
+                                    <div class="position-relative">
+                                        @if($hasPromotion)
+                                            <div class="discount-badge">
+                                                -{{ round((($detail->price - $detail->promotion_price) / $detail->price) * 100) }}%
+                                            </div>
+                                        @endif
+                                        <img src="{{ $imageUrl }}" alt="{{ $book->name }}">
                                     </div>
-                                @elseif ($detail->promotion_price && $detail->promotion_price == $detail->price)
-                                    <div class="new-badge">Mới</div>
-                                @endif
-                            </div>
 
-                            <div class="product-info">
-<h3 class="product-title">
-    <a href="{{ route('book.detail', $book->id) }}" title="{{ $book->name }}">
-        {{ $book->name }}
-    </a>
-</h3>
+                                    <div class="card-body d-flex flex-column">
+                                        <h6 class="flex-grow-1 fs-6">
+                                            <a href="{{ route('product.show', $book->id) }}"
+                                                class="text-dark text-decoration-none">
+                                                {{ $book->name }}
+                                            </a>
+                                        </h6>
+                                        <p class="text-muted small mb-2">{{ $book->author->name ?? 'N/A' }}</p>
 
-
-                                <div class="product-author">
-                                    <i class="fas fa-user"></i>
-                                    <span>Tác giả: {{ $book->author->name ?? 'Chưa cập nhật' }}</span>
-                                </div>
-
-                                <div class="product-rating">
-                                    @php
-                                        $rating = rand(3, 5);
-                                        $reviews = rand(10, 999);
-                                    @endphp
-                                    <div class="stars">
-                                        @for ($i = 1; $i <= 5; $i++)
-                                            <i class="fas fa-star {{ $i <= $rating ? 'active' : '' }}"></i>
-                                        @endfor
+                                        <div class="d-flex justify-content-between align-items-center mt-auto">
+                                            <p class="book-price mb-0">
+                                                @if($hasPromotion)
+                                                    {{ number_format($detail->promotion_price, 0, '', '.') }}₫
+                                                    <span class="old-price">{{ number_format($detail->price, 0, '', '.') }}₫</span>
+                                                @elseif($detail)
+                                                    {{ number_format($detail->price, 0, '', '.') }}₫
+                                                @else
+                                                    N/A
+                                                @endif
+                                            </p>
+                                            <a href="{{ route('product.show', $book->id) }}"
+                                                class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </div>
                                     </div>
-                                    <span class="rating-text">{{ $rating }}/5 ({{ $reviews }} đánh giá)</span>
+                                </div>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="col-12">
+                            <p class="text-center text-muted">Hiện chưa có sách mới nào.</p>
+                        </div>
+                    @endforelse
+                </div>
+
+
+            </div>
+        </section>
+
+
+
+
+
+        {{-- Danh Mục Sách Phổ Biến (tăng kích thước + hiệu ứng đẹp) --}}
+        {{-- Danh Mục Sách Phổ Biến (áp CSS + biểu tượng theo nội dung) --}}
+        <section class="py-5" style="background-color: white;">
+            <style>
+                .category-hover {
+                    width: 90px;
+                    height: 90px;
+                    border-radius: 50%;
+                    background-color: #e9f0ff;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin: 0 auto 15px;
+                    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+                    transition: transform 0.3s ease, box-shadow 0.3s ease;
+                }
+
+                .category-hover:hover {
+                    transform: scale(1.1);
+                    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+                }
+
+                .category-hover i {
+                    font-size: 30px;
+                    color: #007bff;
+                    transition: color 0.3s ease;
+                }
+
+                .category-hover:hover i {
+                    color: #0056b3;
+                }
+
+                .category-title {
+                    font-size: 1rem;
+                    font-weight: 600;
+                    color: #212529;
+                    transition: color 0.3s ease;
+                }
+
+                .category-hover:hover+.category-title {
+                    color: #0d6efd;
+                }
+            </style>
+
+            <div class="container">
+                <h2 class="text-center mb-5 fw-bold" style="font-size: 2rem;">Danh Mục Sách Phổ Biến</h2>
+                <div class="row justify-content-center" id="popularCategories">
+                    @forelse ($popularCategories as $category)
+                        @php
+                            $categoryIcons = [
+                                'Khoa Học' => 'fa-flask-vial',
+                                'Thiếu Nhi' => 'fa-child',
+                                'Giáo Dục' => 'fa-graduation-cap',
+                                'Tình Cảm' => 'fa-heart',
+                                'Tâm Lý' => 'fa-brain',
+                                'Tiểu Thuyết' => 'fa-book-open',
+                                'Kỹ Năng Sống' => 'fa-hands-helping',
+                                'Ngoại Ngữ' => 'fa-language',
+                                // Thêm danh mục khác ở đây
+                            ];
+                            $iconClass = $categoryIcons[$category->name] ?? 'fa-book';
+                            $url = route('category.show', $category->id);
+                        @endphp
+
+                        <div class="col-lg-3 col-md-4 col-6 mb-4 text-center">
+                            <a href="{{ $url }}" class="d-block text-decoration-none">
+                                <div class="category-hover">
+                                    <i class="fas {{ $iconClass }}"></i>
+                                </div>
+                                <h5 class="mb-0 category-title">{{ $category->name }}</h5>
+                            </a>
+                        </div>
+                    @empty
+                        <div class="col-12 text-center">
+                            <p class="text-muted">Chưa có danh mục nào để hiển thị.</p>
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+        </section>
+
+
+        <section class="py-5" style="background-color: #f8f9fa;">
+            <div class="container">
+                <h2 class="text-center mb-5 fw-bold">📣 Khách Hàng Nói Gì Về BookStore</h2>
+
+                @if(session('success'))
+                    <div class="alert alert-success text-center">{{ session('success') }}</div>
+                @endif
+
+                <div class="row">
+                    @forelse($reviews as $review)
+                        <div class="col-md-4 mb-4">
+                            <div class="review-card text-center h-100 p-4 border rounded bg-white shadow-sm">
+                                {{-- Ảnh đại diện ngẫu nhiên --}}
+                                <img src="https://i.pravatar.cc/80?u={{ $review->user->id }}" class="rounded-circle mb-3"
+                                    alt="avatar">
+
+                                {{-- Sao đánh giá --}}
+                                <div class="rating-stars mb-3 text-warning fs-5">
+                                    @for($i = 1; $i <= 5; $i++)
+                                        <i class="fas fa-star{{ $i <= $review->rating ? '' : '-o' }}"></i>
+                                    @endfor
                                 </div>
 
-                                <div class="product-price">
-                                    @php
-                                        $showPrice = $detail->promotion_price && $detail->promotion_price < $detail->price
-                                            ? $detail->promotion_price
-                                            : $detail->price;
-                                    @endphp
-                                    <span class="current-price">{{ number_format($showPrice, 0, '', '.') }}₫</span>
-                                    @if ($detail->promotion_price && $detail->promotion_price < $detail->price)
-                                        <span class="original-price">{{ number_format($detail->price, 0, '', '.') }}₫</span>
+                                {{-- Bình luận --}}
+                                <p class="mb-3 text-secondary fst-italic">"{{ $review->comment }}"</p>
+
+                                {{-- Tên người dùng --}}
+                                <strong class="text-primary d-block">— {{ $review->user->name }}</strong>
+
+                                {{-- Tuỳ chọn quản lý (nếu cần) --}}
+                                @auth
+                                    @if(Auth::user()->is_admin)
+                                        <form action="{{ route('reviews.destroy', $review) }}" method="POST"
+                                            onsubmit="return confirm('Xoá đánh giá này?')" class="mt-3">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="btn btn-sm btn-outline-danger">🗑️ Xoá</button>
+                                        </form>
                                     @endif
-                                </div>
+                                @endauth
+                            </div>
+                        </div>
+                    @empty
+                        <div class="col-12 text-center">
+                            <p class="text-muted">Chưa có đánh giá nào từ người dùng.</p>
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+        </section>
 
-                                <div class="product-actions">
-                                    <button class="add-to-cart-btn">
-                                        <i class="fas fa-shopping-cart"></i>
-                                        Thêm vào giỏ
-                                    </button>
-                                    <button class="buy-now-btn">
-                                        Mua ngay
-                                    </button>
+
+
+    </div>
+
+
+
+    <div id="bookDetail" class="page">
+        <div class="container py-5" id="bookDetailContent"></div>
+    </div>
+
+    <div id="authors" class="page">
+        <div class="container py-5">
+            <h2 class="text-center mb-5 fw-bold">Tác Giả Nổi Tiếng</h2>
+            <div class="row row-cols-2 row-cols-md-4 g-4" id="authorsList"></div>
+        </div>
+    </div>
+
+    <div id="contact" class="page">
+        <div class="container py-5">
+            <h2 class="text-center mb-5 fw-bold">Liên Hệ Với Chúng Tôi</h2>
+            <div class="row">
+                <div class="col-lg-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h3>Thông tin liên lạc</h3>
+                            <p>Nếu bạn có bất kỳ câu hỏi nào, đừng ngần ngại liên hệ với chúng tôi.</p>
+                            <ul class="list-unstyled">
+                                <li class="mb-3"><i class="fas fa-map-marker-alt fa-fw me-2 text-primary"></i>123 Đường
+                                    Sách, Quận Tri Thức, Hà Nội</li>
+                                <li class="mb-3"><i class="fas fa-phone fa-fw me-2 text-primary"></i>(+84) 123 456 789</li>
+                                <li class="mb-3"><i
+                                        class="fas fa-envelope fa-fw me-2 text-primary"></i>support@bookstore.com</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h3>Gửi tin nhắn</h3>
+                            <form
+                                onsubmit="event.preventDefault(); showToast('Đã gửi tin nhắn thành công!'); this.reset();">
+                                <div class="mb-3"><input type="text" class="form-control" placeholder="Họ và Tên" required>
+                                </div>
+                                <div class="mb-3"><input type="email" class="form-control" placeholder="Email của bạn"
+                                        required></div>
+                                <div class="mb-3"><textarea class="form-control" rows="5" placeholder="Nội dung tin nhắn"
+                                        required></textarea></div>
+                                <button type="submit" class="btn btn-primary w-100">Gửi Tin Nhắn</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="cart" class="page">
+        <div class="container py-5">
+            <h2 class="mb-4"><i class="fas fa-shopping-cart me-2"></i>Giỏ Hàng Của Bạn</h2>
+            <div class="row">
+                <div class="col-lg-8" id="cartItemsContainer"></div>
+                <div class="col-lg-4">
+                    <div class="card position-sticky" style="top: 80px;">
+                        <div class="card-header">
+                            <h5 class="mb-0">Tổng Kết Đơn Hàng</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label">Mã Giảm Giá</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control voucher-input" id="voucherCode"
+                                        placeholder="Nhập mã voucher">
+                                    <button class="btn btn-outline-primary" onclick="applyVoucher()">Áp Dụng</button>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Tạm tính:</span><span id="subtotal">0đ</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Giảm giá:</span><span class="text-success" id="discount">-0đ</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Phí vận chuyển:</span><span id="shippingFee">0đ</span>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between mb-4">
+                                <strong>Tổng cộng:</strong><strong class="text-danger fs-5" id="total">0đ</strong>
+                            </div>
+                            <button class="btn btn-success w-100 mb-2" onclick="proceedToCheckout()" id="checkoutBtn"
+                                disabled>
+                                <i class="fas fa-credit-card me-2"></i>Thanh Toán
+                            </button>
+                            <button class="btn btn-outline-primary w-100" onclick="showPage('books')">
+                                <i class="fas fa-arrow-left me-2"></i>Tiếp Tục Mua Sắm
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="checkout" class="page">
+        <div class="container py-5">
+            <h2 class="mb-4"><i class="fas fa-credit-card me-2"></i>Thanh Toán & Giao Hàng</h2>
+            <div class="row">
+                <div class="col-lg-7">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Thông Tin Giao Hàng</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="checkoutForm">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3"><label class="form-label">Họ và Tên *</label><input
+                                            type="text" class="form-control" id="customerName" required></div>
+                                    <div class="col-md-6 mb-3"><label class="form-label">Số Điện Thoại *</label><input
+                                            type="tel" class="form-control" id="phoneNumber" required></div>
+                                </div>
+                                <div class="mb-3"><label class="form-label">Email</label><input type="email"
+                                        class="form-control" id="email"></div>
+                                <div class="mb-3"><label class="form-label">Địa Chỉ Giao Hàng *</label><textarea
+                                        class="form-control" id="shippingAddress" rows="3" required></textarea></div>
+                                <div class="mb-3"><label class="form-label">Ghi Chú</label><textarea class="form-control"
+                                        id="orderNote" rows="2"></textarea></div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Phương Thức Thanh Toán</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-check mb-3"><input class="form-check-input" type="radio" name="paymentMethod"
+                                    id="cod" value="COD" checked><label class="form-check-label" for="cod"><i
+                                        class="fas fa-money-bill-wave me-2"></i>Thanh toán khi nhận hàng (COD)</label></div>
+                            <div class="form-check mb-3"><input class="form-check-input" type="radio" name="paymentMethod"
+                                    id="qrpay" value="QR_PAY"><label class="form-check-label" for="qrpay"><i
+                                        class="fas fa-qrcode me-2"></i>Thanh toán QR Code</label></div>
+                            <div class="form-check"><input class="form-check-input" type="radio" name="paymentMethod"
+                                    id="bank" value="BANK"><label class="form-check-label" for="bank"><i
+                                        class="fas fa-university me-2"></i>Chuyển khoản ngân hàng</label></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-5">
+                    <div class="card position-sticky" style="top: 80px;">
+                        <div class="card-header">
+                            <h5 class="mb-0">Đơn Hàng Của Bạn</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="checkoutSummary" style="max-height: 250px; overflow-y: auto; padding-right: 15px;">
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between mb-2"><span>Tạm tính:</span><span
+                                    id="checkoutSubtotal">0đ</span></div>
+                            <div class="d-flex justify-content-between mb-2"><span>Giảm giá:</span><span
+                                    class="text-success" id="checkoutDiscount">-0đ</span></div>
+                            <div class="d-flex justify-content-between mb-2"><span>Phí vận chuyển:</span><span
+                                    id="checkoutShipping">0đ</span></div>
+                            <hr>
+                            <div class="d-flex justify-content-between mb-4"><strong>Tổng cộng:</strong><strong
+                                    class="text-danger fs-5" id="checkoutTotal">0đ</strong></div>
+                            <button class="btn btn-success w-100 btn-lg" onclick="placeOrder()"><i
+                                    class="fas fa-check-circle me-2"></i>XÁC NHẬN ĐẶT HÀNG</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="profile" class="page">
+        <div class="container py-5">
+            <div class="row">
+                <div class="col-lg-3">
+                    <div class="card position-sticky" style="top: 80px;">
+                        <div class="card-body text-center">
+                            <img src="https://i.pravatar.cc/150?u=4" class="rounded-circle mb-3" alt="avatar"
+                                id="profileAvatar">
+                            <h5 id="profileName"></h5>
+                            <p class="text-muted" id="profileEmail"></p>
+                        </div>
+                        <div class="list-group list-group-flush" id="profile-tabs" role="tablist">
+                            <a class="list-group-item list-group-item-action active" data-bs-toggle="tab"
+                                href="#tab-profile" role="tab">Thông tin cá nhân</a>
+                            <a class="list-group-item list-group-item-action" data-bs-toggle="tab" href="#tab-orders"
+                                role="tab">Lịch sử đơn hàng</a>
+                            <a class="list-group-item list-group-item-action" data-bs-toggle="tab" href="#tab-address"
+                                role="tab">Địa chỉ của tôi</a>
+                            <a class="list-group-item list-group-item-action text-danger" href="#" onclick="logout()">Đăng
+                                xuất</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-9">
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="tab-profile" role="tabpanel">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Thông Tin Tài Khoản</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3"><label class="form-label">Họ và Tên</label><input
+                                                    type="text" class="form-control" id="profileFormName"></div>
+                                            <div class="col-md-6 mb-3"><label class="form-label">Email</label><input
+                                                    type="email" class="form-control" id="profileFormEmail" disabled></div>
+                                        </div>
+                                        <button class="btn btn-primary">Lưu thay đổi</button>
+                                    </form>
                                 </div>
                             </div>
                         </div>
-                    @endforeach
-                @empty
-                    <div class="no-products">
-                        <div class="no-products-icon">
-                            <i class="fas fa-book-open"></i>
+                        <div class="tab-pane fade" id="tab-orders" role="tabpanel">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Lịch Sử Đơn Hàng</h5>
+                                </div>
+                                <div class="card-body" id="orderHistory"></div>
+                            </div>
                         </div>
-                        <h3>Không tìm thấy sản phẩm</h3>
-                        <p>Hãy thử điều chỉnh bộ lọc hoặc tìm kiếm với từ khóa khác</p>
-                        <button class="reset-filter-btn">Đặt lại bộ lọc</button>
+                        <div class="tab-pane fade" id="tab-address" role="tabpanel">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Sổ Địa Chỉ</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p>Bạn chưa có địa chỉ nào.</p>
+                                    <button class="btn btn-primary">Thêm địa chỉ mới</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                @endforelse
-            </div>
-
-            {{-- Pagination --}}
-            @if(isset($books) && method_exists($books, 'links'))
-                <div class="pagination-wrapper">
-                    {{ $books->links() }}
-                </div>
-            @endif
-        </div>
-    </section>
-
-    <!-- Newsletter Section -->
-    <section class="newsletter-section">
-        <div class="container">
-            <div class="newsletter-content">
-                <div class="newsletter-text">
-                    <h3>Đăng ký nhận tin</h3>
-                    <p>Nhận thông báo về sách mới và ưu đãi đặc biệt</p>
-                </div>
-                <div class="newsletter-form">
-                    <input type="email" placeholder="Nhập email của bạn..." class="email-input">
-                    <button class="subscribe-btn">Đăng ký</button>
                 </div>
             </div>
         </div>
-    </section>
-</div>
-
-<style>
-/* General Styles */
-.homepage-container {
-    background-color: #f8f9fa;
-}
-
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 15px;
-}
-
-.section-title {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #2c3e50;
-    margin-bottom: 2rem;
-    text-align: center;
-    position: relative;
-}
-
-.section-title::after {
-    content: '';
-    position: absolute;
-    bottom: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 60px;
-    height: 3px;
-    background: linear-gradient(90deg, #3498db, #2980b9);
-    border-radius: 2px;
-}
-
-/* Hero Banner */
-.hero-banner {
-    margin-bottom: 3rem;
-}
-
-.promotional-banner {
-    margin-top: 1rem;
-}
-
-.promo-image {
-    width: 100%;
-    height: auto;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-}
-
-/* Category Section */
-.category-section {
-    background: white;
-    padding: 3rem 0;
-    margin-bottom: 2rem;
-    border-radius: 15px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-}
-
-/* Filter Section */
-.filter-section {
-    background: white;
-    padding: 2rem 0;
-    margin-bottom: 2rem;
-    border-radius: 15px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-}
-
-.filter-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
-}
-
-.filter-group {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-}
-
-.filter-dropdown {
-    position: relative;
-}
-
-.filter-btn {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.25rem;
-    background: #f8f9fa;
-    border: 2px solid #e9ecef;
-    border-radius: 8px;
-    color: #495057;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.filter-btn:hover {
-    background: #e9ecef;
-    border-color: #3498db;
-    color: #3498db;
-}
-
-.dropdown-menu {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    background: white;
-    border: 1px solid #e9ecef;
-    border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    min-width: 200px;
-    z-index: 1000;
-    display: none;
-    padding: 1rem;
-}
-
-.filter-dropdown:hover .dropdown-menu {
-    display: block;
-}
-
-.price-range {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-}
-
-.price-input {
-    padding: 0.5rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    width: 100px;
-}
-
-.apply-btn {
-    padding: 0.5rem 1rem;
-    background: #3498db;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.filter-options, .rating-options, .sort-options {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.filter-options label, .rating-options label, .sort-options label {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    cursor: pointer;
-    padding: 0.25rem 0;
-}
-
-.search-filter {
-    flex: 1;
-    max-width: 400px;
-}
-
-.search-box {
-    display: flex;
-    border: 2px solid #e9ecef;
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-.search-input {
-    flex: 1;
-    padding: 0.75rem 1rem;
-    border: none;
-    outline: none;
-    font-size: 1rem;
-}
-
-.search-btn {
-    padding: 0.75rem 1rem;
-    background: #3498db;
-    color: white;
-    border: none;
-    cursor: pointer;
-    transition: background 0.3s ease;
-}
-
-.search-btn:hover {
-    background: #2980b9;
-}
-
-.active-filters {
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid #e9ecef;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.clear-all-btn {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    background: #e74c3c;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 0.9rem;
-}
-
-/* Products Section */
-.products-section {
-    padding: 2rem 0;
-}
-
-.section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-}
-
-.view-options {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.view-btn {
-    padding: 0.5rem;
-    background: #f8f9fa;
-    border: 1px solid #e9ecef;
-    border-radius: 4px;
-    cursor: pointer;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.view-btn.active {
-    background: #3498db;
-    color: white;
-    border-color: #3498db;
-}
-
-.products-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 2rem;
-    margin-bottom: 3rem;
-}
-
-.product-card {
-    background: white;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 2px 15px rgba(0,0,0,0.08);
-    transition: all 0.3s ease;
-    position: relative;
-}
-
-.product-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-}
-
-.product-image {
-    position: relative;
-    overflow: hidden;
-    height: 250px;
-}
-
-.product-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.3s ease;
-}
-
-.product-card:hover .product-image img {
-    transform: scale(1.05);
-}
-
-.product-overlay {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.product-card:hover .product-overlay {
-    opacity: 1;
-}
-
-.quick-view-btn, .wishlist-btn {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    border: none;
-    background: rgba(255,255,255,0.9);
-    color: #666;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s ease;
-}
-
-.quick-view-btn:hover, .wishlist-btn:hover {
-    background: #3498db;
-    color: white;
-}
-
-.discount-badge, .new-badge {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: white;
-}
-
-.discount-badge {
-    background: #e74c3c;
-}
-
-.new-badge {
-    background: #27ae60;
-}
-
-.product-info {
-    padding: 1.5rem;
-}
-
-.product-title {
-    margin: 0 0 0.5rem 0;
-    font-size: 1.1rem;
-    font-weight: 600;
-    line-height: 1.4;
-}
-
-.product-title a {
-    color: #2c3e50;
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
-
-.product-title a:hover {
-    color: #3498db;
-}
-
-.product-author {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: #666;
-    font-size: 0.9rem;
-    margin-bottom: 0.75rem;
-}
-
-.product-rating {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-}
-
-.stars {
-    display: flex;
-    gap: 2px;
-}
-
-.stars i {
-    color: #ddd;
-    font-size: 0.9rem;
-}
-
-.stars i.active {
-    color: #f39c12;
-}
-
-.rating-text {
-    font-size: 0.8rem;
-    color: #666;
-}
-
-.product-price {
-    margin-bottom: 1rem;
-}
-
-.current-price {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: #e74c3c;
-}
-
-.original-price {
-    font-size: 1rem;
-    color: #999;
-    text-decoration: line-through;
-    margin-left: 0.5rem;
-}
-
-.product-actions {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.add-to-cart-btn, .buy-now-btn {
-    flex: 1;
-    padding: 0.75rem;
-    border: none;
-    border-radius: 6px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.add-to-cart-btn {
-    background: #f8f9fa;
-    color: #3498db;
-    border: 1px solid #3498db;
-}
-
-.add-to-cart-btn:hover {
-    background: #3498db;
-    color: white;
-}
-
-.buy-now-btn {
-    background: #3498db;
-    color: white;
-}
-
-.buy-now-btn:hover {
-    background: #2980b9;
-}
-
-.no-products {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 4rem 2rem;
-    background: white;
-    border-radius: 12px;
-}
-
-.no-products-icon {
-    font-size: 4rem;
-    color: #bdc3c7;
-    margin-bottom: 1rem;
-}
-
-.no-products h3 {
-    font-size: 1.5rem;
-    color: #2c3e50;
-    margin-bottom: 0.5rem;
-}
-
-.no-products p {
-    color: #666;
-    margin-bottom: 1.5rem;
-}
-
-.reset-filter-btn {
-    padding: 0.75rem 1.5rem;
-    background: #3498db;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-}
-
-/* Newsletter Section */
-.newsletter-section {
-    background: linear-gradient(135deg, #3498db, #2980b9);
-    color: white;
-    padding: 3rem 0;
-    margin-top: 3rem;
-}
-
-.newsletter-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 2rem;
-}
-
-.newsletter-text h3 {
-    font-size: 1.5rem;
-    margin-bottom: 0.5rem;
-}
-
-.newsletter-form {
-    display: flex;
-    gap: 0.5rem;
-    max-width: 400px;
-    flex: 1;
-}
-
-.email-input {
-    flex: 1;
-    padding: 0.75rem;
-    border: none;
-    border-radius: 6px;
-    outline: none;
-}
-
-.subscribe-btn {
-    padding: 0.75rem 1.5rem;
-    background: #e74c3c;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 500;
-    white-space: nowrap;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .filter-bar {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .filter-group {
-        justify-content: center;
-    }
-
-    .products-grid {
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-        gap: 1rem;
-    }
-
-    .newsletter-content {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .section-title {
-        font-size: 1.5rem;
-    }
-}
-
-@media (max-width: 480px) {
-    .products-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .product-actions {
-        flex-direction: column;
-    }
-
-    .newsletter-form {
-        flex-direction: column;
-    }
-}
-</style>
-
-<script>
-// Add account container function
-function addContainTaiKhoan() {
-    // Implementation for account container
-    console.log('Account container added');
-}
-
-// Filter products by name
-function filterProductsName(input) {
-    const searchTerm = input.value.trim().toLowerCase();
-    const products = document.querySelectorAll('.product-card');
-    let found = false;
-
-    if (searchTerm.length > 0) {
-        products.forEach(product => {
-            const title = product.querySelector('.product-title a').textContent.trim().toLowerCase();
-            if (title.includes(searchTerm)) {
-                product.style.display = '';
-                found = true;
-            } else {
-                product.style.display = 'none';
-            }
-        });
-    } else {
-        products.forEach(product => {
-            product.style.display = '';
-            found = true;
-        });
-    }
-
-    // Hiện thông báo nếu không có sản phẩm
-    let noProductsMsg = document.querySelector('.no-products');
-    if (!found) {
-        if (!noProductsMsg) {
-            const productsGrid = document.querySelector('.products-grid');
-            const noProductsDiv = document.createElement('div');
-            noProductsDiv.className = 'no-products';
-            noProductsDiv.innerHTML = `
-                <div class=\"no-products-icon\">\n                    <i class=\"fas fa-book-open\"></i>\n                </div>\n                <h3>Không tìm thấy sản phẩm</h3>\n                <p>Không có sản phẩm nào phù hợp với từ khóa tìm kiếm</p>\n            `;
-            productsGrid.appendChild(noProductsDiv);
-        }
-    } else if (noProductsMsg) {
-        noProductsMsg.remove();
-    }
-}
-
-// Lọc tổng hợp theo filter
-function filterProductsAll() {
-    const minPrice = parseInt(document.querySelector('.price-range input[placeholder="0"]').value) || 0;
-    const maxPrice = parseInt(document.querySelector('.price-range input[placeholder="1000000"]').value) || 1000000;
-    const promoChecked = Array.from(document.querySelectorAll('.filter-options input[type="checkbox"]:checked')).map(cb => cb.value);
-    const rating = parseInt(document.querySelector('.rating-options input[type="radio"]:checked')?.value || 0);
-    const sort = document.querySelector('.sort-options input[type="radio"]:checked')?.value || '';
-
-    let products = Array.from(document.querySelectorAll('.product-card'));
-    let found = false;
-
-    // Lọc theo giá
-    products.forEach(product => {
-        const price = parseInt(product.getAttribute('data-price'));
-        const promo = product.getAttribute('data-promo');
-        const rate = parseInt(product.getAttribute('data-rating'));
-        let show = true;
-
-        if (price < minPrice || price > maxPrice) show = false;
-        if (promoChecked.length > 0 && !promoChecked.includes(promo)) show = false;
-        if (rating > 0 && rate < rating) show = false;
-
-        product.style.display = show ? '' : 'none';
-        if (show) found = true;
-    });
-
-    // Sắp xếp
-    if (sort) {
-        let sorted = products.filter(p => p.style.display !== 'none');
-        if (sort === 'price-low') {
-            sorted.sort((a, b) => parseInt(a.getAttribute('data-price')) - parseInt(b.getAttribute('data-price')));
-        } else if (sort === 'price-high') {
-            sorted.sort((a, b) => parseInt(b.getAttribute('data-price')) - parseInt(a.getAttribute('data-price')));
-        } else if (sort === 'newest') {
-            // Không có dữ liệu ngày, bỏ qua
-        } else if (sort === 'popular') {
-            sorted.sort((a, b) => parseInt(b.getAttribute('data-rating')) - parseInt(a.getAttribute('data-rating')));
-        }
-        const grid = document.querySelector('.products-grid');
-        sorted.forEach(p => grid.appendChild(p));
-    }
-
-    // Hiện thông báo nếu không có sản phẩm
-    let noProductsMsg = document.querySelector('.no-products');
-    if (!found) {
-        if (!noProductsMsg) {
-            const productsGrid = document.querySelector('.products-grid');
-            const noProductsDiv = document.createElement('div');
-            noProductsDiv.className = 'no-products';
-            noProductsDiv.innerHTML = `
-                <div class=\"no-products-icon\">\n                    <i class=\"fas fa-book-open\"></i>\n                </div>\n                <h3>Không tìm thấy sản phẩm</h3>\n                <p>Không có sản phẩm nào phù hợp với bộ lọc</p>\n            `;
-            productsGrid.appendChild(noProductsDiv);
-        }
-    } else if (noProductsMsg) {
-        noProductsMsg.remove();
-    }
-}
-
-// Gắn sự kiện cho filter
-
-document.addEventListener('DOMContentLoaded', function() {
-    // View toggle functionality
-    const viewBtns = document.querySelectorAll('.view-btn');
-    const productsGrid = document.querySelector('.products-grid');
-
-    viewBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-            viewBtns.forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-
-            if (this.dataset.view === 'list') {
-                productsGrid.style.gridTemplateColumns = '1fr';
-            } else {
-                productsGrid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(280px, 1fr))';
-            }
-        });
-    });
-
-    // Wishlist functionality
-    document.querySelectorAll('.wishlist-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const icon = this.querySelector('i');
-            icon.classList.toggle('far');
-            icon.classList.toggle('fas');
-
-            if (icon.classList.contains('fas')) {
-                this.style.color = '#e74c3c';
-            } else {
-                this.style.color = '#666';
-            }
-        });
-    });
-
-    // Newsletter subscription
-    const subscribeBtn = document.querySelector('.subscribe-btn');
-    if (subscribeBtn) {
-        subscribeBtn.addEventListener('click', function() {
-            const emailInput = document.querySelector('.email-input');
-            const email = emailInput.value;
-
-            if (email && email.includes('@')) {
-                alert('Cảm ơn bạn đã đăng ký nhận tin!');
-                emailInput.value = '';
-            } else {
-                alert('Vui lòng nhập email hợp lệ!');
-            }
-        });
-    }
-
-    // Add to cart functionality
-    document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const productCard = this.closest('.product-card');
-            const productName = productCard.querySelector('.product-title a').textContent;
-
-            // Add loading state
-            const originalText = this.innerHTML;
-            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang thêm...';
-            this.disabled = true;
-
-            // Simulate API call
-            setTimeout(() => {
-                this.innerHTML = '<i class="fas fa-check"></i> Đã thêm';
-                setTimeout(() => {
-                    this.innerHTML = originalText;
-                    this.disabled = false;
-                }, 1000);
-            }, 500);
-        });
-    });
-
-    // Khoảng giá
-    document.querySelector('.price-range .apply-btn').addEventListener('click', function() {
-        filterProductsAll();
-    });
-    // Khuyến mãi
-    document.querySelectorAll('.filter-options input[type="checkbox"]').forEach(cb => {
-        cb.addEventListener('change', filterProductsAll);
-    });
-    // Đánh giá
-    document.querySelectorAll('.rating-options input[type="radio"]').forEach(radio => {
-        radio.addEventListener('change', filterProductsAll);
-    });
-    // Sắp xếp
-    document.querySelectorAll('.sort-options input[type="radio"]').forEach(radio => {
-        radio.addEventListener('change', filterProductsAll);
-    });
-
-    // Reset filter
-    const resetBtn = document.getElementById('deleteAllFilter');
-    if (resetBtn) {
-        resetBtn.addEventListener('click', function() {
-            // Reset khoảng giá
-            document.querySelector('.price-range input[placeholder="0"]').value = '';
-            document.querySelector('.price-range input[placeholder="1000000"]').value = '';
-            // Reset khuyến mãi
-            document.querySelectorAll('.filter-options input[type="checkbox"]').forEach(cb => cb.checked = false);
-            // Reset đánh giá
-            document.querySelectorAll('.rating-options input[type="radio"]').forEach(radio => radio.checked = false);
-            // Reset sắp xếp
-            document.querySelectorAll('.sort-options input[type="radio"]').forEach(radio => radio.checked = false);
-            // Hiện lại tất cả sản phẩm
-            filterProductsAll();
-        });
-    }
-});
-
-// Call the function when page loads
-addContainTaiKhoan();
-</script>
+    </div>
 @endsection

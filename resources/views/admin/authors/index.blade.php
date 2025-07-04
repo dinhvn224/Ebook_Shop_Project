@@ -18,6 +18,29 @@
         </div>
     @endif
 
+    <!-- Thanh tìm kiếm -->
+    <div class="mb-3">
+        <form action="{{ route('admin.authors.index') }}" method="GET" class="row g-2">
+            <div class="col-auto">
+                <input type="text" name="keyword" class="form-control" placeholder="Tìm theo tên tác giả..."
+                       value="{{ request('keyword') }}">
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-outline-primary">
+                    <i class="fas fa-search"></i> Tìm kiếm
+                </button>
+            </div>
+            @if(request('keyword'))
+                <div class="col-auto">
+                    <a href="{{ route('admin.authors.index') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-times"></i> Xóa lọc
+                    </a>
+                </div>
+            @endif
+        </form>
+    </div>
+
+    <!-- Bảng danh sách -->
     <div class="card">
         <div class="card-body table-responsive">
             <table class="table table-bordered table-hover text-center align-middle">

@@ -2,22 +2,12 @@
     <div class="sidebar-inner slimscroll">
         <div id="sidebar-menu" class="sidebar-menu">
             <ul>
-                <li class="active">
-                    <a href="{{ route('admin.dashboard') }}">
-                        <i class="fas fa-tachometer-alt me-2"></i>
-                        <span>Bảng điều khiển</span>
-                    </a>
-                </li>
 
-                <li class="submenu">
-                    <a href="javascript:void(0);">
-                        <i class="fas fa-th-large me-2"></i>
-                        <span>Quản lý danh mục</span>
-                        <span class="menu-arrow"></span>
+                <li>
+                    <a href="{{ route('admin.dashboard') }}">
+                        <i class="fas fa-image me-2"></i>
+                        <span>dashboard</span>
                     </a>
-                    <ul>
-                        <li><a href="{{ route('admin.categories.index') }}">Danh mục</a></li>
-                    </ul>
                 </li>
 
                 <li class="submenu">
@@ -31,6 +21,8 @@
                         <li><a href="{{ route('admin.books.create') }}">Thêm sách mới</a></li>
                     </ul>
                 </li>
+
+
 
                 <li>
                     <a href="{{ route('admin.images.index') }}">
@@ -108,7 +100,18 @@
                         <span>Sản phẩm Voucher</span>
                     </a>
                 </li>
+
+
+                <li>
+                    <a href="{{ route('admin.reviews.index') }}">
+                        <i class="fas fa-image me-2"></i>
+                        <span>Rivew</span>
+                    </a>
+                </li>
+
             </ul>
+
+
 
         </div>
     </div>

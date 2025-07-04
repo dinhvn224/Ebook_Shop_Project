@@ -1,5 +1,7 @@
 @extends('admin.layouts.app')
 
+@section('title', 'Danh sách Sách')
+
 @section('content')
 <div class="content">
     <div class="page-header d-flex justify-content-between align-items-center mb-3">
@@ -34,7 +36,7 @@
                         <label class="form-label fw-bold">📚 Thể Loại</label>
                         <select name="category_id" class="form-select">
                             <option value="">-- Chọn --</option>
-                            @foreach($categories ?? [] as $c)
+                            @foreach($categories as $c)
                                 <option value="{{ $c->id }}" {{ request('category_id') == $c->id ? 'selected' : '' }}>{{ $c->name }}</option>
                             @endforeach
                         </select>
@@ -43,7 +45,7 @@
                         <label class="form-label fw-bold">✍️ Tác giả</label>
                         <select name="author_id" class="form-select">
                             <option value="">-- Chọn --</option>
-                            @foreach($authors ?? [] as $a)
+                            @foreach($authors as $a)
                                 <option value="{{ $a->id }}" {{ request('author_id') == $a->id ? 'selected' : '' }}>{{ $a->name }}</option>
                             @endforeach
                         </select>
@@ -52,7 +54,7 @@
                         <label class="form-label fw-bold">🏢 Nhà xuất bản</label>
                         <select name="publisher_id" class="form-select">
                             <option value="">-- Chọn --</option>
-                            @foreach($publishers ?? [] as $p)
+                            @foreach($publishers as $p)
                                 <option value="{{ $p->id }}" {{ request('publisher_id') == $p->id ? 'selected' : '' }}>{{ $p->name }}</option>
                             @endforeach
                         </select>
@@ -93,24 +95,20 @@
                             <td>{{ $book->publisher->name ?? '—' }}</td>
                             <td>{{ $book->category->name ?? '—' }}</td>
                             <td class="text-start text-muted">
-                                {{ Str::limit($book->description, 50) ?: 'Không có' }}
+                                {{ \Illuminate\Support\Str::limit($book->description, 50) ?: 'Không có' }}
                             </td>
                             <td>
-                                @if($book->details->count())
-                                    @php
-                                        $min = $book->details->min('price');
-                                        $max = $book->details->max('price');
-                                    @endphp
-                                    {{ number_format($min) }}{{ $min != $max ? ' - ' . number_format($max) : '' }} đ
-                                @else
-                                    <span class="text-muted">—</span>
-                                @endif
+                                @php
+                                    $min = $book->details->min('price');
+                                    $max = $book->details->max('price');
+                                @endphp
+                                {{ $min ? number_format($min) . ($min != $max ? ' - ' . number_format($max) : '') . ' đ' : '—' }}
                             </td>
                             <td>
                                 <a href="{{ route('admin.books.edit', $book->id) }}" class="btn btn-primary btn-sm me-1" title="Sửa">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <form action="{{ route('admin.books.destroy', $book->id) }}" method="POST" style="display:inline;">
+                                <form action="{{ route('admin.books.destroy', $book->id) }}" method="POST" class="d-inline">
                                     @csrf
                                     @method('DELETE')
                                     <button class="btn btn-danger btn-sm" title="Xóa" onclick="return confirm('Bạn chắc chắn muốn xóa?')">
@@ -132,6 +130,7 @@
         </div>
 
         {{-- Phân trang --}}
+        @if($books->hasPages())
         <div class="card-footer d-flex justify-content-between align-items-center">
             <div>
                 {{ $books->links('pagination::bootstrap-5') }}
@@ -140,6 +139,7 @@
                 Hiển thị từ {{ $books->firstItem() ?? 0 }} đến {{ $books->lastItem() ?? 0 }} / {{ $books->total() }} sách
             </div>
         </div>
+        @endif
     </div>
 </div>
 @endsection
