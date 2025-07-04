@@ -59,7 +59,7 @@ class BookController extends Controller
         $request->validate([
             'name' => 'required',
             'author_id' => 'required|exists:authors,id',
-            'publisher_id' => 'required|exists:publishers,id',
+            'publisher_id' => 'required|exists:publisher,id',
             'category_id' => 'required|exists:categories,id',
         ]);
 
@@ -92,12 +92,59 @@ class BookController extends Controller
     // BookDetail methods...
     public function addDetail(Request $request, $bookId)
     {
-        // validate và thêm chi tiết sách
+        $request->validate([
+            'language' => 'required|string|max:255',
+            'size' => 'required|string|max:255',
+            'publish_year' => 'required|integer',
+            'total_pages' => 'required|integer',
+            'quantity' => 'required|integer|min:0',
+            'price' => 'required|numeric|min:0',
+            'promotion_price' => 'nullable|numeric|min:0',
+            'description' => 'nullable|string',
+        ]);
+
+        $detail = new BookDetail();
+        $detail->book_id = $bookId;
+        $detail->language = $request->language;
+        $detail->size = $request->size;
+        $detail->publish_year = $request->publish_year;
+        $detail->total_pages = $request->total_pages;
+        $detail->quantity = $request->quantity;
+        $detail->price = $request->price;
+        $detail->promotion_price = $request->promotion_price;
+        $detail->description = $request->description;
+        $detail->is_active = $request->has('is_active') ? 1 : 0;
+        $detail->save();
+
+        return redirect()->route('admin.books.edit', $bookId)->with('success', 'Thêm chi tiết sách thành công!');
     }
 
     public function updateDetail(Request $request, $bookId, $detailId)
     {
-        // validate và cập nhật chi tiết sách
+        $request->validate([
+            'language' => 'required|string|max:255',
+            'size' => 'required|string|max:255',
+            'publish_year' => 'required|integer',
+            'total_pages' => 'required|integer',
+            'quantity' => 'required|integer|min:0',
+            'price' => 'required|numeric|min:0',
+            'promotion_price' => 'nullable|numeric|min:0',
+            'description' => 'nullable|string',
+        ]);
+
+        $detail = BookDetail::where('book_id', $bookId)->findOrFail($detailId);
+        $detail->language = $request->language;
+        $detail->size = $request->size;
+        $detail->publish_year = $request->publish_year;
+        $detail->total_pages = $request->total_pages;
+        $detail->quantity = $request->quantity;
+        $detail->price = $request->price;
+        $detail->promotion_price = $request->promotion_price;
+        $detail->description = $request->description;
+        $detail->is_active = $request->has('is_active') ? 1 : 0;
+        $detail->save();
+
+        return redirect()->route('admin.books.edit', $bookId)->with('success', 'Cập nhật chi tiết sách thành công!');
     }
 
     public function deleteDetail($bookId, $detailId)

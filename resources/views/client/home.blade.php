@@ -48,8 +48,14 @@
 
                 .product-card img {
                     width: 100%;
-                    height: 250px;
-                    object-fit: cover;
+                    max-width: 160px;
+                    height: auto;
+                    aspect-ratio: 3/4;
+                    object-fit: contain;
+                    background: #fff;
+                    display: block;
+                    margin-left: auto;
+                    margin-right: auto;
                     transition: transform 0.3s ease;
                 }
 
@@ -58,16 +64,19 @@
                 }
 
                 .discount-badge {
-                    position: absolute;
-                    top: 10px;
-                    left: 10px;
+                    display: inline-block;
+                    margin-left: 8px;
                     background-color: #dc3545;
                     color: white;
-                    padding: 5px 8px;
+                    padding: 2px 10px;
                     font-size: 0.75rem;
-                    border-radius: 4px;
+                    min-width: 0;
+                    text-align: center;
+                    border-radius: 999px;
                     z-index: 1;
                     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+                    font-weight: bold;
+                    letter-spacing: 0.5px;
                 }
 
                 .book-price {
@@ -107,12 +116,7 @@
                             $imageUrl = asset($noImage); // mặc định
 
                             if ($mainImage && !empty($mainImage->url)) {
-                                $fullPath = public_path($mainImage->url);
-                                if (file_exists($fullPath)) {
-                                    $imageUrl = asset($mainImage->url);
-                                } elseif (file_exists(public_path($fallbackImage))) {
-                                    $imageUrl = asset($fallbackImage);
-                                }
+                                $imageUrl = asset('storage/' . $mainImage->url);
                             }
                         @endphp
 
@@ -143,6 +147,7 @@
                                                 @if($hasPromotion)
                                                     {{ number_format($detail->promotion_price, 0, '', '.') }}₫
                                                     <span class="old-price">{{ number_format($detail->price, 0, '', '.') }}₫</span>
+                                                    <span class="discount-badge align-middle">-{{ round((($detail->price - $detail->promotion_price) / $detail->price) * 100) }}%</span>
                                                 @elseif($detail)
                                                     {{ number_format($detail->price, 0, '', '.') }}₫
                                                 @else
@@ -441,13 +446,13 @@
                             <h5 class="mb-0">Phương Thức Thanh Toán</h5>
                         </div>
                         <div class="card-body">
-                            <div class="form-check mb-3"><input class="form-check-input" type="radio" name="paymentMethod"
+                            <div class="form-check mb-3"><input class="form-check-input" type="radio" name="payment_method"
                                     id="cod" value="COD" checked><label class="form-check-label" for="cod"><i
                                         class="fas fa-money-bill-wave me-2"></i>Thanh toán khi nhận hàng (COD)</label></div>
-                            <div class="form-check mb-3"><input class="form-check-input" type="radio" name="paymentMethod"
+                            <div class="form-check mb-3"><input class="form-check-input" type="radio" name="payment_method"
                                     id="qrpay" value="QR_PAY"><label class="form-check-label" for="qrpay"><i
                                         class="fas fa-qrcode me-2"></i>Thanh toán QR Code</label></div>
-                            <div class="form-check"><input class="form-check-input" type="radio" name="paymentMethod"
+                            <div class="form-check"><input class="form-check-input" type="radio" name="payment_method"
                                     id="bank" value="BANK"><label class="form-check-label" for="bank"><i
                                         class="fas fa-university me-2"></i>Chuyển khoản ngân hàng</label></div>
                         </div>

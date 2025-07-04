@@ -82,7 +82,7 @@
                         if ($mainImage && !empty($mainImage->url)) {
                             $fullPath = public_path($mainImage->url);
                             if (file_exists($fullPath)) {
-                                $imageUrl = asset($mainImage->url);
+                                $imageUrl = asset('storage/' . $mainImage->url);
                             } elseif (file_exists(public_path($fallbackImage))) {
                                 $imageUrl = asset($fallbackImage);
                             }
