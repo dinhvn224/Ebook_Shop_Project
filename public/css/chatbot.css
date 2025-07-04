@@ -561,28 +561,37 @@
 .books-list {
     margin-top: 10px;
     padding-left: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 .book-item {
     background: #f7f7fa;
     border-radius: 8px;
-    padding: 8px 12px;
-    margin-bottom: 6px;
-    font-size: 13px;
+    padding: 10px 14px;
+    margin-bottom: 0;
+    font-size: 14px;
     color: #333;
     border-left: 3px solid #667eea;
+    box-shadow: 0 1px 4px rgba(102,126,234,0.07);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
 }
 .book-title {
     font-weight: bold;
     color: #222;
+    font-size: 15px;
 }
 .book-author {
-    font-size: 12px;
+    font-size: 13px;
     color: #666;
 }
 .book-price {
-    font-size: 12px;
-    color: #4caf50;
+    font-size: 14px;
+    color: #1976d2;
     font-weight: bold;
+    margin-top: 2px;
 }
 
 /* Different source color for bot message */

@@ -323,7 +323,7 @@ class AdvancedChatbot {
             this.addMessage(message, 'bot', sourceClass, {
                 sourceIcon,
                 sourceText,
-                books
+                books: []
             });
         }, 500);
     }
@@ -343,21 +343,10 @@ class AdvancedChatbot {
         if (sender === 'bot' && meta.sourceIcon && meta.sourceText) {
             metaHtml = `<div class="message-meta"><span class="icon">${meta.sourceIcon}</span> <span class="text">${meta.sourceText}</span></div>`;
         }
-        let booksHtml = '';
-        if (sender === 'bot' && Array.isArray(meta.books) && meta.books.length > 0) {
-            booksHtml = `<div class="books-list">${meta.books.map(book => `
-                <div class="book-item">
-                    <div class="book-title">${book.name || ''}</div>
-                    <div class="book-author">${book.author || ''}</div>
-                    <div class="book-price">${book.price ? book.price + 'đ' : ''}</div>
-                </div>
-            `).join('')}</div>`;
-        }
         messageDiv.innerHTML = `
             <div class="message-content">
                 ${metaHtml}
                 ${this.formatMessage(content)}
-                ${booksHtml}
                 <div class="message-time">${time}</div>
             </div>
         `;
