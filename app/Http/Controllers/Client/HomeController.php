@@ -80,7 +80,9 @@ class HomeController extends Controller
         $products = $bookDetails->map(function ($detail) {
             $book = $detail->book;
             $image = $book->images->first();
-            $imageUrl = $image ? asset($image->url) : asset('client/img/products/noimage.png');
+            // Lấy ảnh mặc định từ DB nếu không có ảnh
+            $defaultImage = \App\Models\Image::first();
+            $imageUrl = $image ? asset($image->url) : ($defaultImage ? asset($defaultImage->url) : '');
 
             $promoPrice = $detail->promotion_price;
             $price = $promoPrice ?? $detail->price;

@@ -4,13 +4,21 @@
     <div class="container py-5">
         <style>
             .book-cover {
-                border-radius: 10px;
-                object-fit: cover;
-                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
                 width: 100%;
-                height: 340px;
+                height: 320px;
+                object-fit: contain;
+                border-radius: 12px;
+                background: #fff;
+                box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+                padding: 16px;
+                margin-bottom: 8px;
+                display: block;
+                transition: transform 0.2s, box-shadow 0.2s;
             }
-
+            .book-cover:hover {
+                transform: scale(1.03);
+                box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+            }
             .book-title {
                 font-size: 1.75rem;
                 font-weight: 700;
@@ -57,6 +65,10 @@
                 background: #fff;
                 box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
                 position: relative;
+                min-width: 140px;
+                max-width: 160px;
+                margin: 0 auto;
+                padding: 8px 4px;
             }
 
             .related-product:hover {
@@ -66,26 +78,32 @@
 
             .related-product img {
                 width: 100%;
-                height: 200px;
-                object-fit: cover;
+                height: 120px;
+                object-fit: contain;
+                border-radius: 8px;
+                background: #fff;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+                padding: 6px;
+                transition: transform 0.2s, box-shadow 0.2s;
+            }
+            .related-product img:hover {
+                transform: scale(1.03);
+                box-shadow: 0 4px 16px rgba(0,0,0,0.10);
             }
 
             .related-title {
-                font-weight: 600;
                 font-size: 0.95rem;
-                margin-bottom: 2px;
-                color: #212529;
+                font-weight: 500;
+                margin-bottom: 0.25rem;
             }
 
             .related-author {
                 font-size: 0.85rem;
-                color: #6c757d;
             }
 
             .related-price {
                 font-size: 1rem;
                 font-weight: 600;
-                color: #0d6efd;
             }
 
             .related-price .old {
@@ -108,18 +126,23 @@
 
             .add-btn {
                 position: absolute;
-                bottom: 12px;
-                right: 12px;
-                width: 34px;
-                height: 34px;
-                background: #0d6efd;
-                color: white;
-                display: flex;
-                justify-content: center;
-                align-items: center;
+                bottom: 10px;
+                right: 10px;
+                z-index: 2;
+            }
+            .add-btn .btn {
+                padding: 4px 8px;
+                font-size: 0.9rem;
                 border-radius: 50%;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-                font-size: 0.85rem;
+                min-width: 32px;
+                min-height: 32px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .add-btn .btn i {
+                font-size: 1.1rem;
+                margin: 0;
             }
 
             .tab-content {
@@ -129,31 +152,100 @@
                 background: #fff;
                 border-radius: 0 0 6px 6px;
             }
+            .row.g-2 {
+                --bs-gutter-x: 0.5rem;
+                --bs-gutter-y: 0.5rem;
+            }
+            .related-books-row {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 12px;
+                justify-content: flex-start;
+            }
+            .related-product {
+                background: #fff;
+                border-radius: 12px;
+                box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+                padding: 16px 12px 12px 12px;
+                min-width: 160px;
+                max-width: 180px;
+                flex: 1 1 18%;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                position: relative;
+                margin: 0;
+            }
+            .related-product .related-img {
+                width: 100%;
+                height: 180px;
+                object-fit: contain;
+                border-radius: 8px;
+                background: #fff;
+                box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+                padding: 8px;
+                margin-bottom: 8px;
+            }
+            .related-product .badge-tap {
+                position: absolute;
+                top: 12px;
+                left: 12px;
+                background: #222;
+                color: #fff;
+                font-size: 0.85rem;
+                font-weight: 600;
+                border-radius: 6px;
+                padding: 2px 10px;
+                z-index: 2;
+                opacity: 0.92;
+            }
+            .related-product .discount-badge {
+                position: absolute;
+                top: 12px;
+                right: 12px;
+                background: #e53935;
+                color: #fff;
+                font-size: 0.85rem;
+                font-weight: 600;
+                border-radius: 6px;
+                padding: 2px 10px;
+                z-index: 2;
+                opacity: 0.92;
+            }
+            .related-title {
+                font-size: 1rem;
+                font-weight: 600;
+                margin-bottom: 0.25rem;
+                color: #222;
+                text-align: center;
+                min-height: 40px;
+            }
+            .related-author {
+                font-size: 0.9rem;
+                color: #666;
+                text-align: center;
+                margin-bottom: 2px;
+            }
+            .related-price {
+                font-size: 1.1rem;
+                font-weight: 700;
+                color: #e53935;
+                margin-bottom: 2px;
+                text-align: center;
+            }
+            .related-price .old {
+                text-decoration: line-through;
+                font-size: 0.95rem;
+                color: #888;
+                margin-left: 6px;
+                font-weight: 400;
+            }
         </style>
 
         {{-- Chi tiết sản phẩm --}}
             <div class="row g-5">
                 <div class="col-md-4">
-                    @php
-                        $mainImage = optional($book->images)->firstWhere('is_main', true)
-                            ?? optional($book->images)->where('deleted', 0)->first();
-
-                        $fallbackImage = 'storage/client/img/products/uHSgfoff1LYGatU5hE38DZEA6101DTziZCDqMp2t.png';
-                        $noImage = 'client/img/products/noimage.png';
-
-                        $imageUrl = $noImage;
-
-                        if ($mainImage && !empty($mainImage->url)) {
-                            $imagePath = public_path($mainImage->url);
-                            if (file_exists($imagePath)) {
-                                $imageUrl = $mainImage->url;
-                            } elseif (file_exists(public_path($fallbackImage))) {
-                                $imageUrl = $fallbackImage;
-                            }
-                        }
-                    @endphp
-
-                    <img src="{{ asset($imageUrl) }}" class="book-cover w-100 rounded shadow-sm" alt="{{ $book->name }}">
+                    <img src="{{ $book->main_image_url }}" class="book-cover" alt="{{ $book->name }}">
                 </div>
 
                 <div class="col-md-8">
@@ -265,60 +357,31 @@
         @if($relatedBooks->count())
             <div class="mt-5">
                 <h5 class="fw-bold mb-3">📚 Sách Cùng Thể Loại</h5>
-                <div class="row g-4">
+                <div class="related-books-row">
                     @foreach($relatedBooks as $item)
                         @php
                             $rel = $item->details->first();
-
-                            $mainImage = optional($item->images)->firstWhere('is_main', true)
-                                ?? optional($item->images)->where('deleted', 0)->first();
-
-                            $fallbackImage = 'storage/client/img/products/uHSgfoff1LYGatU5hE38DZEA6101DTziZCDqMp2t.png';
-                            $noImage = 'client/img/products/noimage.png';
-
-                            $imageUrl = $noImage;
-
-                            if ($mainImage && !empty($mainImage->url)) {
-                                $imagePath = public_path($mainImage->url);
-                                if (file_exists($imagePath)) {
-                                    $imageUrl = $mainImage->url;
-                                } elseif (file_exists(public_path($fallbackImage))) {
-                                    $imageUrl = $fallbackImage;
-                                }
-                            }
+                            // Lấy tập sách nếu có
+                            $tap = $rel && $rel->volume ? 'Tập ' . $rel->volume : null;
                         @endphp
-
-                        <div class="col-md-4 col-6">
-                            <div class="related-product position-relative">
-                                @if($rel && $rel->promotion_price && $rel->promotion_price < $rel->price)
-                                    <div class="discount">
-                                        -{{ round(100 - ($rel->promotion_price / $rel->price) * 100) }}%
-                                    </div>
+                        <div class="related-product">
+                            @if($tap)
+                                <span class="badge-tap">{{ $tap }}</span>
+                            @endif
+                            @if($rel && $rel->promotion_price && $rel->promotion_price < $rel->price)
+                                <span class="discount-badge">-{{ round(100 - ($rel->promotion_price / $rel->price) * 100) }}%</span>
+                            @endif
+                            <a href="{{ route('books.show', $item->id) }}">
+                                <img src="{{ $item->main_image_url }}" alt="{{ $item->name }}" class="related-img">
+                            </a>
+                            <p class="related-title mb-1">{{ $item->name }}</p>
+                            <p class="related-author text-muted small">{{ $item->author->name ?? 'Ẩn danh' }}</p>
+                            <p class="related-price mb-0">
+                                {{ number_format($rel->promotion_price ?? $rel->price, 0, '', '.') }}₫
+                                @if($rel->promotion_price && $rel->promotion_price < $rel->price)
+                                    <span class="old">{{ number_format($rel->price, 0, '', '.') }}₫</span>
                                 @endif
-
-                                <a href="{{ route('books.show', $item->id) }}">
-                                    <img src="{{ asset($imageUrl) }}" alt="{{ $item->name }}" class="w-100"
-                                        style="height: 220px; object-fit: cover;">
-                                </a>
-
-                                <div class="p-3">
-                                    <p class="related-title mb-1">{{ $item->name }}</p>
-                                    <p class="related-author text-muted small">{{ $item->author->name ?? 'Ẩn danh' }}</p>
-                                    <p class="related-price mb-0">
-                                        {{ number_format($rel->promotion_price ?? $rel->price, 0, '', '.') }}₫
-                                        @if($rel->promotion_price && $rel->promotion_price < $rel->price)
-                                            <span class="old">{{ number_format($rel->price, 0, '', '.') }}₫</span>
-                                        @endif
-                                    </p>
-                                </div>
-
-                                <div class="add-btn">
-                                    <a href="{{ route('cart.index') }}" class="btn btn-outline-primary">
-                                        <i class="fas fa-cart-plus"></i>
-                                    </a>
-                                </div>
-
-                            </div>
+                            </p>
                         </div>
                     @endforeach
                 </div>

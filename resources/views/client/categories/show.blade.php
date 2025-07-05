@@ -2,46 +2,69 @@
 @section('title', 'Danh mục: ' . $category->name)
 
 @section('content')
-<div class="container py-5">
+<section class="py-5" style="background-color: #f8f9fa;">
+    <div class="container">
     <style>
-        .category-card {
+        .product-card {
             border: none;
-            border-radius: 6px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            overflow: hidden;
-            background-color: #fff;
-        }
-
-        .category-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
-        }
-
-        .category-card img {
-            width: 100%;
-            height: 220px;
-            object-fit: cover;
+            perspective: 1000px;
             transition: transform 0.3s ease;
+            border-radius: 6px;
+            overflow: hidden;
         }
 
-        .category-card:hover img {
+        .product-card-inner {
+            transition: transform 0.5s;
+            transform-style: preserve-3d;
+        }
+
+        .product-card:hover .product-card-inner {
+            transform: rotateY(3deg) scale(1.02);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 260px;
+            object-fit: contain;
+            border-radius: 8px;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            transition: transform 0.2s;
+            padding: 8px;
+        }
+        .product-card:hover img {
             transform: scale(1.03);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.10);
         }
 
-        .category-card .card-title {
-            font-size: 0.95rem;
-            font-weight: 500;
-            color: #212529;
-        }
-
-        .category-card .price-text {
-            font-weight: 600;
+        .discount-badge {
+            position: absolute;
+            bottom: 16px;
+            left: 16px;
+            top: auto;
+            right: auto;
+            transform: none;
+            background: linear-gradient(90deg, #ff416c 0%, #ff4b2b 100%);
+            color: #fff;
+            padding: 6px 18px;
             font-size: 1rem;
-            color: #0d6efd;
+            font-weight: bold;
+            border-radius: 20px;
+            z-index: 2;
+            box-shadow: 0 4px 16px rgba(255, 65, 108, 0.15);
+            letter-spacing: 1px;
+            border: 2px solid #fff;
+            opacity: 0.95;
         }
 
-        .category-card .price-text .old-price {
+        .book-price {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #007bff;
+        }
+
+        .book-price .old-price {
             text-decoration: line-through;
             font-size: 0.85rem;
             color: #888;
@@ -101,11 +124,11 @@
 
         <!-- Danh sách Sách -->
         <div class="col-lg-9">
-            <div class="d-flex justify-content-between align-items-center mb-4 bg-white p-3 rounded shadow-sm">
-                <h3 class="mb-0 fw-bold">
+            <div class="d-flex justify-content-between align-items-center mb-5">
+                <h2 class="fw-bold fs-2">
                     Danh mục: {{ $category->name }}
                     <span class="text-muted fw-normal fs-6">({{ $books->total() }} cuốn)</span>
-                </h3>
+                </h2>
                 <form method="GET" action="" class="d-flex align-items-center">
                     @foreach(request()->except('sort') as $k => $v)
                         <input type="hidden" name="{{ $k }}" value="{{ $v }}">
@@ -120,29 +143,53 @@
                 </form>
             </div>
 
-            <div class="row">
+            <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-4">
                 @forelse ($books as $book)
-                    @php $detail = optional($book->details->first()); @endphp
+                    @php
+                        $detail = optional($book->details->first());
+                        $hasPromotion = $detail && $detail->promotion_price && $detail->promotion_price < $detail->price;
+                    @endphp
                     @if($detail)
-                        <div class="col-md-4 col-6 mb-4">
-                            <a href="{{ route('books.show', $book->id) }}" class="text-decoration-none text-dark">
-                                <div class="card h-100 category-card">
-                                    <img src="{{ asset($book->images->first()->url ?? 'client/img/products/noimage.png') }}"
-                                        alt="{{ $book->name }}" class="card-img-top">
-                                    <div class="card-body text-center">
-                                        <h6 class="card-title mb-1">{{ $book->name }}</h6>
-                                        <p class="text-muted small mb-1">{{ $book->author->name ?? 'Ẩn danh' }}</p>
-                                        <p class="price-text mb-0">
-                                            @if($detail->promotion_price && $detail->promotion_price < $detail->price)
-                                                {{ number_format($detail->promotion_price, 0, '', '.') }}₫
-                                                <span class="old-price">{{ number_format($detail->price, 0, '', '.') }}₫</span>
-                                            @else
-                                                {{ number_format($detail->price, 0, '', '.') }}₫
-                                            @endif
-                                        </p>
+                        <div class="col">
+                            <div class="card h-100 product-card">
+                                <div class="product-card-inner">
+                                    <div class="position-relative">
+                                        @if($hasPromotion)
+                                            <div class="discount-badge">
+                                                -{{ round((($detail->price - $detail->promotion_price) / $detail->price) * 100) }}%
+                                            </div>
+                                        @endif
+                                        <img src="{{ $book->main_image_url }}" alt="{{ $book->name }}">
+                                    </div>
+
+                                    <div class="card-body d-flex flex-column">
+                                        <h6 class="flex-grow-1 fs-6">
+                                            <a href="{{ route('books.show', $book->id) }}"
+                                                class="text-dark text-decoration-none">
+                                                {{ $book->name }}
+                                            </a>
+                                        </h6>
+                                        <p class="text-muted small mb-2">{{ $book->author->name ?? 'Ẩn danh' }}</p>
+
+                                        <div class="d-flex justify-content-between align-items-center mt-auto">
+                                            <p class="book-price mb-0">
+                                                @if($hasPromotion)
+                                                    {{ number_format($detail->promotion_price, 0, '', '.') }}₫
+                                                    <span class="old-price">{{ number_format($detail->price, 0, '', '.') }}₫</span>
+                                                @elseif($detail)
+                                                    {{ number_format($detail->price, 0, '', '.') }}₫
+                                                @else
+                                                    N/A
+                                                @endif
+                                            </p>
+                                            <a href="{{ route('books.show', $book->id) }}"
+                                                class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
-                            </a>
+                            </div>
                         </div>
                     @endif
                 @empty
@@ -156,11 +203,11 @@
             </div>
 
             @if($books->count())
-                <div class="d-flex justify-content-center mt-4">
+                <div class="d-flex justify-content-center mt-5">
                     {{ $books->appends(request()->all())->links() }}
                 </div>
             @endif
         </div>
     </div>
-</div>
+</section>
 @endsection

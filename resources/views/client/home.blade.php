@@ -48,26 +48,37 @@
 
                 .product-card img {
                     width: 100%;
-                    height: 250px;
-                    object-fit: cover;
-                    transition: transform 0.3s ease;
+                    height: 260px;
+                    object-fit: contain;
+                    border-radius: 8px;
+                    background: #fff;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+                    transition: transform 0.2s;
+                    padding: 8px;
                 }
-
                 .product-card:hover img {
                     transform: scale(1.03);
+                    box-shadow: 0 4px 16px rgba(0,0,0,0.10);
                 }
 
                 .discount-badge {
                     position: absolute;
-                    top: 10px;
-                    left: 10px;
-                    background-color: #dc3545;
-                    color: white;
-                    padding: 5px 8px;
-                    font-size: 0.75rem;
-                    border-radius: 4px;
-                    z-index: 1;
-                    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+                    bottom: 16px;
+                    left: 16px;
+                    top: auto;
+                    right: auto;
+                    transform: none;
+                    background: linear-gradient(90deg, #ff416c 0%, #ff4b2b 100%);
+                    color: #fff;
+                    padding: 6px 18px;
+                    font-size: 1rem;
+                    font-weight: bold;
+                    border-radius: 20px;
+                    z-index: 2;
+                    box-shadow: 0 4px 16px rgba(255, 65, 108, 0.15);
+                    letter-spacing: 1px;
+                    border: 2px solid #fff;
+                    opacity: 0.95;
                 }
 
                 .book-price {
@@ -97,25 +108,7 @@
                         @php
                             $detail = optional($book->details)->first();
                             $hasPromotion = $detail && $detail->promotion_price && $detail->promotion_price < $detail->price;
-
-                            $mainImage = optional($book->images)->firstWhere('is_main', true)
-                                ?? optional($book->images)->where('deleted', 0)->first();
-
-                            $fallbackImage = 'storage/client/img/products/uHSgfoff1LYGatU5hE38DZEA6101DTziZCDqMp2t.png';
-                            $noImage = 'client/img/products/noimage.png';
-
-                            $imageUrl = asset($noImage); // mặc định
-
-                            if ($mainImage && !empty($mainImage->url)) {
-                                $fullPath = public_path($mainImage->url);
-                                if (file_exists($fullPath)) {
-                                    $imageUrl = asset($mainImage->url);
-                                } elseif (file_exists(public_path($fallbackImage))) {
-                                    $imageUrl = asset($fallbackImage);
-                                }
-                            }
                         @endphp
-
 
                         <div class="col">
                             <div class="card h-100 product-card">
@@ -126,7 +119,7 @@
                                                 -{{ round((($detail->price - $detail->promotion_price) / $detail->price) * 100) }}%
                                             </div>
                                         @endif
-                                        <img src="{{ $imageUrl }}" alt="{{ $book->name }}">
+                                        <img src="{{ $book->main_image_url }}" alt="{{ $book->name }}">
                                     </div>
 
                                     <div class="card-body d-flex flex-column">

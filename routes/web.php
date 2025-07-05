@@ -132,7 +132,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     // Reviews
     Route::prefix('reviews')->as('reviews.')->group(function () {
         Route::get('/', [AdminReviewController::class, 'index'])->name('index');
+        Route::get('/{id}', [AdminReviewController::class, 'show'])->name('show');
         Route::patch('/{review}/status', [AdminReviewController::class, 'updateStatus'])->name('updateStatus');
+        Route::post('/{id}/reply', [AdminReviewController::class, 'reply'])->name('reply');
+        Route::delete('/{id}', [AdminReviewController::class, 'destroy'])->name('destroy');
     });
 
     // Books & Book Details
