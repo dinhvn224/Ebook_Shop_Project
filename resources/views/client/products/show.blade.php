@@ -5,16 +5,10 @@
         <style>
             .book-cover {
                 border-radius: 10px;
-                object-fit: contain;
+                object-fit: cover;
                 box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
                 width: 100%;
-                max-width: 260px;
-                height: auto;
-                aspect-ratio: 3/4;
-                background: #fff;
-                display: block;
-                margin-left: auto;
-                margin-right: auto;
+                height: 340px;
             }
 
             .book-title {
@@ -135,41 +129,6 @@
                 background: #fff;
                 border-radius: 0 0 6px 6px;
             }
-            .discount-badge {
-                display: inline-block;
-                margin-left: 8px;
-                background-color: #dc3545;
-                color: white;
-                padding: 2px 10px;
-                font-size: 0.75rem;
-                min-width: 0;
-                text-align: center;
-                border-radius: 999px;
-                z-index: 1;
-                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-                font-weight: bold;
-                letter-spacing: 0.5px;
-            }
-            .add-btn {
-                position: relative;
-                width: 34px;
-                height: 34px;
-                background: #0d6efd;
-                color: white;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                border-radius: 50%;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-                font-size: 1rem;
-                border: none;
-                outline: none;
-                transition: background 0.2s;
-            }
-            .add-btn:hover {
-                background: #0056b3;
-                color: #fff;
-            }
         </style>
 
         {{-- Chi tiết sản phẩm --}}
@@ -185,7 +144,12 @@
                         $imageUrl = $noImage;
 
                         if ($mainImage && !empty($mainImage->url)) {
-                            $imageUrl = 'storage/' . $mainImage->url;
+                            $imagePath = public_path($mainImage->url);
+                            if (file_exists($imagePath)) {
+                                $imageUrl = $mainImage->url;
+                            } elseif (file_exists(public_path($fallbackImage))) {
+                                $imageUrl = $fallbackImage;
+                            }
                         }
                     @endphp
 
@@ -305,40 +269,55 @@
                     @foreach($relatedBooks as $item)
                         @php
                             $rel = $item->details->first();
+
                             $mainImage = optional($item->images)->firstWhere('is_main', true)
                                 ?? optional($item->images)->where('deleted', 0)->first();
-                            $imageUrl = 'client/img/products/noimage.png';
+
+                            $fallbackImage = 'storage/client/img/products/uHSgfoff1LYGatU5hE38DZEA6101DTziZCDqMp2t.png';
+                            $noImage = 'client/img/products/noimage.png';
+
+                            $imageUrl = $noImage;
+
                             if ($mainImage && !empty($mainImage->url)) {
-                                $imageUrl = 'storage/' . $mainImage->url;
+                                $imagePath = public_path($mainImage->url);
+                                if (file_exists($imagePath)) {
+                                    $imageUrl = $mainImage->url;
+                                } elseif (file_exists(public_path($fallbackImage))) {
+                                    $imageUrl = $fallbackImage;
+                                }
                             }
-                            $hasPromotion = $rel && $rel->promotion_price && $rel->promotion_price < $rel->price;
                         @endphp
 
-                        <div class="col-md-3 col-6">
-                            <div class="related-product position-relative p-1">
+                        <div class="col-md-4 col-6">
+                            <div class="related-product position-relative">
+                                @if($rel && $rel->promotion_price && $rel->promotion_price < $rel->price)
+                                    <div class="discount">
+                                        -{{ round(100 - ($rel->promotion_price / $rel->price) * 100) }}%
+                                    </div>
+                                @endif
+
                                 <a href="{{ route('books.show', $item->id) }}">
-                                    <div class="position-relative text-center">
-                                        <img src="{{ asset($imageUrl) }}" alt="{{ $item->name }}" style="width:100%;max-width:100px;height:auto;aspect-ratio:3/4;object-fit:contain;background:#fff;border-radius:8px;display:block;margin:auto;">
-                                    </div>
+                                    <img src="{{ asset($imageUrl) }}" alt="{{ $item->name }}" class="w-100"
+                                        style="height: 220px; object-fit: cover;">
                                 </a>
-                                <div class="p-2">
-                                    <p class="related-title mb-1" style="font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:0.97rem;">{{ $item->name }}</p>
-                                    <p class="related-author text-muted small" style="font-size:0.9rem;">{{ $item->author->name ?? 'Ẩn danh' }}</p>
-                                    <div class="d-flex justify-content-between align-items-center mt-2">
-                                        <span class="related-price mb-0" style="font-size:0.98rem;">
-                                            @if($hasPromotion)
-                                                {{ number_format($rel->promotion_price, 0, '', '.') }}₫
-                                                <span class="old">{{ number_format($rel->price, 0, '', '.') }}₫</span>
-                                                <span class="discount-badge align-middle">-{{ round((($rel->price - $rel->promotion_price) / $rel->price) * 100) }}%</span>
-                                            @else
-                                                {{ number_format($rel->price, 0, '', '.') }}₫
-                                            @endif
-                                        </span>
-                                        <button class="add-btn" title="Thêm vào giỏ" style="width:28px;height:28px;font-size:0.95rem;">
-                                            <i class="fas fa-cart-plus"></i>
-                                        </button>
-                                    </div>
+
+                                <div class="p-3">
+                                    <p class="related-title mb-1">{{ $item->name }}</p>
+                                    <p class="related-author text-muted small">{{ $item->author->name ?? 'Ẩn danh' }}</p>
+                                    <p class="related-price mb-0">
+                                        {{ number_format($rel->promotion_price ?? $rel->price, 0, '', '.') }}₫
+                                        @if($rel->promotion_price && $rel->promotion_price < $rel->price)
+                                            <span class="old">{{ number_format($rel->price, 0, '', '.') }}₫</span>
+                                        @endif
+                                    </p>
                                 </div>
+
+                                <div class="add-btn">
+                                    <a href="{{ route('cart.index') }}" class="btn btn-outline-primary">
+                                        <i class="fas fa-cart-plus"></i>
+                                    </a>
+                                </div>
+
                             </div>
                         </div>
                     @endforeach

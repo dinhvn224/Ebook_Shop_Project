@@ -1,0 +1,227 @@
+{
+  "name": "wf2",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "chatbot",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -240,
+        140
+      ],
+      "id": "f03bfbe9-6712-4ad8-944f-ef3b23f30591",
+      "name": "Webhook",
+      "webhookId": "8bf7025a-e9b3-4116-9bbc-7c0401a3b78b"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "31a7e182-9be1-4d69-a726-9d2578d80784",
+              "name": "content",
+              "value": "={{ $json.body.message }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -20,
+        140
+      ],
+      "id": "2fcc4a93-6a4f-409f-9c62-e3757ea99142",
+      "name": "Lấy nội dung câu hỏi"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.content }}",
+        "options": {
+          "systemMessage": "Bạn là trợ lý AI của một cửa hàng sách. Chỉ trả lời các câu hỏi liên quan đến sách, tác giả, thể loại, giá, khuyến mãi, hoặc thông tin sản phẩm sách. Nếu câu hỏi không liên quan đến sách, hãy lịch sự từ chối trả lời. Nếu không có thông tin về sách mà người dùng hỏi, hãy trả lời: \"Xin lỗi, shop chưa có thông tin về sách này.\" Trả lời hoàn toàn bằng tiếng Việt, thân thiện, ngắn gọn, hữu ích."
+        }
+      },
+      "id": "94fd6e01-8dc3-4fb0-a8c4-982d4886c1a3",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        180,
+        140
+      ],
+      "typeVersion": 1.7
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "name": "success",
+              "value": true,
+              "type": "boolean",
+              "id": "7b56a7d7-7527-4d35-9f54-474c3ff4e47f"
+            },
+            {
+              "name": "source",
+              "value": "ai",
+              "type": "string",
+              "id": "a90ce268-723c-4ff3-8487-8aa6c4f5fbda"
+            },
+            {
+              "name": "message",
+              "value": "=  {{ $json.output || $json.message || 'Xin lỗi, tôi không tìm thấy câu trả lời phù hợp.' }}",
+              "type": "string",
+              "id": "34ed6e99-6ba4-444c-a351-4b74420d72ae"
+            },
+            {
+              "name": "books",
+              "value": "=[]",
+              "type": "string",
+              "id": "96ffb25e-8abe-4e1e-8180-d909f84aa516"
+            },
+            {
+              "name": "sessionId",
+              "value": "={{ $json.sessionId || '' }}",
+              "type": "string",
+              "id": "c45dbbec-2a6e-402f-8a52-f0ddde84c720"
+            },
+            {
+              "name": "timestamp",
+              "value": "={{ $now }}",
+              "type": "string",
+              "id": "75a6501d-c1d5-4f34-b512-e58d5b704dc6"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        500,
+        140
+      ],
+      "id": "42281ec1-5077-4dc5-af05-75ed734f96c6",
+      "name": "Format Response"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        680,
+        140
+      ],
+      "id": "bcbd13c3-acde-4ea1-8359-52a07d5fd4ec",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-preview-04-17",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        220,
+        360
+      ],
+      "id": "182b7411-3707-4bc6-aa5b-2b7e12019e0d",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "JgNpcwLYI3Bjyyk9",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Lấy nội dung câu hỏi",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lấy nội dung câu hỏi": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Format Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Response": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "f8821399-05d1-4571-8f7d-bf705e2183af",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "cdd28144a366b5e7807b0d7b2e042605672398ea92baa52aa0b79e3cf69cafa9"
+  },
+  "id": "CszTrZDF4gjQxGnu",
+  "tags": [
+    {
+      "createdAt": "2025-06-29T10:20:16.702Z",
+      "updatedAt": "2025-06-29T10:20:16.702Z",
+      "id": "doFUvwTRM2nk9kQ5",
+      "name": "chatbot"
+    }
+  ]
+}

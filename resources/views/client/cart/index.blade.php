@@ -53,16 +53,22 @@
                             <div class="product-card">
                                 @php
                                     $book = $item->bookDetail->book ?? null;
-                                    $mainImage = optional($book->images)->firstWhere('is_main', true)
-                                        ?? optional($book->images)->where('deleted', 0)->first();
-                                    $imageUrl = 'client/img/products/noimage.png';
-                                    if ($mainImage && !empty($mainImage->url)) {
-                                        $imageUrl = 'storage/' . $mainImage->url;
+                                    $image = $item->bookDetail->image ?? null;
+
+                                    $fallbackImage = 'storage/client/img/products/uHSgfoff1LYGatU5hE38DZEA6101DTziZCDqMp2t.png';
+                                    $noImage = 'client/img/products/noimage.png';
+
+                                    $imageUrl = asset($noImage); // Mặc định nếu không có ảnh
+
+                                    if ($image && file_exists(public_path('storage/' . $image))) {
+                                        $imageUrl = asset('storage/' . $image);
+                                    } elseif (file_exists(public_path($fallbackImage))) {
+                                        $imageUrl = asset($fallbackImage);
                                     }
                                 @endphp
 
                                 <div class="product-image-3d">
-                                    <img src="{{ asset($imageUrl) }}" alt="Product Image">
+                                    <img src="{{ $imageUrl }}" alt="Product Image">
                                     <div class="image-overlay"></div>
                                 </div>
 
@@ -403,15 +409,9 @@
 
         .product-image-3d img {
             width: 100%;
-            max-width: 80px;
-            height: auto;
-            aspect-ratio: 3/4;
-            object-fit: contain;
-            background: #fff;
-            border-radius: 8px;
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
+            height: 100%;
+            object-fit: cover;
+            transition: all 0.3s ease;
         }
 
         .image-overlay {

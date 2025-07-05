@@ -31,6 +31,7 @@ use App\Http\Controllers\Admin\{
 
 use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\ChatBotController;
 
 /*
 |--------------------------------------------------------------------------
@@ -159,6 +160,53 @@ Route::prefix('admin')
     ->as('admin.')
     ->middleware(['auth', 'role:admin'])
     ->group(function () {
+        Route::resource('images', ImageController::class);
+    });
+
+
+
+Route::prefix('admin')
+    ->name('admin.') // 💥 THÊM DÒNG NÀY
+    ->middleware(['auth', 'role:admin']) // 👉 Thêm middleware nếu cần bảo vệ
+    ->group(function () {
+
+        // 📚 Quản lý sách
+        Route::resource('books', AdminBookController::class);
+
+        // ➕ Chi tiết sách (BookDetail)
+        Route::post('books/{book}/details', [AdminBookController::class, 'addDetail'])->name('books.details.add');
+        Route::put('books/{book}/details/{detail}', [AdminBookController::class, 'updateDetail'])->name('books.details.update');
+        Route::delete('books/{book}/details/{detail}', [AdminBookController::class, 'deleteDetail'])->name('books.details.delete');
+    });
+
+Route::prefix('admin')
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.') // 👉 Đặt tên tiền tố 'admin.'
+    ->group(function () {
+        // 🧾 Orders
+        Route::resource('orders', OrderController::class)
+            ->only(['index', 'show', 'update', 'destroy']);
+    });
+
+
+Route::prefix('cart')->name('cart.')->middleware('auth')->group(function() {
+    // Hiển thị giỏ hàng
+    Route::get('/', [CartController::class, 'index'])->name('index');
+
+    // Thêm sản phẩm vào giỏ hàng
+    Route::post('add', [CartController::class, 'addToCart'])->name('add');
+
+    // Cập nhật số lượng sản phẩm
+    Route::get('update/{id}', [CartController::class, 'updateQuantity'])->name('update');
+
+    // Xóa một sản phẩm khỏi giỏ
+    Route::delete('remove/{id}', [CartController::class, 'removeFromCart'])->name('remove');
+
+    // Xóa toàn bộ giỏ hàng
+    Route::post('clear', [CartController::class, 'clearCart'])->name('clear');
+});
+
+Route::get('book/{id}', [BookController::class, 'show'])->name('book.detail');
         Route::get('reviews', [AdminReviewController::class, 'index'])->name('reviews.index');
         Route::patch('reviews/{id}/status', [AdminReviewController::class, 'updateStatus'])->name('reviews.updateStatus');
         Route::post('reviews/{id}/reply', [AdminReviewController::class, 'reply'])->name('reviews.reply'); // Nếu có
@@ -166,4 +214,8 @@ Route::prefix('admin')
 
         // ✅ Thêm dòng này để sửa lỗi bạn gặp:
         Route::get('reviews/{id}', [AdminReviewController::class, 'show'])->name('reviews.show');
-    });
+
+//
+// 🤖 CHATBOT ROUTES
+//
+Route::post('/chatbot/webhook', [ChatBotController::class, 'webhook'])->name('chatbot.webhook');

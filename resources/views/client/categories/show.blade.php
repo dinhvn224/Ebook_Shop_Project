@@ -8,27 +8,23 @@
             border: none;
             border-radius: 6px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            transition: transform 0.3s cubic-bezier(.4,2,.6,1), box-shadow 0.3s;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
             overflow: hidden;
             background-color: #fff;
         }
+
         .category-card:hover {
-            transform: scale(1.02);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
         }
+
         .category-card img {
             width: 100%;
-            max-width: 160px;
-            height: auto;
-            aspect-ratio: 3/4;
-            object-fit: contain;
-            background: #fff;
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-            border-radius: 10px;
+            height: 220px;
+            object-fit: cover;
             transition: transform 0.3s ease;
         }
+
         .category-card:hover img {
             transform: scale(1.03);
         }
@@ -56,21 +52,6 @@
             top: 80px;
             border: none;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        }
-        .discount-badge {
-            display: inline-block;
-            margin-left: 8px;
-            background-color: #dc3545;
-            color: white;
-            padding: 2px 10px;
-            font-size: 0.75rem;
-            min-width: 0;
-            text-align: center;
-            border-radius: 999px;
-            z-index: 1;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-            font-weight: bold;
-            letter-spacing: 0.5px;
         }
     </style>
 
@@ -141,40 +122,24 @@
 
             <div class="row">
                 @forelse ($books as $book)
-                    @php
-                        $detail = optional($book->details->first());
-                        $mainImage = optional($book->images)->firstWhere('is_main', true)
-                            ?? optional($book->images)->where('deleted', 0)->first();
-                        $imageUrl = 'client/img/products/noimage.png';
-                        if ($mainImage && !empty($mainImage->url)) {
-                            $imageUrl = 'storage/' . $mainImage->url;
-                        }
-                        $hasPromotion = $detail && $detail->promotion_price && $detail->promotion_price < $detail->price;
-                    @endphp
+                    @php $detail = optional($book->details->first()); @endphp
                     @if($detail)
                         <div class="col-md-4 col-6 mb-4">
                             <a href="{{ route('books.show', $book->id) }}" class="text-decoration-none text-dark">
-                                <div class="card h-100 category-card p-2">
-                                    <div class="position-relative text-center">
-                                        <img src="{{ asset($imageUrl) }}" alt="{{ $book->name }}" class="card-img-top mx-auto">
-                                    </div>
+                                <div class="card h-100 category-card">
+                                    <img src="{{ asset($book->images->first()->url ?? 'client/img/products/noimage.png') }}"
+                                        alt="{{ $book->name }}" class="card-img-top">
                                     <div class="card-body text-center">
-                                        <h6 class="flex-grow-1 fs-6 card-title mb-1" style="font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ $book->name }}</h6>
-                                        <p class="text-muted small mb-1" style="font-size: 0.95rem;">{{ $book->author->name ?? 'Ẩn danh' }}</p>
-                                        <div class="d-flex justify-content-between align-items-center mt-auto">
-                                            <p class="price-text mb-0">
-                                                @if($hasPromotion)
-                                                    {{ number_format($detail->promotion_price, 0, '', '.') }}₫
-                                                    <span class="old-price">{{ number_format($detail->price, 0, '', '.') }}₫</span>
-                                                    <span class="discount-badge align-middle">-{{ round((($detail->price - $detail->promotion_price) / $detail->price) * 100) }}%</span>
-                                                @else
-                                                    {{ number_format($detail->price, 0, '', '.') }}₫
-                                                @endif
-                                            </p>
-                                            <a href="{{ route('books.show', $book->id) }}" class="btn btn-sm btn-outline-primary">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
-                                        </div>
+                                        <h6 class="card-title mb-1">{{ $book->name }}</h6>
+                                        <p class="text-muted small mb-1">{{ $book->author->name ?? 'Ẩn danh' }}</p>
+                                        <p class="price-text mb-0">
+                                            @if($detail->promotion_price && $detail->promotion_price < $detail->price)
+                                                {{ number_format($detail->promotion_price, 0, '', '.') }}₫
+                                                <span class="old-price">{{ number_format($detail->price, 0, '', '.') }}₫</span>
+                                            @else
+                                                {{ number_format($detail->price, 0, '', '.') }}₫
+                                            @endif
+                                        </p>
                                     </div>
                                 </div>
                             </a>

@@ -149,7 +149,7 @@
                 <label for="payment_method">Phương thức thanh toán</label>
                 <select name="payment_method" id="payment_method" class="form-control" required>
                     <option value="COD" {{ old('payment_method') == 'COD' ? 'selected' : '' }}>Thanh toán khi nhận hàng</option>
-                    <option value="BANK" {{ old('payment_method') == 'BANK' ? 'selected' : '' }}>Chuyển khoản ngân hàng</option>
+                    <option value="Banking" {{ old('payment_method') == 'Banking' ? 'selected' : '' }}>Chuyển khoản ngân hàng</option>
                 </select>
             </div>
         </div>
