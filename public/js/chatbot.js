@@ -57,14 +57,11 @@ class AdvancedChatbot {
                 </button>
                 <div class="chatbot-window" id="chatbotWindow">
                     <div class="chatbot-header">
-                        <div class="chatbot-info">
-                            <h3>🤖 Chatbot BookStore</h3>
-                            <div class="status" id="chatbotStatus">
-                                <span class="status-dot online"></span>
-                                <span class="status-text">Đang hoạt động</span>
-                            </div>
+                        <div class="chatbot-header-left">
+                            <span class=\"chatbot-logo-icon\">🤖</span>
+                            <span class=\"chatbot-title\">Chatbot BookStore</span>
                         </div>
-                        <div class="chatbot-actions">
+                        <div class="chatbot-header-right">
                             <button class="chatbot-action" id="clearChat" title="Xóa lịch sử chat">
                                 <i class="fas fa-trash"></i>
                             </button>
@@ -77,21 +74,18 @@ class AdvancedChatbot {
                         <!-- Messages will be added here -->
                     </div>
                     <div class="typing-indicator" id="typingIndicator">
-                        <div class="typing-content">
-                            <div class="typing-avatar">🤖</div>
-                            <div class="typing-bubble">
-                                <div class="typing-dots">
-                                    <div class="typing-dot"></div>
-                                    <div class="typing-dot"></div>
-                                    <div class="typing-dot"></div>
-                                </div>
-                                <div class="typing-text" id="typingText">Đang tìm kiếm...</div>
+                        <div class="typing-bubble">
+                            <div class="typing-dots">
+                                <div class="typing-dot"></div>
+                                <div class="typing-dot"></div>
+                                <div class="typing-dot"></div>
                             </div>
+                            <div class="typing-text" id="typingText">Đang tìm kiếm...</div>
                         </div>
                     </div>
                     <div class="chatbot-input-area">
-                        <div class="input-suggestions" id="inputSuggestions" style="display: none;"></div>
                         <div class="input-container">
+
                             <textarea
                                 class="chatbot-input"
                                 id="chatbotInput"
@@ -99,18 +93,11 @@ class AdvancedChatbot {
                                 rows="1"
                                 maxlength="500"
                             ></textarea>
-                            <div class="input-actions">
-                                <button class="input-action" id="attachFile" title="Đính kèm file" style="display: none;">
-                                    <i class="fas fa-paperclip"></i>
-                                </button>
-                                <button class="chatbot-send" id="chatbotSend" title="Gửi tin nhắn">
-                                    <i class="fas fa-paper-plane"></i>
-                                </button>
-                            </div>
+                            <button class="chatbot-send" id="chatbotSend" title="Gửi tin nhắn">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
                         </div>
-                        <div class="input-footer">
-                            <span class="character-count" id="characterCount">0/500</span>
-                        </div>
+                        <span class="character-count" id="characterCount">0/500</span>
                     </div>
                 </div>
             </div>
