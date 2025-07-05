@@ -145,13 +145,6 @@
                 <label for="phone_number">Số điện thoại</label>
                 <input type="text" id="phone_number" name="phone_number" class="form-control" placeholder="0912345678" value="{{ old('phone_number') }}" required>
             </div>
-            <div class="form-group">
-                <label for="payment_method">Phương thức thanh toán</label>
-                <select name="payment_method" id="payment_method" class="form-control" required>
-                    <option value="COD" {{ old('payment_method') == 'COD' ? 'selected' : '' }}>Thanh toán khi nhận hàng</option>
-                    <option value="Banking" {{ old('payment_method') == 'Banking' ? 'selected' : '' }}>Chuyển khoản ngân hàng</option>
-                </select>
-            </div>
         </div>
 
         {{-- Tổng đơn hàng --}}

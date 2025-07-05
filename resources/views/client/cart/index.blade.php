@@ -53,15 +53,15 @@
                             <div class="product-card">
                                 @php
                                     $book = $item->bookDetail->book ?? null;
-                                    $image = $item->bookDetail->image ?? null;
+                                    $mainImage = $book->mainImage ?? null;
 
                                     $fallbackImage = 'storage/client/img/products/uHSgfoff1LYGatU5hE38DZEA6101DTziZCDqMp2t.png';
                                     $noImage = 'client/img/products/noimage.png';
 
                                     $imageUrl = asset($noImage); // Mặc định nếu không có ảnh
 
-                                    if ($image && file_exists(public_path('storage/' . $image))) {
-                                        $imageUrl = asset('storage/' . $image);
+                                    if ($mainImage && file_exists(public_path('storage/' . $mainImage->url))) {
+                                        $imageUrl = asset('storage/' . $mainImage->url);
                                     } elseif (file_exists(public_path($fallbackImage))) {
                                         $imageUrl = asset($fallbackImage);
                                     }

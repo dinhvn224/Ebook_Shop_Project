@@ -33,12 +33,10 @@ class CheckoutController extends Controller
     // Xử lý thanh toán
     public function processOrder(Request $request)
     {
-        // Validate dữ liệu
         $request->validate([
             'customer_name' => 'required|string|max:255',
             'shipping_address' => 'required|string|max:255',
             'phone_number' => 'required|string|max:20',
-            'payment_method' => 'required|string',
         ]);
 
         // Lấy giỏ hàng
@@ -72,7 +70,6 @@ class CheckoutController extends Controller
             $ship_amount = 30000;
             $total_amount = $amount + $ship_amount;
 
-            // Tạo đơn hàng
             $order = Order::create([
                 'user_id' => Auth::id(),
                 'customer_name' => $request->customer_name,
@@ -84,7 +81,6 @@ class CheckoutController extends Controller
                 'ship_amount' => $ship_amount,
                 'change_amount' => 0,
                 'status' => 'pending',
-                'payment_method' => $request->payment_method,
                 'order_date' => Carbon::now(),
             ]);
 

@@ -20,7 +20,7 @@ class CartController extends Controller
                 'items' => function ($query) {
                     $query->where('deleted', false);
                 },
-                'items.bookDetail'
+                'items.bookDetail.book.mainImage'
             ])
             ->first();
 
