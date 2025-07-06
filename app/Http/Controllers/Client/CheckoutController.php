@@ -38,7 +38,7 @@ class CheckoutController extends Controller
             'customer_name' => 'required|string|max:255',
             'shipping_address' => 'required|string|max:255',
             'phone_number' => 'required|string|max:20',
-            'payment_method' => 'required|string',
+            'payment_method' => 'required|string|in:CASH,COD,QR_PAY,COUNTER',
         ]);
 
         // Lấy giỏ hàng
@@ -78,12 +78,9 @@ class CheckoutController extends Controller
                 'customer_name' => $request->customer_name,
                 'shipping_address' => $request->shipping_address,
                 'phone_number' => $request->phone_number,
-                'amount' => $amount,
-                'total_amount' => $total_amount,
                 'final_amount' => $total_amount,
-                'ship_amount' => $ship_amount,
                 'change_amount' => 0,
-                'status' => 'pending',
+                'status' => 'PENDING',
                 'payment_method' => $request->payment_method,
                 'order_date' => Carbon::now(),
             ]);

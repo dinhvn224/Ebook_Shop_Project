@@ -78,8 +78,32 @@ class Book extends Model
         return $query->withoutGlobalScope('not_deleted');
     }
     public function reviews()
-{
-    return $this->hasMany(Review::class, 'book_detail_id', 'id');
-}
+    {
+        return $this->hasMany(Review::class, 'book_detail_id', 'id');
+    }
 
+    /**
+     * Lấy URL ảnh chính của sách
+     */
+    public function getMainImageUrlAttribute()
+    {
+        $mainImage = $this->images()
+            ->where('is_main', true)
+            ->where('deleted', false)
+            ->first();
+
+        if (!$mainImage) {
+            $mainImage = $this->images()
+                ->where('deleted', false)
+                ->first();
+        }
+
+        if ($mainImage && !empty($mainImage->url)) {
+            return asset('storage/' . $mainImage->url);
+        }
+
+        // Fallback to default image
+        $defaultImage = Image::first();
+        return $defaultImage ? asset('storage/' . $defaultImage->url) : asset('client/img/products/noimage.png');
+    }
 }

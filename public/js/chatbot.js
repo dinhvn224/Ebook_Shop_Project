@@ -84,8 +84,8 @@ class AdvancedChatbot {
                         </div>
                     </div>
                     <div class="chatbot-input-area">
-                        <div class="input-suggestions" id="inputSuggestions" style="display: none;"></div>
                         <div class="input-container">
+
                             <textarea
                                 class="chatbot-input"
                                 id="chatbotInput"
