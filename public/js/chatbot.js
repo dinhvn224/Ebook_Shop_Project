@@ -84,8 +84,8 @@ class AdvancedChatbot {
                         </div>
                     </div>
                     <div class="chatbot-input-area">
+                        <div class="input-suggestions" id="inputSuggestions" style="display: none;"></div>
                         <div class="input-container">
-
                             <textarea
                                 class="chatbot-input"
                                 id="chatbotInput"
@@ -432,13 +432,17 @@ class AdvancedChatbot {
      * Show suggestions (placeholder)
      */
     showSuggestions() {
-        // You can implement quick suggestions here
-        // For now, just show/hide the box
-        document.getElementById('inputSuggestions').style.display = 'block';
+        const suggestionsBox = document.getElementById('inputSuggestions');
+        if (suggestionsBox) {
+            suggestionsBox.style.display = 'block';
+        }
     }
 
     hideSuggestions() {
-        document.getElementById('inputSuggestions').style.display = 'none';
+        const suggestionsBox = document.getElementById('inputSuggestions');
+        if (suggestionsBox) {
+            suggestionsBox.style.display = 'none';
+        }
     }
 
     /**
