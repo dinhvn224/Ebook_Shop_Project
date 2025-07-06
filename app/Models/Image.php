@@ -30,7 +30,7 @@ class Image extends Model
         return $this->belongsTo(Book::class);
     }
 
-    
+
 
     /**
      * Scope: Ảnh chính và chưa bị xóa
@@ -61,6 +61,11 @@ class Image extends Model
      */
     public function getUrlOrDefaultAttribute()
     {
-        return $this->url ?? asset('client/img/products/noimage.png');
+        if ($this->url) {
+            return asset('storage/' . $this->url);
+        }
+
+        $defaultImage = self::first();
+        return $defaultImage ? asset('storage/' . $defaultImage->url) : asset('client/img/products/noimage.png');
     }
 }

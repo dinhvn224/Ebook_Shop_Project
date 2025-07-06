@@ -44,39 +44,21 @@
                                 @php
                                     $subtotal = $item->bookDetail->price * $item->quantity;
                                     $total += $subtotal;
+                                    $book = $item->bookDetail->book ?? null;
                                 @endphp
                                 <tr class="cart-row-3d">
-                                    <td class="td-3d">
+                                    <td class="td-3d" style="width: 40px; text-align: center; vertical-align: middle;">
                                         <span class="index-badge">{{ $index++ }}</span>
                                     </td>
-                                    <td class="td-3d product-info">
-                            <div class="product-card">
-                                @php
-                                    $book = $item->bookDetail->book ?? null;
-                                    $image = $item->bookDetail->image ?? null;
-
-                                    $fallbackImage = 'storage/client/img/products/uHSgfoff1LYGatU5hE38DZEA6101DTziZCDqMp2t.png';
-                                    $noImage = 'client/img/products/noimage.png';
-
-                                    $imageUrl = asset($noImage); // Mặc định nếu không có ảnh
-
-                                    if ($image && file_exists(public_path('storage/' . $image))) {
-                                        $imageUrl = asset('storage/' . $image);
-                                    } elseif (file_exists(public_path($fallbackImage))) {
-                                        $imageUrl = asset($fallbackImage);
-                                    }
-                                @endphp
-
-                                <div class="product-image-3d">
-                                    <img src="{{ $imageUrl }}" alt="Product Image">
-                                    <div class="image-overlay"></div>
-                                </div>
-
-                                <a href="{{ route('product.show', $book->id ?? 0) }}" target="_blank" class="product-name-3d">
-                                    {{ $book->name ?? '[Không xác định]' }}
-                                </a>
-                            </div>
-
+                                    <td class="td-3d product-info" style="width: 220px; vertical-align: middle;">
+                                        <div class="product-card" style="gap: 8px; margin: 0; padding: 0;">
+                                            <div class="product-image-3d" style="width: 60px; height: 90px; flex-shrink: 0; margin: 0;">
+                                                <img src="{{ $book ? $book->main_image_url : asset('client/img/products/noimage.png') }}" alt="Product Image">
+                                            </div>
+                                            <a href="{{ route('product.show', $book->id ?? 0) }}" target="_blank" class="product-name-3d" style="display: block; max-width: 140px; white-space: normal; word-break: break-word;">
+                                                {{ $book->name ?? '[Không xác định]' }}
+                                            </a>
+                                        </div>
                                     </td>
                                     <td class="td-3d price-3d">
                                         <span class="price-tag">{{ number_format($item->bookDetail->price, 0, ',', '.') }} ₫</span>
@@ -394,24 +376,32 @@
         }
 
         .product-image-3d {
-            position: relative;
-            width: 80px;
-            height: 80px;
-            border-radius: 12px;
-            overflow: hidden;
-            transform: perspective(200px) rotateY(15deg);
-            transition: all 0.3s ease;
+            width: 100px;
+            height: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+            margin: 0 auto;
+            padding: 0;
         }
-
-        .product-image-3d:hover {
-            transform: perspective(200px) rotateY(0deg) scale(1.1);
-        }
-
         .product-image-3d img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: all 0.3s ease;
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            border-radius: 6px;
+            display: block;
+            margin: 0 auto;
+            background: transparent;
+            box-shadow: none;
+            padding: 0;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .product-image-3d img:hover {
+            transform: scale(1.03);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.10);
         }
 
         .image-overlay {

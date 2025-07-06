@@ -57,7 +57,7 @@ class DashboardTestSeeder extends Seeder
                 'final_amount' => 0,
                 'change_amount' => 0,
                 'status' => $status,
-                'payment_method' => fake()->randomElement(['CASH', 'COD', 'QR_PAY']),
+                'payment_method' => fake()->randomElement(['CASH', 'COD', 'QR_PAY', 'COUNTER']),
                 'order_date' => $date,
                 'created_at' => $date,
                 'updated_at' => $date,

@@ -200,7 +200,7 @@ private function searchInDatabase($intent)
 
                 $books = $query->whereHas('author', fn($q) =>
                     $q->where('name', 'like', "%$authorName%")
-                )->limit(10)->get();
+                )->limit(3)->get();
 
                 if ($books->isEmpty()) {
                     $query = Book::with(['author', 'category', 'publisher', 'details']);
@@ -210,7 +210,7 @@ private function searchInDatabase($intent)
                                 $subQ->orWhere('name', 'like', "%$term%");
                             }
                         });
-                    })->limit(10)->get();
+                    })->limit(3)->get();
                 }
 
                 return [
@@ -233,7 +233,7 @@ private function searchInDatabase($intent)
                 $publisherName = implode(' ', $terms);
                 $books = $query->whereHas('publisher', fn($q) =>
                     $q->where('name', 'like', "%$publisherName%")
-                )->limit(10)->get();
+                )->limit(3)->get();
                 if ($books->isEmpty()) {
                     $query = Book::with(['author', 'category', 'publisher', 'details']);
                     $books = $query->whereHas('publisher', function ($q) use ($terms) {
@@ -242,7 +242,7 @@ private function searchInDatabase($intent)
                                 $subQ->orWhere('name', 'like', "%$term%");
                             }
                         });
-                    })->limit(10)->get();
+                    })->limit(3)->get();
                 }
                 return [
                     'found' => $books->isNotEmpty(),
@@ -265,7 +265,7 @@ private function searchInDatabase($intent)
             case 'category_search':
                 // 1. Ưu tiên tìm theo full phrase
                 $books = $query->where('name', 'like', "%$raw%")
-                    ->limit(10)->get();
+                    ->limit(3)->get();
 
                 // 2. Fallback nếu không có
                 if ($books->isEmpty()) {
@@ -286,7 +286,7 @@ private function searchInDatabase($intent)
                         });
                     });
 
-                    $books = $query->limit(10)->get();
+                    $books = $query->limit(3)->get();
                 }
 
                 break;
@@ -295,7 +295,7 @@ private function searchInDatabase($intent)
                 $query->whereHas('details', fn($d) =>
                     $d->where('price', '<=', $intent['price'])
                 );
-                $books = $query->limit(10)->get();
+                $books = $query->limit(3)->get();
                 if ($books->isEmpty()) {
                     return [
                         'found' => true,
@@ -309,7 +309,7 @@ private function searchInDatabase($intent)
                 $query->whereHas('details', fn($d) =>
                     $d->where('price', '>=', $intent['price'])
                 );
-                $books = $query->limit(10)->get();
+                $books = $query->limit(3)->get();
                 if ($books->isEmpty()) {
                     return [
                         'found' => true,
@@ -323,7 +323,7 @@ private function searchInDatabase($intent)
                 $query->whereHas('details', fn($d) =>
                     $d->whereNotNull('promotion_price')
                 );
-                $books = $query->limit(10)->get();
+                $books = $query->limit(3)->get();
                 break;
 
             default:
@@ -367,9 +367,7 @@ private function searchInDatabase($intent)
             'promotion_inquiry' => '🎉 Sách đang khuyến mãi:',
             'publisher_search' => '🏢 Sách theo nhà xuất bản:',
         ];
-
         $msg = $titles[$type] ?? '📚 Kết quả tìm kiếm:' . "\n\n";
-
         foreach ($books as $b) {
             $d = $b->details->first();
             $msg .= "📖 **{$b->name}**\n";
@@ -385,7 +383,6 @@ private function searchInDatabase($intent)
             }
             $msg .= "\n";
         }
-
         return $msg;
     }
 

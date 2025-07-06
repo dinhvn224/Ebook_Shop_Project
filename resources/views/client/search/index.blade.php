@@ -71,22 +71,6 @@
                     @php
                         $detail = optional($book->details)->first();
                         $hasPromotion = $detail && $detail->promotion_price && $detail->promotion_price < $detail->price;
-
-                        $mainImage = optional($book->images)->firstWhere('is_main', true)
-                            ?? optional($book->images)->where('deleted', 0)->first();
-
-                        $fallbackImage = 'storage/client/img/products/uHSgfoff1LYGatU5hE38DZEA6101DTziZCDqMp2t.png';
-                        $noImage = 'client/img/products/noimage.png';
-
-                        $imageUrl = asset($noImage);
-                        if ($mainImage && !empty($mainImage->url)) {
-                            $fullPath = public_path($mainImage->url);
-                            if (file_exists($fullPath)) {
-                                $imageUrl = asset($mainImage->url);
-                            } elseif (file_exists(public_path($fallbackImage))) {
-                                $imageUrl = asset($fallbackImage);
-                            }
-                        }
                     @endphp
 
                     <div class="col">
@@ -98,7 +82,7 @@
                                             -{{ round((($detail->price - $detail->promotion_price) / $detail->price) * 100) }}%
                                         </div>
                                     @endif
-                                    <img src="{{ $imageUrl }}" alt="{{ $book->name }}">
+                                    <img src="{{ $book->main_image_url }}" alt="{{ $book->name }}">
                                 </div>
 
                                 <div class="card-body d-flex flex-column">

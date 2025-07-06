@@ -21,6 +21,8 @@ class Order extends Model
         'order_date',
         'completed_date',
         'change_amount',
+        'voucher_id',
+        'voucher_discount',
     ];
 
     protected $casts = [
