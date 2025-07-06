@@ -58,6 +58,41 @@ class ChatBotController extends Controller
                 ]);
             }
 
+            // --- NEW FUNCTIONALITY: Tóm tắt sách từ DB hoặc hỏi AI ---
+            if ($intent['type'] === 'summarize_book' && !empty($intent['raw'])) {
+                $bookName = $intent['raw'];
+                // Sử dụng 'with' để tải eager loading 'details' nếu bạn cần các thông tin khác của BookDetail ở đây
+                $book = Book::where('name', 'like', "%{$bookName}%")->first();
+
+                if ($book && !empty($book->description)) {
+                    // Cung cấp mô tả sách cho Gemini để tóm tắt
+                    $summaryPrompt = "Tóm tắt cuốn sách có tên '{$book->name}' với nội dung sau: \"{$book->description}\". Nếu nội dung này quá ngắn hoặc không đủ chi tiết, hãy sử dụng kiến thức chung của bạn để cung cấp thêm thông tin hữu ích về sách.";
+                    $geminiResponse = $this->callGeminiApi($summaryPrompt);
+                    return response()->json([
+                        'success' => $geminiResponse['success'],
+                        'source' => 'ai_summary',
+                        'message' => $geminiResponse['message'],
+                        'books' => [], // Không trả về sách ở đây vì đã có thông tin tóm tắt
+                        'sessionId' => $sessionId,
+                        'timestamp' => $timestamp,
+                    ]);
+                } else {
+                    // Nếu không tìm thấy sách trong DB hoặc sách không có mô tả,
+                    // chuyển yêu cầu gốc đến Gemini để nó xử lý bằng kiến thức chung
+                    $geminiResponse = $this->callGeminiApi($message);
+                     return response()->json([
+                        'success' => $geminiResponse['success'],
+                        'source' => 'ai',
+                        'message' => $geminiResponse['message'],
+                        'books' => [],
+                        'sessionId' => $sessionId,
+                        'timestamp' => $timestamp,
+                    ]);
+                }
+            }
+            // --- END NEW FUNCTIONALITY ---
+
+
             // 3. Nếu không có trong DB và là yêu cầu "gợi ý/tư vấn" (recommendation)
             $aiResult = ['success' => false, 'message' => '']; // Khởi tạo giá trị mặc định
 
@@ -97,7 +132,8 @@ class ChatBotController extends Controller
                 ]);
 
             } else {
-                // Các trường hợp còn lại (intent không phải recommendation và không tìm thấy trong DB),
+                // Các trường hợp còn lại (intent không phải recommendation và không tìm thấy trong DB,
+                // và cũng không phải summarize_book đã được xử lý),
                 // gửi tin nhắn gốc đến Gemini như một fallback chung
                 $aiResult = $this->callGeminiApi($message); // Không cần sessionId
             }
@@ -163,6 +199,20 @@ class ChatBotController extends Controller
         if ($intent['type'] === 'general_chat') {
             return $intent;
         }
+
+        // NEW: Nhận diện ý định tóm tắt sách
+        // Sử dụng regex để lấy tên sách sau "tóm tắt sách", "nội dung chính sách", "thông tin về sách"
+        // Regex đã được điều chỉnh để linh hoạt hơn với từ "cuốn" hoặc không có từ nào sau động từ
+        if (preg_match('/(tóm tắt|nội dung chính|thông tin về)\s*(cuốn|sách)?\s*(.+)/u', $text, $matches)) {
+            $intent['type'] = 'summarize_book';
+            $bookNameCandidate = trim($matches[3]); // Lấy phần sau "sách" hoặc "cuốn"
+            $intent['raw'] = $bookNameCandidate; // Giữ nguyên tên sách để tìm kiếm chính xác
+            // Vẫn lọc stop words cho search_terms nếu muốn dùng cho tìm kiếm linh hoạt hơn
+            // nhưng ở đây ta dùng raw để tìm kiếm chính xác tên sách
+            $intent['search_terms'] = $this->extractSearchTerms($bookNameCandidate);
+            return $intent; // Trả về ngay nếu ý định này được phát hiện
+        }
+
 
         // Nhận diện các ý định tìm kiếm cụ thể (ưu tiên)
         if (str_contains($text, 'tác giả')) {
@@ -230,7 +280,7 @@ class ChatBotController extends Controller
     private function extractSearchTerms($text)
     {
         $stopWords = [
-            'tôi', 'muốn', 'tìm', 'kiếm', 'sách', 'cuốn', 'của', 'có', 'không',
+            'tôi', 'muốn', 'tìm', 'kiếm', 'cuốn', 'của', 'có', 'không',
             'và', 'hay', 'hoặc', 'nào', 'gì', 'ai', 'xin', 'hãy', 'cho',
             'thông', 'tin', 'về', 'tên', 'là', 'tác', 'giả', 'k', 'đồng','đ',
             'nhà', 'xuất', 'bản', 'nxb', 'publisher', 'thể', 'loại', 'genre', 'loại',
@@ -260,9 +310,15 @@ class ChatBotController extends Controller
 
             // Nếu không có từ khóa tìm kiếm và không phải là các intent đặc biệt về giá/khuyến mãi
             // và không phải là recommendation (vì recommendation sẽ có logic riêng)
+            // và không phải summarize_book (vì summarize_book sẽ được xử lý riêng)
             if (empty($terms) && !in_array($intent['type'], ['price_below', 'price_above', 'promotion_inquiry'])) {
                 return ['found' => false];
             }
+            // Nếu là summarize_book, searchInDatabase sẽ không xử lý nó ở đây, mà webhook sẽ xử lý
+            if ($intent['type'] === 'summarize_book') {
+                return ['found' => false];
+            }
+
 
             $query = Book::with(['author', 'category', 'publisher', 'details']);
             $books = collect(); // Khởi tạo collection rỗng
@@ -303,7 +359,6 @@ class ChatBotController extends Controller
                     break;
 
                 case 'book_search':
-                // Loại bỏ 'recommendation' khỏi đây vì nó sẽ có logic riêng trong webhook
                 case 'category_search': // Category_search cũng sẽ tìm theo tên sách hoặc thể loại
 
                     // 1. Ưu tiên tìm theo full phrase nếu có raw message
@@ -423,6 +478,7 @@ class ChatBotController extends Controller
             'promotion_inquiry' => '🎉 Sách đang khuyến mãi:',
             'publisher_search' => '🏢 Sách theo nhà xuất bản:',
             'author_search' => '✍️ Sách theo tác giả:',
+            'summarize_book' => '📖 Tóm tắt sách:', // Thêm tiêu đề cho tóm tắt sách
         ];
         // Sửa đổi tiêu đề cho recommendation để không lặp lại "Dưới đây là 3 cuốn sách ngẫu nhiên..."
         $msg = ($titles[$type] ?? '📚 Kết quả tìm kiếm:') . "\n\n";
@@ -479,6 +535,7 @@ class ChatBotController extends Controller
                 ]
             ];
 
+            // Đảm bảo sử dụng v1 thay vì v1beta cho model ổn định
             $response = Http::timeout(30)->post("https://generativelanguage.googleapis.com/v1/models/{$model}:generateContent?key={$apiKey}", [
                 'contents' => $contents,
                 'generationConfig' => [
