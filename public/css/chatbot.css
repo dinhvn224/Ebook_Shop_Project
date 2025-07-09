@@ -644,3 +644,16 @@
 .message.bot.ai .message-content {
     border-left: 4px solid #667eea;
 }
+
+/* Link chi tiết sản phẩm trong chatbot */
+.product-detail-link {
+    color: inherit !important; /* Giống màu chữ xung quanh */
+    text-decoration: none !important; /* Bỏ gạch chân */
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+.product-detail-link:hover {
+    color: #667eea !important; /* Hiệu ứng hover nhẹ, có thể đổi màu khác nếu muốn */
+    text-decoration: underline;
+}

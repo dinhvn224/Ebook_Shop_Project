@@ -126,6 +126,7 @@ class ChatBotController extends Controller
                         'promotion_price' => optional($b->details->first())->promotion_price,
                         'quantity' => optional($b->details->first())->quantity,
                         'description' => $b->description,
+                        'url' => url('/product/' . $b->id), // Thay đổi URL chi tiết sản phẩm
                     ])->toArray(),
                     'sessionId' => $sessionId,
                     'timestamp' => $timestamp,
@@ -453,6 +454,7 @@ class ChatBotController extends Controller
                     'promotion_price' => optional($b->details->first())->promotion_price,
                     'quantity' => optional($b->details->first())->quantity,
                     'description' => $b->description,
+                    'url' => url('/product/' . $b->id), // Thay đổi URL chi tiết sản phẩm ở đây
                 ])->toArray(),
             ];
         } catch (\Exception $e) {
@@ -478,13 +480,11 @@ class ChatBotController extends Controller
             'promotion_inquiry' => '🎉 Sách đang khuyến mãi:',
             'publisher_search' => '🏢 Sách theo nhà xuất bản:',
             'author_search' => '✍️ Sách theo tác giả:',
-            'summarize_book' => '📖 Tóm tắt sách:', // Thêm tiêu đề cho tóm tắt sách
+            'summarize_book' => '📖 Tóm tắt sách:',
         ];
-        // Sửa đổi tiêu đề cho recommendation để không lặp lại "Dưới đây là 3 cuốn sách ngẫu nhiên..."
         $msg = ($titles[$type] ?? '📚 Kết quả tìm kiếm:') . "\n\n";
 
         if ($books->isEmpty()) {
-            // Đây là fallback nếu không có sách nào, nhưng với random thì ít khi xảy ra nếu DB có dữ liệu
             return "Xin lỗi, không tìm thấy sách nào theo yêu cầu của bạn.";
         }
 
@@ -496,11 +496,13 @@ class ChatBotController extends Controller
             $msg .= "🏢 NXB: " . optional($b->publisher)->name . "\n";
             if ($d) {
                 $msg .= "💰 Giá: " . number_format($d->price) . " đ\n";
-                if ($d->promotion_price && $d->promotion_price < $d->price) { // Chỉ hiện KM nếu có và nhỏ hơn giá gốc
+                if ($d->promotion_price && $d->promotion_price < $d->price) {
                     $msg .= "🎯 KM: " . number_format($d->promotion_price) . " đ\n";
                 }
                 $msg .= "📦 Tồn kho: {$d->quantity}\n";
             }
+            // Thêm URL chi tiết sách nếu có
+            $msg .= "🔗 Chi tiết: " . url('/product/' . $b->id) . "\n";
             $msg .= "\n";
         }
         return $msg;
@@ -511,7 +513,7 @@ class ChatBotController extends Controller
      * @param string $message Tin nhắn gửi đến AI.
      * @return array Kết quả phản hồi từ AI.
      */
-    private function callGeminiApi($message) // Bỏ $sessionId
+    private function callGeminiApi($message)
     {
         try {
             $apiKey = env('GEMINI_API_KEY');
@@ -525,7 +527,6 @@ class ChatBotController extends Controller
             }
 
             // Xây dựng nội dung cho API Gemini
-            // Không có lịch sử trò chuyện được truyền đi
             $contents = [
                 [
                     'role' => 'user',
@@ -535,7 +536,6 @@ class ChatBotController extends Controller
                 ]
             ];
 
-            // Đảm bảo sử dụng v1 thay vì v1beta cho model ổn định
             $response = Http::timeout(30)->post("https://generativelanguage.googleapis.com/v1/models/{$model}:generateContent?key={$apiKey}", [
                 'contents' => $contents,
                 'generationConfig' => [
@@ -560,7 +560,6 @@ class ChatBotController extends Controller
             ]);
 
             $text = '';
-            // Kiểm tra cấu trúc phản hồi từ Gemini
             if (isset($data['candidates'][0]['content']['parts'][0]['text'])) {
                 $text = $data['candidates'][0]['content']['parts'][0]['text'];
             } else {

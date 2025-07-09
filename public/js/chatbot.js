@@ -71,8 +71,7 @@ class AdvancedChatbot {
                         </div>
                     </div>
                     <div class="chatbot-messages" id="chatbotMessages">
-                        <!-- Messages will be added here -->
-                    </div>
+                        </div>
                     <div class="typing-indicator" id="typingIndicator">
                         <div class="typing-bubble">
                             <div class="typing-dots">
@@ -305,12 +304,24 @@ class AdvancedChatbot {
                 sourceClass = 'ai';
                 this.updateTypingStatus('Trả lời từ AI');
                 break;
+            case 'database_random_recommendation': // Thêm case này cho recommendation
+                sourceIcon = '✨';
+                sourceText = 'Gợi ý sách ngẫu nhiên';
+                sourceClass = 'database';
+                this.updateTypingStatus('Đang gợi ý sách...');
+                break;
+            case 'ai_summary': // Thêm case này cho tóm tắt sách
+                sourceIcon = '📖';
+                sourceText = 'Tóm tắt từ AI';
+                sourceClass = 'ai';
+                this.updateTypingStatus('Đang tóm tắt sách...');
+                break;
         }
         setTimeout(() => {
             this.addMessage(message, 'bot', sourceClass, {
                 sourceIcon,
                 sourceText,
-                books: []
+                books: books // Truyền mảng books vào đây
             });
         }, 500);
     }
@@ -330,10 +341,12 @@ class AdvancedChatbot {
         if (sender === 'bot' && meta.sourceIcon && meta.sourceText) {
             metaHtml = `<div class="message-meta"><span class="icon">${meta.sourceIcon}</span> <span class="text">${meta.sourceText}</span></div>`;
         }
+        // Thay đổi dòng này để meta.books được xử lý bởi formatMessage riêng,
+        // và message-time được đặt ngoài kết quả của formatMessage.
         messageDiv.innerHTML = `
             <div class="message-content">
                 ${metaHtml}
-                ${this.formatMessage(content)}
+                ${this.formatMessage(content, meta.books)}
                 <div class="message-time">${time}</div>
             </div>
         `;
@@ -351,19 +364,32 @@ class AdvancedChatbot {
 
     /**
      * Format message content (support markdown-like formatting)
+     * Now also handles product URLs.
      */
-    formatMessage(content) {
+    formatMessage(content, books = []) {
         if (typeof content !== 'string') {
             content = String(content ?? '');
         }
+        // Bold text
         content = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        // New lines
         content = content.replace(/\n/g, '<br>');
+
+        // Handle URLs for books explicitly if they are in the message content
+        // This regex specifically targets the "🔗 Chi tiết: URL" format
         content = content.replace(
-            /(https?:\/\/[^\s]+)/g,
-            '<a href="$1" target="_blank" rel="noopener">$1</a>'
+            /🔗 Chi tiết:\s*(https?:\/\/[^\s<]+)/g,
+            '<a href="$1" target="_blank" rel="noopener" class="product-detail-link">🔗 Chi tiết</a>'
+        );
+
+        // General URL formatting if any other URL is present
+        content = content.replace(
+            /(?<!href=")(https?:\/\/[^\s<]+)/g, // Avoid replacing URLs already inside href attributes
+            '<a href="$1" target="_blank" rel="noopener" class="product-detail-link">$1</a>'
         );
         return content;
     }
+
 
     /**
      * Show enhanced typing indicator
