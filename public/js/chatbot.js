@@ -341,8 +341,7 @@ class AdvancedChatbot {
         if (sender === 'bot' && meta.sourceIcon && meta.sourceText) {
             metaHtml = `<div class="message-meta"><span class="icon">${meta.sourceIcon}</span> <span class="text">${meta.sourceText}</span></div>`;
         }
-        // Thay đổi dòng này để meta.books được xử lý bởi formatMessage riêng,
-        // và message-time được đặt ngoài kết quả của formatMessage.
+
         messageDiv.innerHTML = `
             <div class="message-content">
                 ${metaHtml}
@@ -362,10 +361,7 @@ class AdvancedChatbot {
         this.scrollToBottom();
     }
 
-    /**
-     * Format message content (support markdown-like formatting)
-     * Now also handles product URLs.
-     */
+
     formatMessage(content, books = []) {
         if (typeof content !== 'string') {
             content = String(content ?? '');
@@ -375,14 +371,12 @@ class AdvancedChatbot {
         // New lines
         content = content.replace(/\n/g, '<br>');
 
-        // Handle URLs for books explicitly if they are in the message content
-        // This regex specifically targets the "🔗 Chi tiết: URL" format
+
         content = content.replace(
             /🔗 Chi tiết:\s*(https?:\/\/[^\s<]+)/g,
             '<a href="$1" target="_blank" rel="noopener" class="product-detail-link">🔗 Chi tiết</a>'
         );
 
-        // General URL formatting if any other URL is present
         content = content.replace(
             /(?<!href=")(https?:\/\/[^\s<]+)/g, // Avoid replacing URLs already inside href attributes
             '<a href="$1" target="_blank" rel="noopener" class="product-detail-link">$1</a>'
@@ -475,7 +469,7 @@ class AdvancedChatbot {
      * Handle typing (placeholder for future improvements)
      */
     handleTyping() {
-        // You can implement typing detection, suggestions, etc.
+        
     }
 
     /**
